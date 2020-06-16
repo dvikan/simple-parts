@@ -12,7 +12,7 @@ Features:
 
 ## Router
 
-The router accepts a regex and a callable handler.
+The router accepts a regex and a handler.
 
     <?php require 'vendor/autoload.php';
     
