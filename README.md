@@ -9,6 +9,7 @@ Features:
 * Response
 * HttpClient
 * Session
+* Logger
 
 ## Router
 
@@ -125,3 +126,13 @@ shared.
     session('user', 'root');
     
     print session('user');
+
+## Logger
+
+    <?php require 'vendor/autoload.php';
+
+    use StaticParts\Logger;
+
+    $logger = new Logger('./application.log');
+
+    $logger->log('Something happened');
