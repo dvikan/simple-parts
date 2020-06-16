@@ -10,6 +10,7 @@ Features:
 * HttpClient
 * Session
 * Logger
+* Database migrations
 
 ## Router
 
@@ -136,3 +137,31 @@ shared.
     $logger = new Logger('./application.log');
 
     $logger->log('Something happened');
+
+## Database migrations
+
+Prove a dsn, folder and a cache.
+
+    <?php require 'vendor/autoload.php';
+
+    use StaticParts\Migrator;
+
+    $migrator = new Migrator('sqlite:database.sqlite3', './migrations', './migrations-cache');
+
+    $migrator->run();
+
+Place your migrations as .sql files in the folder:
+
+    $ ls  migrations
+    001-init.sql
+
+Place sql inside the migration:
+
+    $ cat migrations/001-init.sql
+    create table user (
+        id integer primary key,
+        name text,
+        mobile text,
+        email text,
+        created_at text
+    );
