@@ -6,7 +6,7 @@ class Router
 {
     private $routes;
 
-    public function map($regex, $handler)
+    public function map(string$regex, array $handler)
     {
         $this->routes[$regex] = $handler;
     }

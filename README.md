@@ -1,6 +1,8 @@
-# StaticParts - simple components for building web apps
+# StaticParts
 
-Features:
+Intentionally very simple components for building applications.
+
+Components:
 
 * Router
 * Template engine
@@ -14,15 +16,14 @@ Features:
 
 ## Router
 
-The router accepts a regex and a handler.
+The router accepts a regex and a handler. The handler MUST be
+an array with a class and a method.
 
-    <?php require 'vendor/autoload.php';
+    <?php
     
     $router = new StaticParts\Router;
     
-    $router->map('/user/([0-9]+)', function ($args) {
-        return 'User id is: ' . $args[0];
-    });
+    $router->map('/user/([0-9]+)', [UserController::class, 'profile']);
     
     $routeInfo = $router->match('/user/42');
     
@@ -165,3 +166,7 @@ Place sql inside the migration:
         email text,
         created_at text
     );
+
+## Development
+
+Run tests: `composer run test`
