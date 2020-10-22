@@ -8,11 +8,18 @@ class Response
     private $code;
     private $headers;
 
-    public function __construct(string $body = null, int $code = 200, array $headers = [])
+    public function __construct(string $body = '', int $code = 200, array $headers = [])
     {
         $this->body = $body;
         $this->code = $code;
         $this->headers = $headers;
+    }
+
+    public function json(array $data): self
+    {
+        $this->body = json_encode($data, JSON_THROW_ON_ERROR);
+        $this->headers['Content-type'] = 'application/json';
+        return $this;
     }
 
     public function send()

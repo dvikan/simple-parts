@@ -11,6 +11,14 @@ function render(string $template, array $vars = []): string
 }
 
 /**
+ * Helper function for creating a Response
+ */
+function response(string $body = '', int $code = 200, array $headers = []): Response
+{
+    return new Response($body, $code, $headers);
+}
+
+/**
  * Escape variable for html context.
  */
 function e(string $s): string
