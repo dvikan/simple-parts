@@ -29,7 +29,7 @@ class Container implements ArrayAccess
     public function offsetGet($name)
     {
         if (! isset($this[$name])) {
-            throw new Exception;
+            throw new Exception(sprintf('Dependency "%s" not found', $name));
         }
 
         if (isset($this->resolved[$name])) {
