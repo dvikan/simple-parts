@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace StaticParts;
+namespace dvikan\SimpleParts;
 
 use Exception;
 use stdClass;

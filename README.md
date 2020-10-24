@@ -1,6 +1,6 @@
-# StaticParts
+# Simple Parts
 
-Intentionally very simple components for building applications.
+Intentionally simple components for building applications.
 
 Components:
 
@@ -21,7 +21,7 @@ an array with a class and a method.
 
     <?php
     
-    $router = new StaticParts\Router;
+    $router = new \dvikan\SimpleParts\Router;
     
     $router->map('/user/([0-9]+)', [UserController::class, 'profile']);
     
@@ -37,9 +37,9 @@ an array with a class and a method.
 The template engine interprets the template as php code and the `e()`
 function escapes for html context.
    
-    <?php require 'vendor/autoload.php';
+    <?php
     
-    use function StaticParts\render;
+    use function \dvikan\SimpleParts\render;
     
     print render('index.tpl', [
         'message' => 'Hello world <3',
@@ -47,7 +47,7 @@ function escapes for html context.
 
 The template:
 
-    <?php use function StaticParts\e; ?>
+    <?php use function \dvikan\SimpleParts\e; ?>
     
     <p>
         Message of the day: <?= e($message) ?>
@@ -58,11 +58,9 @@ The template:
 The container stores arrays and callables. Callables are invoked once and then 
 shared.
     
-    <?php require 'vendor/autoload.php';
+    <?php
     
-    use StaticParts\Container;
-    
-    $container = new Container;
+    $container = new \dvikan\SimpleParts\Container;
     
     $container['options'] = [
         'title' => 'weeee',
@@ -86,29 +84,23 @@ shared.
 
 ## Request
 
-    <?php require 'vendor/autoload.php';
-    
-    use StaticParts\Request;
-    
-    $request = Request::fromGlobals();
+    <?php
+        
+    $request = \dvikan\SimpleParts\Request::fromGlobals();
     
 ## Response
 
-    <?php require 'vendor/autoload.php';
-    
-    use StaticParts\Response;
-    
-    $response = new Response('Hello world');
+    <?php
+        
+    $response = new \dvikan\SimpleParts\Response('Hello world');
     
     $response->send();
 
 ## HttpClient
 
-    <?php require 'vendor/autoload.php';
-    
-    use StaticParts\HttpClient;
-    
-    $client = new HttpClient;
+    <?php
+        
+    $client = new \dvikan\SimpleParts\HttpClient;
     
     $response = $client->get('https://example.com/');
     $response2 = $client->post('https://example.com/', ['name' => 'val']);
@@ -119,9 +111,9 @@ shared.
     
 ## Session
 
-    <?php require 'vendor/autoload.php';
+    <?php
     
-    use function StaticParts\session;
+    use function \dvikan\SimpleParts\session;
     
     session_start();
     
@@ -131,23 +123,23 @@ shared.
 
 ## Logger
 
-    <?php require 'vendor/autoload.php';
-
-    use StaticParts\Logger;
-
-    $logger = new Logger('./application.log');
+    <?php
+    
+    $logger = new \dvikan\SimpleParts\Logger('./application.log');
 
     $logger->log('Something happened');
 
 ## Database migrations
 
-Prove a dsn, folder and a cache.
+Provide a dsn, folder and a cache.
 
-    <?php require 'vendor/autoload.php';
+    <?php
 
-    use StaticParts\Migrator;
-
-    $migrator = new Migrator('sqlite:database.sqlite3', './migrations', './migrations-cache');
+    $migrator = new \dvikan\SimpleParts\Migrator(
+        'sqlite:database.sqlite3',
+        './migrations',
+        './migrations-cache'
+    );
 
     $migrator->run();
 

@@ -1,10 +1,10 @@
 {
-    "name": "dvikan/static-parts",
-    "description": "Simple components for building web apps.",
+    "name": "dvikan/simple-parts",
+    "description": "Simple components for building applications",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "StaticParts\\": "src/"
+            "dvikan\\SimpleParts\\": "src/"
         },
         "files": [
             "src/utils.php"

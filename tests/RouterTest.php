@@ -1,7 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use StaticParts\Router;
+use dvikan\SimpleParts\Router;
 
 class RouterTest extends TestCase
 {

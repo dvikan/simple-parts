@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace StaticParts;
+namespace dvikan\SimpleParts;
 
 function render(string $template, array $vars = []): string
 {
