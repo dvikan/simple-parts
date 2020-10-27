@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
@@ -10,46 +12,33 @@ class Request
 
     public static function fromGlobals(): Request
     {
-        return new Request($_GET, $_POST, $_SERVER);
+        $request = new Request;
+        $request->get = $_GET;
+        $request->post = $_POST;
+        $request->server = $_SERVER;
+        return $request;
     }
 
-    private function __construct(array $get, array $post, array $server)
-    {
-        $this->get = $get;
-        $this->post = $post;
-        $this->server = $server;
+    public static function fromArrays(
+        array $get = null,
+        array $post = null,
+        array $server = null
+    ): Request {
+        $request = new Request;
+        $request->get = $get;
+        $request->post = $post;
+        $request->server = $server;
+        return $request;
     }
 
-    /**
-     * Get string POST var. Otherwise null.
-     */
-    public function post(string $name): string
+    public function get(string $name)
     {
-        if (! isset($this->post[$name])) {
-            return '';
-        }
-
-        if (! is_string($this->post[$name])) {
-            return '';
-        }
-
-        return $this->post[$name];
+        return $this->get[$name] ?? null;
     }
 
-    /**
-     * Get array POST var
-     */
-    public function postArray(string $name): array
+    public function post(string $name)
     {
-        if (! isset($this->post[$name])) {
-            return [];
-        }
-
-        if (! is_array($this->post[$name])) {
-            return [];
-        }
-
-        return $this->post[$name];
+        return $this->post[$name] ?? null;
     }
 
     public function isGet(): bool

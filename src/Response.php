@@ -8,11 +8,29 @@ class Response
     private $code;
     private $headers;
 
-    public function __construct(string $body = '', int $code = 200, array $headers = [])
-    {
+    public function __construct(
+        string $body = '',
+        int $code = 200,
+        array $headers = []
+    ) {
         $this->body = $body;
         $this->code = $code;
         $this->headers = $headers;
+    }
+
+    public function body(): string
+    {
+        return $this->body;
+    }
+
+    public function code(): int
+    {
+        return $this->code;
+    }
+
+    public function headers(): array
+    {
+        return $this->headers;
     }
 
     public function json(array $data): self

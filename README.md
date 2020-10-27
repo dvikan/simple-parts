@@ -13,6 +13,12 @@ Components:
 * Session
 * Logger
 * Database migrations
+* ErrorHandler (todo)
+* Console (todo)
+* git wrapper (todo)
+* irc client (todo)
+* socket wrapper (todo)
+* web framework (todo)
 
 ## Router
 
@@ -87,27 +93,31 @@ shared.
     <?php
         
     $request = \dvikan\SimpleParts\Request::fromGlobals();
-    
+
+    $request->get('id') // '5'
+    $request->post('message') // 'hello world'
+   
 ## Response
 
     <?php
-        
+
     $response = new \dvikan\SimpleParts\Response('Hello world');
     
+    $response->body() // 'Hello world'
+    $response->code() // 200
+    $response->headers() // array
+    $response->json(['message' => 'hello'])
+
     $response->send();
 
 ## HttpClient
 
     <?php
-        
+
     $client = new \dvikan\SimpleParts\HttpClient;
-    
+
     $response = $client->get('https://example.com/');
     $response2 = $client->post('https://example.com/', ['name' => 'val']);
-    
-    print $response->code;
-    print_r($response->headers);
-    print $response->body;
     
 ## Session
 
