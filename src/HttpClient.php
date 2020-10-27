@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace dvikan\SimpleParts;
 
 use Exception;
-use stdClass;
 
 class HttpClient
 {
@@ -20,7 +19,7 @@ class HttpClient
         $this->options = array_merge($defaults, $options);
     }
 
-    public function get(string $url): stdClass
+    public function get(string $url): Response
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -28,7 +27,7 @@ class HttpClient
         return $this->createResponse($ch);
     }
 
-    public function post(string $url, array $vars = []): stdClass
+    public function post(string $url, array $vars = []): Response
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -37,7 +36,7 @@ class HttpClient
         return $this->createResponse($ch);
     }
 
-    private function createResponse($ch): stdClass
+    private function createResponse($ch): Response
     {
         curl_setopt($ch, CURLOPT_USERAGENT, 'curl');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -69,10 +68,7 @@ class HttpClient
             throw new Exception('curl error: ' . curl_error($ch));
         }
 
-        $response = new stdClass;
-        $response->code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $response->headers = $headers;
-        $response->body = $body;
+        $response = new Response($body, curl_getinfo($ch, CURLINFO_HTTP_CODE), $headers);
 
         curl_close($ch);
 

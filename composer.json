@@ -17,6 +17,7 @@
         "test": "phpunit"
     },
     "require": {
-      "ext-json": "*"
+      "ext-json": "*",
+        "ext-curl": "*"
     }
 }
