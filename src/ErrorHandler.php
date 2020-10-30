@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
@@ -8,16 +6,22 @@ use Throwable;
 
 final class ErrorHandler
 {
-    const DEFAULT_OPTIONS = [
+    const OPTIONS = [
         'print_errors' => true,
         'exit_on_error' => true,
     ];
 
     private $options;
 
-    public function __construct(array $options = [])
+    private function __construct() {}
+
+    public static function fromOptions(array $options = []): void
     {
-        $this->options = array_merge(self::DEFAULT_OPTIONS, $options);
+        $errorHandler = new self();
+        $errorHandler->options = array_merge(self::OPTIONS, $options);
+
+        set_error_handler([$errorHandler, 'handleError']);
+        set_exception_handler([$errorHandler, 'handleException']);
     }
 
     public function handleError($errno, $errstr, $errfile, $errline)
