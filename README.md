@@ -15,6 +15,7 @@ Components:
 * Database migrations
 * Rss
 * ErrorHandler
+* JsonFile
 * Console (todo)
 * git wrapper (todo)
 * irc client (todo)
@@ -181,6 +182,16 @@ Fetch channel feed from url:
     set_error_handler([$errorHandler, 'handleError']);
     set_exception_handler([$errorHandler, 'handleException']);
 
+## JsonFile
+
+Read and write arrays. They are persisted as json.
+
+    $jsonFile = JsonFile::fromFile('./cache.json');
+    
+    $jsonFile->write([1,2,3]);
+    
+    $numbers = $jsonFile->read();
+    
 ## Development
 
 Run tests: `composer run test`
