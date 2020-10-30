@@ -28,7 +28,7 @@ final class Rss
             'items'         => [],
         ];
 
-        foreach($xml->channel->item as $item) {
+        foreach ($xml->channel->item as $item) {
             $guid = (string) $item->guid;
             $date = new DateTimeImmutable((string)$item->pubDate);
 

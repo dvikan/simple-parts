@@ -14,7 +14,7 @@ Components:
 * Logger
 * Database migrations
 * Rss
-* ErrorHandler (todo)
+* ErrorHandler
 * Console (todo)
 * git wrapper (todo)
 * irc client (todo)
@@ -173,6 +173,13 @@ Place sql inside the migration:
 Fetch channel feed from url:
 
     $channel = Rss::fromUrl('https://classic.wowhead.com/news/rss/classic');
+
+## ErrorHandler
+
+    $errorHandler = new ErrorHandler;
+    
+    set_error_handler([$errorHandler, 'handleError']);
+    set_exception_handler([$errorHandler, 'handleException']);
 
 ## Development
 

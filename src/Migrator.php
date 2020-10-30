@@ -32,7 +32,7 @@ class Migrator
 
         $doneMigrations = array_map('trim', file($this->cache));
 
-        foreach(glob($this->folder . '/*.sql') as $migration) {
+        foreach (glob($this->folder . '/*.sql') as $migration) {
             if (in_array($migration, $doneMigrations)) {
                 continue;
             }
