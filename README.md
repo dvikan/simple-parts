@@ -13,12 +13,15 @@ Components:
 * Session
 * Logger
 * Database migrations
+* Rss
 * ErrorHandler (todo)
 * Console (todo)
 * git wrapper (todo)
 * irc client (todo)
 * socket wrapper (todo)
 * web framework (todo)
+
+All classes reside under the `dvikan\SimpleParts` namespace.
 
 ## Router
 
@@ -27,7 +30,7 @@ an array with a class and a method.
 
     <?php
     
-    $router = new \dvikan\SimpleParts\Router;
+    $router = new Router;
     
     $router->map('/user/([0-9]+)', [UserController::class, 'profile']);
     
@@ -43,10 +46,6 @@ an array with a class and a method.
 The template engine interprets the template as php code and the `e()`
 function escapes for html context.
    
-    <?php
-    
-    use function \dvikan\SimpleParts\render;
-    
     print render('index.tpl', [
         'message' => 'Hello world <3',
     ]);
@@ -66,7 +65,7 @@ shared.
     
     <?php
     
-    $container = new \dvikan\SimpleParts\Container;
+    $container = new Container;
     
     $container['options'] = [
         'title' => 'weeee',
@@ -92,7 +91,7 @@ shared.
 
     <?php
         
-    $request = \dvikan\SimpleParts\Request::fromGlobals();
+    $request = Request::fromGlobals();
 
     $request->get('id') // '5'
     $request->post('message') // 'hello world'
@@ -101,7 +100,7 @@ shared.
 
     <?php
 
-    $response = new \dvikan\SimpleParts\Response('Hello world');
+    $response = new Response('Hello world');
     
     $response->body() // 'Hello world'
     $response->code() // 200
@@ -114,7 +113,7 @@ shared.
 
     <?php
 
-    $client = new \dvikan\SimpleParts\HttpClient;
+    $client = new HttpClient;
 
     $response = $client->get('https://example.com/');
     $response2 = $client->post('https://example.com/', ['name' => 'val']);
@@ -123,7 +122,7 @@ shared.
 
     <?php
     
-    use function \dvikan\SimpleParts\session;
+    use function session;
     
     session_start();
     
@@ -135,7 +134,7 @@ shared.
 
     <?php
     
-    $logger = new \dvikan\SimpleParts\Logger('./application.log');
+    $logger = new Logger('./application.log');
 
     $logger->log('Something happened');
 
@@ -145,7 +144,7 @@ Provide a dsn, folder and a cache.
 
     <?php
 
-    $migrator = new \dvikan\SimpleParts\Migrator(
+    $migrator = Migrator(
         'sqlite:database.sqlite3',
         './migrations',
         './migrations-cache'
@@ -168,6 +167,12 @@ Place sql inside the migration:
         email text,
         created_at text
     );
+
+## RSS
+
+Fetch channel feed from url:
+
+    $channel = Rss::fromUrl('https://classic.wowhead.com/news/rss/classic');
 
 ## Development
 
