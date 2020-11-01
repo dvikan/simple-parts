@@ -15,7 +15,7 @@ final class ErrorHandler
 
     private function __construct() {}
 
-    public static function fromOptions(array $options = []): void
+    public static function initialize(array $options = []): void
     {
         $errorHandler = new self();
         $errorHandler->options = array_merge(self::OPTIONS, $options);
