@@ -21,6 +21,10 @@ Components:
 * irc client (todo)
 * socket wrapper (todo)
 * web framework (todo)
+* Url (todo)
+* Csv (todo)
+* Collection (todo)
+* ImapClient (todo)
 
 All classes reside under the `dvikan\SimpleParts` namespace.
 

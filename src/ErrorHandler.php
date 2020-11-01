@@ -22,6 +22,7 @@ final class ErrorHandler
 
         set_error_handler([$errorHandler, 'handleError']);
         set_exception_handler([$errorHandler, 'handleException']);
+        register_shutdown_function([$errorHandler, 'handleShutdown']);
     }
 
     public function handleError($errno, $errstr, $errfile, $errline)
@@ -49,5 +50,14 @@ final class ErrorHandler
         }
 
         exit(1); // Explicit exit for the status code
+    }
+
+    public function handleShutdown()
+    {
+        $err = error_get_last();
+        if ($err) {
+            var_dump($err);
+        }
+        exit(1);
     }
 }

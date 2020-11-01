@@ -23,7 +23,7 @@ final class HttpClient
 
     public function get(string $url): Response
     {
-        if ($this->ch === null) {
+        if (!isset($this->ch)) {
             $this->ch = $this->createCurlHandle();
         }
 
@@ -47,6 +47,10 @@ final class HttpClient
     private function createCurlHandle()
     {
         $ch = curl_init();
+
+        if ($ch === false) {
+            throw new SimpleException('Unable to create curl handle');
+        }
 
         curl_setopt($ch, CURLOPT_USERAGENT, 'curl');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -96,6 +100,8 @@ final class HttpClient
 
     public function __destruct()
     {
-        curl_close($this->ch);
+        if (isset($this->ch)) {
+            curl_close($this->ch);
+        }
     }
 }
