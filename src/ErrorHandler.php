@@ -58,6 +58,5 @@ final class ErrorHandler
         if ($err) {
             var_dump($err);
         }
-        exit(1);
     }
 }
