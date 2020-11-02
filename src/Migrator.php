@@ -8,9 +8,9 @@ class Migrator
 {
     private $folder;
     private $cache;
-    private $dsn;
+    private $pdo;
 
-    public function __construct(string $dsn, string $folder, string $cache)
+    public function __construct(PDO $pdo, string $folder, string $cache)
     {
         if (! is_dir($folder)) {
             mkdir($folder);
@@ -22,14 +22,11 @@ class Migrator
 
         $this->folder = $folder;
         $this->cache = $cache;
-        $this->dsn = $dsn;
+        $this->pdo = $pdo;
     }
 
     public function run()
     {
-        $pdo = new PDO($this->dsn);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
         $doneMigrations = array_map('trim', file($this->cache));
 
         foreach (glob($this->folder . '/*.sql') as $migration) {
@@ -39,7 +36,7 @@ class Migrator
 
             print "Running `$migration`\n";
 
-            $pdo->exec(file_get_contents($migration));
+            $this->pdo->exec(file_get_contents($migration));
 
             $fp = fopen($this->cache, 'a');
             fwrite($fp, "$migration\n");

@@ -12,8 +12,8 @@ Components:
 * HttpClient
 * Session
 * Logger
-* Database migrations
-* Rss
+* Migrator (Database migrations)
+* RssClient
 * ErrorHandler
 * JsonFile
 * Console (todo)
@@ -25,6 +25,7 @@ Components:
 * Csv (todo)
 * Collection (todo)
 * ImapClient (todo)
+* DataMapper (ORM, todo)
 
 All classes reside under the `dvikan\SimpleParts` namespace.
 
@@ -143,14 +144,16 @@ shared.
 
     $logger->log('Something happened');
 
-## Database migrations
+## Migrator (Database migrations)
 
 Provide a dsn, folder and a cache.
 
     <?php
 
+    $pdo = new PDO('sqlite:database.sqlite3');
+
     $migrator = Migrator(
-        'sqlite:database.sqlite3',
+        $pdo,
         './migrations',
         './migrations-cache'
     );
@@ -173,7 +176,7 @@ Place sql inside the migration:
         created_at text
     );
 
-## RSS
+## RssClient
 
 Fetch channel feed from url:
 
