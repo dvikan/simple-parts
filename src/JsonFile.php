@@ -32,7 +32,12 @@ final class JsonFile
 
     public function write(array $data): void
     {
-        $json = json_encode($data, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+        $json = json_encode(
+            $data,
+            JSON_THROW_ON_ERROR
+            | JSON_PRETTY_PRINT
+            | JSON_UNESCAPED_SLASHES
+        );
 
         if ($json === false) {
             throw new SimpleException();
