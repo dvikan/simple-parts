@@ -6,7 +6,8 @@ final class HttpClient
 {
     const OPTIONS = [
         'auth_basic' => [],
-        'auth_bearer' => '',
+        'auth_bearer' => null,
+        'client_id' => null,
     ];
 
     private $options;
@@ -65,8 +66,12 @@ final class HttpClient
 
         $headers = [];
 
-        if ($this->options['auth_bearer']) {
-            $headers[] = "Authorization: token " . $this->options['auth_bearer'];
+        if (isset($this->options['auth_bearer'])) {
+            $headers[] = sprintf("Authorization: Bearer %s", $this->options['auth_bearer']);
+        }
+
+        if (isset($this->options['client_id'])) {
+            $headers[] = sprintf("client-id: %s", $this->options['client_id']);
         }
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
