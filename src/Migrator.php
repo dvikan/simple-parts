@@ -6,41 +6,62 @@ use PDO;
 
 class Migrator
 {
-    private $folder;
-    private $cache;
+    private $migrations;
+    private $cacheFolder;
     private $pdo;
 
-    public function __construct(PDO $pdo, string $folder, string $cache)
-    {
-        if (! is_dir($folder)) {
-            mkdir($folder);
-        }
-
-        if (! file_exists($cache)) {
-            touch($cache);
-        }
-
-        $this->folder = $folder;
-        $this->cache = $cache;
+    public function __construct(
+        PDO $pdo,
+        string $migrations = './migrations',
+        string $cacheFolder = './var/cache'
+    ) {
+        $this->migrations = $migrations;
+        $this->cacheFolder = $cacheFolder;
         $this->pdo = $pdo;
     }
 
-    public function run()
+    public function migrate(): void
     {
-        $doneMigrations = array_map('trim', file($this->cache));
+        $this->guardAgainstNonExistingFolders();
 
-        foreach (glob($this->folder . '/*.sql') as $migration) {
-            if (in_array($migration, $doneMigrations)) {
+        $cache = JsonFile::fromFile(sprintf("%s/migrator.json", $this->cacheFolder));
+
+        $migrations = $cache->read();
+
+        $messages = [];
+
+        foreach (glob($this->migrations . '/*.sql') as $migration) {
+            if (in_array($migration, $migrations)) {
                 continue;
             }
 
-            print "Running `$migration`\n";
+            $result = $this->pdo->exec(file_get_contents($migration));
 
-            $this->pdo->exec(file_get_contents($migration));
+            if ($result === false) {
+                exit(sprintf("pdo error: %s\n", $this->pdo->errorInfo()[2]));
+            }
 
-            $fp = fopen($this->cache, 'a');
-            fwrite($fp, "$migration\n");
-            fclose($fp);
+            $messages[] = "Running $migration";
+            $migrations[] = $migration;
+            $cache->write($migrations);
+        }
+
+
+        if ($messages === []) {
+            exit(0);
+        }
+
+        print implode(PHP_EOL, $messages) . PHP_EOL;
+    }
+
+    private function guardAgainstNonExistingFolders(): void
+    {
+        if (!is_dir($this->migrations)) {
+            exit(sprintf("Migrations folder not found: %s\n", $this->migrations));
+        }
+
+        if (!is_dir($this->cacheFolder)) {
+            exit(sprintf("Cache folder not found: %s\n", $this->cacheFolder));
         }
     }
 }

@@ -12,7 +12,7 @@ Components:
 * HttpClient
 * Session
 * Logger
-* Migrator (Database migrations)
+* Migrator (database migrations)
 * RssClient
 * ErrorHandler
 * JsonFile
@@ -28,6 +28,7 @@ Components:
 * ImapClient (todo)
 * DataMapper (ORM, todo)
 * Dotenv (todo)
+* EventDispatcher (todo)
 
 All classes reside under the `dvikan\SimpleParts` namespace.
 
@@ -150,33 +151,21 @@ $logger = new Logger('./application.log');
 $logger->log('Something happened');
 ```
 
-## Migrator (Database migrations)
+## Migrator (database migrations)
 
-Provide a PDO, folder and a cache.
+The migrator assumes that your migrations are stored as `.sql` files in `./migrations`
+and that your cache folder is at `./var/cache`.
 
 ```php
-    $pdo = new PDO('sqlite:database.sqlite3');
+$migrator = new Migrator(new PDO('sqlite:db.sqlite'));
 
-    $migrator = Migrator(
-        $pdo,
-        './migrations',
-        './migrations-cache'
-    );
-
-    $migrator->run();
+$migrator->migrate();
 ```
 
-Place your migrations as .sql files in the folder:
+Example:
 
-```bash
-ls  migrations
-001-init.sql
-```
-
-Place sql inside the migration:
-
-```bash
-cat migrations/001-init.sql
+```console
+$ cat migrations/001-init.sql
 create table user (
     id integer primary key,
     name text,
@@ -184,6 +173,8 @@ create table user (
     email text,
     created_at text
 );
+
+$ ./bin/migrate.php
 ```
 
 ## RssClient
@@ -191,7 +182,7 @@ create table user (
 Fetch channel feed from url:
 
 ```php
-    $channel = Rss::fromUrl('https://classic.wowhead.com/news/rss/classic');
+$channel = Rss::fromUrl('https://classic.wowhead.com/news/rss/classic');
 ```
 
 ## ErrorHandler
@@ -214,7 +205,7 @@ $jsonFile->write([1,2,3]);
 
 $numbers = $jsonFile->read();
 ```
-    
+
 ## Development
 
 Run tests: `composer run test`
