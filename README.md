@@ -16,7 +16,7 @@ Components:
 * RssClient
 * ErrorHandler
 * JsonFile
-* Json (todo)
+* Json
 * Console (todo)
 * git wrapper (todo)
 * irc client (todo)
@@ -204,6 +204,15 @@ $jsonFile = JsonFile::fromFile('./cache.json');
 $jsonFile->write([1,2,3]);
 
 $numbers = $jsonFile->read();
+```
+
+## Json
+
+The `Json` class encodes and decodes json and will always throw exception on failure.
+
+```php
+print Json::encode(['hello']);
+print Json::decode('{"foo":"bar"}');
 ```
 
 ## Development
