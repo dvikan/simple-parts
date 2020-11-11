@@ -154,7 +154,7 @@ $logger->log('Something happened');
 ## Migrator (database migrations)
 
 The migrator assumes that your migrations are stored as `.sql` files in `./migrations`
-and that your cache folder is at `./var/cache`.
+and that your persistent folder is at `./var`.
 
 ```php
 $migrator = new Migrator(new PDO('sqlite:db.sqlite'));

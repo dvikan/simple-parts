@@ -13,7 +13,7 @@ class Migrator
     public function __construct(
         PDO $pdo,
         string $migrations = './migrations',
-        string $cacheFolder = './var/cache'
+        string $cacheFolder = './var'
     ) {
         $this->migrations = $migrations;
         $this->cacheFolder = $cacheFolder;
