@@ -9,9 +9,12 @@ final class ErrorHandler
     const OPTIONS = [
         'print_errors' => true,
         'exit_on_error' => true,
+        'error_log' => '/dev/null',
     ];
 
     private $options;
+    /** @var Logger */
+    private $logger;
 
     private function __construct() {}
 
@@ -19,6 +22,8 @@ final class ErrorHandler
     {
         $errorHandler = new self();
         $errorHandler->options = array_merge(self::OPTIONS, $options);
+
+        $errorHandler->logger = new Logger($errorHandler->options['error_log']);
 
         set_error_handler([$errorHandler, 'handleError']);
         set_exception_handler([$errorHandler, 'handleException']);
@@ -32,10 +37,15 @@ final class ErrorHandler
             E_WARNING => 'Warning',
             E_NOTICE => 'Notice',
             E_DEPRECATED => 'Deprecated',
+            E_RECOVERABLE_ERROR => 'Recoverable error',
         ];
 
+        $message = sprintf("%s: %s in %s:%s", $errors[$errno] ?? $errno, $errstr, $errfile, $errline);
+
+        $this->logger->log($message);
+
         if ($this->options['print_errors']) {
-            printf("%s: %s in %s:%s\n", $errors[$errno] ?? $errno, $errstr, $errfile, $errline);
+            print $message . PHP_EOL;
         }
 
         if ($this->options['exit_on_error']) {
@@ -45,8 +55,12 @@ final class ErrorHandler
 
     public function handleException(Throwable $e)
     {
+        $message = sprintf('Uncaught %s: "%s" in %s:%s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine());
+
+        $this->logger->log($message);
+
         if ($this->options['print_errors']) {
-            printf("Uncaught %s: %s in %s:%s\n", get_class($e), $e->getMessage(), $e->getFile(), $e->getLine());
+            print $message . PHP_EOL;
         }
 
         exit(1); // Explicit exit for the status code
@@ -56,6 +70,7 @@ final class ErrorHandler
     {
         $err = error_get_last();
         if ($err) {
+            $this->logger->log(implode(', ', $err));
             var_dump($err);
         }
     }
