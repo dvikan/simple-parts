@@ -23,6 +23,11 @@ class Response
         return $this->body;
     }
 
+    public function json(): array
+    {
+        return Json::decode($this->body);
+    }
+
     public function code(): int
     {
         return $this->code;
@@ -33,9 +38,14 @@ class Response
         return $this->headers;
     }
 
-    public function json(array $data): self
+    public function isOk(): bool
     {
-        $this->body = json_encode($data, JSON_THROW_ON_ERROR);
+        return $this->code >= 200 && $this->code <= 226;
+    }
+
+    public function withJson(array $data): self
+    {
+        $this->body = Json::encode($data);
         $this->headers['Content-type'] = 'application/json';
         return $this;
     }

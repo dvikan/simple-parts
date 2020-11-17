@@ -7,23 +7,20 @@ use Throwable;
 final class ErrorHandler
 {
     const OPTIONS = [
-        'print_errors' => true,
         'exit_on_error' => true,
-        'error_log' => '/dev/null',
     ];
 
     private $options;
-    /** @var Logger */
     private $logger;
 
     private function __construct() {}
 
-    public static function initialize(array $options = []): void
+    public static function initialize($logger = null, array $options = []): void
     {
         $errorHandler = new self();
-        $errorHandler->options = array_merge(self::OPTIONS, $options);
 
-        $errorHandler->logger = new Logger($errorHandler->options['error_log']);
+        $errorHandler->logger = $logger ?: new NullLogger();
+        $errorHandler->options = array_merge(self::OPTIONS, $options);
 
         set_error_handler([$errorHandler, 'handleError']);
         set_exception_handler([$errorHandler, 'handleException']);
@@ -40,13 +37,9 @@ final class ErrorHandler
             E_RECOVERABLE_ERROR => 'Recoverable error',
         ];
 
-        $message = sprintf("%s: %s in %s:%s", $errors[$errno] ?? $errno, $errstr, $errfile, $errline);
+        $message = sprintf('%s: %s in %s:%s', $errors[$errno] ?? $errno, $errstr, $errfile, $errline);
 
-        $this->logger->log($message);
-
-        if ($this->options['print_errors']) {
-            print $message . PHP_EOL;
-        }
+        $this->logger->log(Logger::ERROR, $message);
 
         if ($this->options['exit_on_error']) {
             exit(1);
@@ -57,11 +50,7 @@ final class ErrorHandler
     {
         $message = sprintf('Uncaught %s: "%s" in %s:%s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine());
 
-        $this->logger->log($message);
-
-        if ($this->options['print_errors']) {
-            print $message . PHP_EOL;
-        }
+        $this->logger->log(Logger::ERROR, $message);
 
         exit(1); // Explicit exit for the status code
     }
@@ -69,9 +58,10 @@ final class ErrorHandler
     public function handleShutdown()
     {
         $err = error_get_last();
+
         if ($err) {
-            $this->logger->log(implode(', ', $err));
-            var_dump($err);
+            $message = implode(', ', $err);
+            $this->logger->log(Logger::ERROR, $message);
         }
     }
 }

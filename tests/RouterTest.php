@@ -1,7 +1,8 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
+
+namespace dvikan\SimpleParts;
+
 use PHPUnit\Framework\TestCase;
-use dvikan\SimpleParts\Router;
 
 class RouterTest extends TestCase
 {

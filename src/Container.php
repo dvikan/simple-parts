@@ -3,23 +3,20 @@
 namespace dvikan\SimpleParts;
 
 use ArrayAccess;
-use Exception;
+use Closure;
 
 class Container implements ArrayAccess
 {
     private $container = [];
     private $resolved = [];
 
-    /**
-     * Value must be array or callable.
-     */
     public function offsetSet($name, $value)
     {
         if (isset($this[$name])) {
-            throw new Exception;
+            throw new SimpleException(sprintf('Container: already has a value stored in "%s"', $name));
         }
 
-        if (is_array($value)) {
+        if (! $value instanceof Closure) {
             $this->resolved[$name] = $value;
         }
 
@@ -29,20 +26,14 @@ class Container implements ArrayAccess
     public function offsetGet($name)
     {
         if (! isset($this[$name])) {
-            throw new Exception(sprintf('Dependency "%s" not found', $name));
+            throw new SimpleException(sprintf('Container: dependency "%s" not found', $name));
         }
 
         if (isset($this->resolved[$name])) {
             return $this->resolved[$name];
         }
 
-        $resolved = $this->container[$name]($this);
-
-        if (! $resolved) {
-            throw new Exception;
-        }
-
-        return $this->resolved[$name] = $resolved;
+        return $this->resolved[$name] = $this->container[$name]($this);
     }
 
     public function offsetExists($name)

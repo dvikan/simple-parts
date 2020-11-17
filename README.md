@@ -12,11 +12,12 @@ Components:
 * HttpClient
 * Session
 * Logger
-* Migrator (database migrations)
-* RssClient
+* Migrator
+* Rss
 * ErrorHandler
-* JsonFile
 * Json
+* JsonFile
+* FileCache
 * Console (todo)
 * git wrapper (todo)
 * irc client (todo)
@@ -38,7 +39,7 @@ The router accepts a regex and a handler. The handler MUST be
 an array with a class and a method.
 
 ```php
-$router = new Router;
+$router = new Router();
 
 $router->map('/user/([0-9]+)', [UserController::class, 'profile']);
 
@@ -73,31 +74,20 @@ The template:
     
 ## Container
 
-The container stores arrays and callables. Callables are invoked once and then 
-shared.
-    
-```php
-$container = new Container;
+The container stores reusable dependencies.
 
-$container['options'] = [
-    'title' => 'weeee',
+```php
+$container = new Container();
+
+$container['http_client_options'] = [
+    'connect_timeout' => 3,
 ];
 
-$container['random_number'] = function () {
-    return rand(1, 1000);
+$container['httpClient'] = function($c) {
+    return new HttpClient($c['http_client_options']);
 };
 
-print $container['random_number'] . PHP_EOL;
-print $container['random_number'] . PHP_EOL;
-
-print_r($container['options']);
-
-691
-691
-Array
-(
-    [title] => weeee
-)
+$httpClient = $container['httpClient'];
 ```
 
 ## Request
@@ -105,19 +95,16 @@ Array
 ```php
 $request = Request::fromGlobals();
 
-$request->get('id') // '5'
-$request->post('message') // 'hello world'
+print $request->get('id');
+print $request->post('message');
+print $request->body();
+print $request->json();
 ```
    
 ## Response
 
 ```php
-$response = new Response('Hello world');
-
-$response->body() // 'Hello world'
-$response->code() // 200
-$response->headers() // array
-$response->json(['message' => 'hello'])
+$response = new Response('Hello world', 200, ['Content-type' => 'text/plain']);
 
 $response->send();
 ```
@@ -125,10 +112,10 @@ $response->send();
 ## HttpClient
 
 ```php
-$client = new HttpClient;
+$client = new HttpClient();
 
 $response = $client->get('https://example.com/');
-$response2 = $client->post('https://example.com/', ['name' => 'val']);
+$response = $client->post('https://example.com/', ['foo' => 'bar']);
 ```
     
 ## Session
@@ -145,10 +132,18 @@ print session('user');
 
 ## Logger
 
-```php
-$logger = new Logger('./application.log');
+The logger has three severity levels and accepts an array of handlers in its constructor.
 
-$logger->log('Something happened');
+```php
+$logger = new Logger([
+    new PrintHandler(),
+    new FileHandler('./error.log'),
+    new LibNotifyHandler()
+]);
+
+$logger->info('hello');
+$logger->warning('hello');
+$logger->error('hello');
 ```
 
 ## Migrator (database migrations)
@@ -177,33 +172,24 @@ create table user (
 $ ./bin/migrate.php
 ```
 
-## RssClient
+## Rss
 
-Fetch channel feed from url:
+The rss client parses rss 2.0 or atom feeds.
 
 ```php
-$channel = Rss::fromUrl('https://classic.wowhead.com/news/rss/classic');
+$feed = Rss::fromUrl('https://classic.wowhead.com/news/rss/classic');
+$feed = Rss::fromFile('./feed.xml');
 ```
 
 ## ErrorHandler
 
-```php
-$errorHandler = new ErrorHandler;
-
-set_error_handler([$errorHandler, 'handleError']);
-set_exception_handler([$errorHandler, 'handleException']);
-```
-
-## JsonFile
-
-Read and write arrays. They are persisted as json.
+The error handler registers itself for errors, exceptions and the shutdown function.
+All php errors and exceptions are passed off to the logger with severity `error`.
 
 ```php
-$jsonFile = JsonFile::fromFile('./cache.json');
+$logger = new Logger([new PrintHandler()]);
 
-$jsonFile->write([1,2,3]);
-
-$numbers = $jsonFile->read();
+ErrorHandler::initialize($logger);
 ```
 
 ## Json
@@ -215,6 +201,24 @@ print Json::encode(['hello']);
 print Json::decode('{"foo":"bar"}');
 ```
 
-## Development
+## JsonFile
 
-Run tests: `composer run test`
+Read/write to a json file.
+
+```php
+$storage = new JsonFile('./numbers.json');
+
+$storage->putContents([1,2,3]);
+
+print_r($storage->getContents());
+```
+
+## FileCache
+
+```php
+$cache = new FileCache('/cache.json');
+
+$cache->set('foo', 'bar');
+
+print $cache->get('foo');
+```

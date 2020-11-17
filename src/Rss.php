@@ -12,7 +12,7 @@ final class Rss
 
     public static function fromUrl(string $url): array
     {
-        $httpClient = HttpClient::fromOptions();
+        $httpClient = new HttpClient();
 
         $response = $httpClient->get($url);
 

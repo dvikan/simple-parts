@@ -5,7 +5,6 @@ namespace dvikan\SimpleParts;
 final class HttpClient
 {
     const OPTIONS = [
-        'auth_basic' => [],
         'auth_bearer' => null,
         'client_id' => null,
     ];
@@ -13,13 +12,10 @@ final class HttpClient
     private $options;
     private $ch;
 
-    private function __construct() {}
-
-    public static function fromOptions(array $options = []): self
+    public function __construct(array $options = [])
     {
-        $httpClient = new self;
-        $httpClient->options = array_merge(self::OPTIONS, $options);
-        return $httpClient;
+        $this->options = array_merge(self::OPTIONS, $options);
+        $this->ch = null;
     }
 
     public function get(string $url): Response
@@ -59,11 +55,6 @@ final class HttpClient
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         curl_setopt($ch, CURLOPT_HEADER, false);
 
-        if ($this->options['auth_basic']) {
-            $userpwd = sprintf('%s:%s', $this->options['auth_basic'][0], $this->options['auth_basic'][1]);
-            curl_setopt($ch, CURLOPT_USERPWD, $userpwd);
-        }
-
         $headers = [];
 
         if (isset($this->options['auth_bearer'])) {
@@ -97,10 +88,16 @@ final class HttpClient
         $body = curl_exec($this->ch);
 
         if ($body === false) {
-            throw new SimpleException(curl_error($this->ch));
+            throw new SimpleException(sprintf('Curl error: %s', curl_error($this->ch)));
         }
 
-        return new Response($body, curl_getinfo($this->ch, CURLINFO_HTTP_CODE), $headers);
+        $response = new Response($body, curl_getinfo($this->ch, CURLINFO_HTTP_CODE), $headers);
+
+        if ($response->isOk()) {
+            return $response;
+        }
+
+        throw new SimpleException('The response was not ok');
     }
 
     public function __destruct()

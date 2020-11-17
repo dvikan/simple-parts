@@ -4,7 +4,14 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "dvikan\\SimpleParts\\": "src/"
+            "dvikan\\SimpleParts\\": [
+              "tests/",
+              "src/",
+              "src/logger/",
+              "src/json/",
+              "src/http/",
+              "src/cache/"
+            ]
         },
         "files": [
             "src/utils.php"

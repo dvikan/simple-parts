@@ -24,9 +24,9 @@ class Migrator
     {
         $this->guardAgainstNonExistingFolders();
 
-        $cache = JsonFile::fromFile(sprintf("%s/migrator.json", $this->cacheFolder));
+        $storage = new JsonFile(sprintf("%s/migrator.json", $this->cacheFolder));
 
-        $migrations = $cache->read();
+        $migrations = $storage->getContents();
 
         $messages = [];
 
@@ -43,7 +43,7 @@ class Migrator
 
             $messages[] = "Running $migration";
             $migrations[] = $migration;
-            $cache->write($migrations);
+            $storage->putContents($migrations);
         }
 
 
@@ -57,11 +57,13 @@ class Migrator
     private function guardAgainstNonExistingFolders(): void
     {
         if (!is_dir($this->migrations)) {
-            exit(sprintf("Migrations folder not found: %s\n", $this->migrations));
+            printf("Migrations folder not found: %s\n", $this->migrations);
+            exit(1);
         }
 
         if (!is_dir($this->cacheFolder)) {
-            exit(sprintf("Cache folder not found: %s\n", $this->cacheFolder));
+            printf("Cache folder not found: %s\n", $this->cacheFolder);
+            exit(1);
         }
     }
 }
