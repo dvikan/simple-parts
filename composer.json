@@ -21,6 +21,7 @@
         "ext-curl": "*",
       "ext-simplexml": "*",
       "ext-imap": "*",
-      "ext-pdo": "*"
+      "ext-pdo": "*",
+      "ext-libxml": "*"
     }
 }

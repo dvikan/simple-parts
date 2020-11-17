@@ -3,6 +3,7 @@
 namespace dvikan\SimpleParts;
 
 use DateTime;
+use Exception;
 use SimpleXMLElement;
 
 final class Rss
@@ -29,7 +30,15 @@ final class Rss
 
     public static function fromXml(string $xml): array
     {
-        $xml = new SimpleXMLElement($xml);
+        $previous = libxml_use_internal_errors(true);
+
+        try {
+            $xml = new SimpleXMLElement($xml);
+        } catch (Exception $e) {
+            throw new SimpleException(sprintf('Unable to parse xml: '. $e->getMessage()));
+        } finally {
+            libxml_use_internal_errors($previous);
+        }
 
         if (isset($xml->channel)) {
             $feed = self::fromRss($xml);
