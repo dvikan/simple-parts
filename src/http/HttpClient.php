@@ -103,10 +103,11 @@ final class HttpClient
             throw new SimpleException(sprintf('Curl error: %s', curl_error($this->ch)));
         }
 
-        $response = new Response($body, curl_getinfo($this->ch, CURLINFO_HTTP_CODE), $headers);
+        $code = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+        $response = new Response($body, $code, $headers);
 
         if (!$response->isOk()) {
-            throw new SimpleException('The response was not ok');
+            throw new SimpleException('The response was not ok', $code);
         }
 
         return $response;
