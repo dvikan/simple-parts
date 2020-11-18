@@ -4,9 +4,18 @@ namespace dvikan\SimpleParts;
 
 final class HttpClient
 {
+    const USERAGENT         = 'useragent';
+    const CONNECT_TIMEOUT   = 'connect_timeout';
+    const TIMEOUT           = 'timeout';
+    const CLIENT_ID         = 'client_id';
+    const AUTH_BEARER       = 'auth_bearer';
+
     const OPTIONS = [
-        'auth_bearer' => null,
-        'client_id' => null,
+        self::USERAGENT         => 'Curl',
+        self::CONNECT_TIMEOUT   => 10,
+        self::TIMEOUT           => 10,
+        self::CLIENT_ID         => null,
+        self::AUTH_BEARER       => null,
     ];
 
     private $options;
@@ -49,20 +58,20 @@ final class HttpClient
             throw new SimpleException('Unable to create curl handle');
         }
 
-        curl_setopt($ch, CURLOPT_USERAGENT, 'curl');
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->options[self::USERAGENT]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->options[self::CONNECT_TIMEOUT]);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->options[self::TIMEOUT]);
         curl_setopt($ch, CURLOPT_HEADER, false);
 
         $headers = [];
 
-        if (isset($this->options['auth_bearer'])) {
-            $headers[] = sprintf("Authorization: Bearer %s", $this->options['auth_bearer']);
+        if (isset($this->options[self::AUTH_BEARER])) {
+            $headers[] = sprintf('Authorization: Bearer %s', $this->options[self::AUTH_BEARER]);
         }
 
-        if (isset($this->options['client_id'])) {
-            $headers[] = sprintf("client-id: %s", $this->options['client_id']);
+        if (isset($this->options[self::CLIENT_ID])) {
+            $headers[] = sprintf('client-id: %s', $this->options[self::CLIENT_ID]);
         }
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -76,12 +85,15 @@ final class HttpClient
         curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$headers) {
             $len = strlen($header);
             $header = explode(':', $header);
-            if(count($header) !== 2) {
+
+            if (count($header) !== 2) {
                 return $len;
             }
+
             $name = strtolower(trim($header[0]));
             $value = trim($header[1]);
             $headers[$name] = $value;
+
             return $len;
         });
 
@@ -93,11 +105,11 @@ final class HttpClient
 
         $response = new Response($body, curl_getinfo($this->ch, CURLINFO_HTTP_CODE), $headers);
 
-        if ($response->isOk()) {
-            return $response;
+        if (!$response->isOk()) {
+            throw new SimpleException('The response was not ok');
         }
 
-        throw new SimpleException('The response was not ok');
+        return $response;
     }
 
     public function __destruct()

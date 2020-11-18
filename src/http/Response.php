@@ -8,11 +8,8 @@ class Response
     private $code;
     private $headers;
 
-    public function __construct(
-        string $body = '',
-        int $code = 200,
-        array $headers = []
-    ) {
+    public function __construct(string $body = '', int $code = 200, array $headers = [])
+    {
         $this->body = $body;
         $this->code = $code;
         $this->headers = $headers;
