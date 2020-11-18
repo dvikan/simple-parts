@@ -4,15 +4,23 @@ namespace dvikan\SimpleParts;
 
 class Logger
 {
-    const INFO = 'info';
-    const WARNING = 'warning';
-    const ERROR = 'error';
+    public const INFO = 10;
+    public const WARNING = 20;
+    public const ERROR = 30;
+
+    public const LOG_LEVELS = [
+        self::INFO => 'INFO',
+        self::WARNING => 'WARNING',
+        self::ERROR => 'ERROR',
+    ];
 
     private $handlers;
+    private $name;
 
-    public function __construct(array $handlers = [])
+    public function __construct(string $name = 'default', array $handlers = [])
     {
         $this->handlers = $handlers;
+        $this->name = $name;
     }
 
     public function info(string $message)
@@ -30,10 +38,16 @@ class Logger
         $this->log(self::ERROR, $message);
     }
 
-    public function log(string $severity, string $message)
+    public function log(int $level, string $message)
     {
         foreach ($this->handlers as $handler) {
-            $handler->handle($severity, $message);
+            $handler->handle([
+                'channel'       => $this->name,
+                'level'         => $level,
+                'level_name'    => self::LOG_LEVELS[$level],
+                'message'       => $message,
+                'datetime'      => new \DateTime(),
+            ]);
         }
     }
 }

@@ -2,13 +2,17 @@
 
 namespace dvikan\SimpleParts;
 
-use DateTime;
-
 class PrintHandler
 {
-    public function handle(string $severity, string $message)
+    public function handle(array $record)
     {
-        $now = new DateTime();
-        fprintf(STDERR, "[%s] %s %s\n", $now->format('Y-m-d H:i:s'), $severity, $message);
+        fprintf(
+            STDERR,
+            "[%s] %s.%s %s\n",
+            (new \DateTime())->format('Y-m-d H:i:s'),
+            $record['channel'],
+            $record['level_name'],
+            $record['message']
+        );
     }
 }

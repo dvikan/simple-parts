@@ -2,21 +2,21 @@
 
 namespace dvikan\SimpleParts;
 
-use DateTime;
-
 class FileHandler
 {
-    private $filepath;
+    private $filePath;
 
-    public function __construct(string $filepath)
+    public function __construct(string $filePath)
     {
-        $this->filepath = $filepath;
+        $this->filePath = $filePath;
     }
 
-    public function handle(string $severity, string $message)
+    public function handle(array $record)
     {
-        $now = new DateTime();
-        $line = sprintf("[%s] %s %s\n", $now->format('Y-m-d H:i:s'), $severity, $message);
-        file_put_contents($this->filepath, $line, FILE_APPEND);
+        file_put_contents(
+            $this->filePath,
+            sprintf("[%s] %s.%s %s\n", $record['datetime']->format('Y-m-d H:i:s'), $record['channel'], $record['level_name'], $record['message']),
+            FILE_APPEND
+        );
     }
 }

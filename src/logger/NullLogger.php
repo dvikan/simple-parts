@@ -4,7 +4,7 @@ namespace dvikan\SimpleParts;
 
 class NullLogger
 {
-    public function log(string $severity, string $message)
+    public function log(array $record)
     {
         // noop
     }

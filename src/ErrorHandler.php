@@ -2,12 +2,9 @@
 
 namespace dvikan\SimpleParts;
 
-use Throwable;
-
 final class ErrorHandler
 {
     const OPTIONS = [
-        'exit_on_error' => true,
     ];
 
     private $options;
@@ -27,9 +24,9 @@ final class ErrorHandler
         register_shutdown_function([$errorHandler, 'handleShutdown']);
     }
 
-    public function handleError($errno, $errstr, $errfile, $errline)
+    public function handleError($code, $message, $file, $line)
     {
-        $errors = [
+        $errorStrings = [
             E_ERROR => 'Error',
             E_WARNING => 'Warning',
             E_NOTICE => 'Notice',
@@ -37,22 +34,22 @@ final class ErrorHandler
             E_RECOVERABLE_ERROR => 'Recoverable error',
         ];
 
-        $message = sprintf('%s: %s in %s:%s', $errors[$errno] ?? $errno, $errstr, $errfile, $errline);
+        $this->logger->log(
+            Logger::ERROR,
+            sprintf('%s: %s in %s:%s', $errorStrings[$code] ?? $code, $message, $file, $line)
+        );
 
-        $this->logger->log(Logger::ERROR, $message);
-
-        if ($this->options['exit_on_error']) {
-            exit(1);
-        }
+        exit(1);
     }
 
-    public function handleException(Throwable $e)
+    public function handleException($e)
     {
-        $message = sprintf('Uncaught %s: "%s" in %s:%s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine());
+        $this->logger->log(
+            Logger::ERROR,
+            sprintf('Uncaught Exception %s: "%s" at %s line %s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine())
+        );
 
-        $this->logger->log(Logger::ERROR, $message);
-
-        exit(1); // Explicit exit for the status code
+        exit(1);
     }
 
     public function handleShutdown()
@@ -60,8 +57,7 @@ final class ErrorHandler
         $err = error_get_last();
 
         if ($err) {
-            $message = implode(', ', $err);
-            $this->logger->log(Logger::ERROR, $message);
+            $this->logger->log(Logger::ERROR, $err['message']);
         }
     }
 }

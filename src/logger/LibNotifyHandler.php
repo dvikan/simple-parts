@@ -4,8 +4,11 @@ namespace dvikan\SimpleParts;
 
 class LibNotifyHandler
 {
-    public function handle(string $severity, string $message)
+    public function handle(array $record)
     {
-        system(sprintf("notify-send -t 15000 %s %s", 'Logger', escapeshellarg(sprintf('%s %s', $severity, $message))));
+        $title = escapeshellarg($record['channel'] . '.' . $record['level_name']);
+        $message = escapeshellarg($record['message']);
+
+        system(sprintf('notify-send -t 15000 %s %s', $title, $message));
     }
 }
