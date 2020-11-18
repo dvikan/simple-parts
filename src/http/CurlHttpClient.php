@@ -4,20 +4,6 @@ namespace dvikan\SimpleParts;
 
 final class CurlHttpClient implements HttpClient
 {
-    const USERAGENT         = 'useragent';
-    const CONNECT_TIMEOUT   = 'connect_timeout';
-    const TIMEOUT           = 'timeout';
-    const CLIENT_ID         = 'client_id';
-    const AUTH_BEARER       = 'auth_bearer';
-
-    const OPTIONS = [
-        self::USERAGENT         => 'Curl',
-        self::CONNECT_TIMEOUT   => 10,
-        self::TIMEOUT           => 10,
-        self::CLIENT_ID         => null,
-        self::AUTH_BEARER       => null,
-    ];
-
     private $options;
     private $ch;
 
