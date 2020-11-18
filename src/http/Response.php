@@ -37,7 +37,7 @@ class Response
 
     public function isOk(): bool
     {
-        return $this->code >= 200 && $this->code <= 226;
+        return $this->code === 200;
     }
 
     public function withJson(array $data): self

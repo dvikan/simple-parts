@@ -33,9 +33,7 @@ final class HttpClient
             $this->ch = $this->createCurlHandle();
         }
 
-        curl_setopt($this->ch, CURLOPT_URL, $url);
-
-        return $this->execute();
+        return $this->execute($url);
     }
 
     public function post(string $url, array $vars = []): Response
@@ -44,10 +42,9 @@ final class HttpClient
             $this->ch = $this->createCurlHandle();
         }
 
-        curl_setopt($this->ch, CURLOPT_URL, $url);
         curl_setopt($this->ch, CURLOPT_POSTFIELDS, $vars);
 
-        return $this->execute();
+        return $this->execute($url);
     }
 
     private function createCurlHandle()
@@ -79,8 +76,10 @@ final class HttpClient
         return $ch;
     }
 
-    private function execute(): Response
+    private function execute(string $url): Response
     {
+        curl_setopt($this->ch, CURLOPT_URL, $url);
+
         $headers = [];
         curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$headers) {
             $len = strlen($header);
@@ -106,8 +105,8 @@ final class HttpClient
         $code = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
         $response = new Response($body, $code, $headers);
 
-        if (!$response->isOk()) {
-            throw new SimpleException('The response was not ok', $code);
+        if (! $response->isOk()) {
+            throw new SimpleException(sprintf('The response for "%s" was not OK', $url), $code);
         }
 
         return $response;

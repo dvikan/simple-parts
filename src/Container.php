@@ -16,6 +16,9 @@ class Container implements ArrayAccess
             throw new SimpleException(sprintf('Container: already has a value stored in "%s"', $name));
         }
 
+        if ($value === null) {
+            throw new SimpleException('Container: null is not allowed');
+        }
         if (! $value instanceof Closure) {
             $this->resolved[$name] = $value;
         }
