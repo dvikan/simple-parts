@@ -2,8 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-use Exception;
-
-class SimpleException extends Exception
+class SimpleException extends \Exception
 {
+    public const NOT_FOUND = 10;
 }

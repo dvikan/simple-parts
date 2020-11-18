@@ -11,9 +11,9 @@ final class Rss
     const DATE_FORMAT = 'Y-m-d H:i:s';
     private $client;
 
-    public function __construct(HttpClient $client = null)
+    public function __construct(CurlHttpClient $client = null)
     {
-        $this->client = $client ?: new HttpClient();
+        $this->client = $client ?: new CurlHttpClient();
     }
 
     public function fromUrl(string $url): array

@@ -112,12 +112,12 @@ $response->send();
 ## HttpClient
 
 ```php
-$client = new HttpClient();
+$client = new CurlHttpClient();
 
 $response = $client->get('https://example.com/');
 $response = $client->post('https://example.com/', ['foo' => 'bar']);
 ```
-    
+
 ## Session
 
 ```php
