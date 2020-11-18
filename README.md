@@ -174,11 +174,16 @@ $ ./bin/migrate.php
 
 ## Rss
 
-The rss client parses rss 2.0 or atom feeds.
+The rss client parses rss 2.0 and atom feeds.
 
 ```php
-$feed = Rss::fromUrl('https://classic.wowhead.com/news/rss/classic');
-$feed = Rss::fromFile('./feed.xml');
+$rss = new Rss();
+
+$feed = $rss->fromUrl('https://www.reddit.com/r/php/.rss');
+
+foreach ($feed['items'] as $item) {
+    printf("%s %s %s\n", $item['date'], $item['title'], $item['link']);
+}
 ```
 
 ## ErrorHandler

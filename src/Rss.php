@@ -9,26 +9,28 @@ use SimpleXMLElement;
 final class Rss
 {
     const DATE_FORMAT = 'Y-m-d H:i:s';
+    private $client;
 
-    public static function fromUrl(string $url): array
+    public function __construct(HttpClient $client = null)
     {
-        $httpClient = new HttpClient();
-
-        $response = $httpClient->get($url);
-
-        return self::fromXml($response->body());
+        $this->client = $client ?: new HttpClient();
     }
 
-    public static function fromFile(string $file): array
+    public function fromUrl(string $url): array
+    {
+        return $this->fromXml($this->client->get($url)->body());
+    }
+
+    private function fromFile(string $file): array
     {
         $xml = file_get_contents($file);
         if ($xml === false) {
-            throw new SimpleException();
+            throw new SimpleException('Call to file_get_contents() failed');
         }
         return self::fromXml($xml);
     }
 
-    public static function fromXml(string $xml): array
+    private function fromXml(string $xml): array
     {
         $previous = libxml_use_internal_errors(true);
 
@@ -41,9 +43,9 @@ final class Rss
         }
 
         if (isset($xml->channel)) {
-            $feed = self::fromRss($xml);
+            $feed = $this->fromRss($xml);
         } else {
-            $feed = self::fromAtom($xml);
+            $feed = $this->fromAtom($xml);
         }
 
         usort($feed['items'], function ($a, $b) {
@@ -53,7 +55,7 @@ final class Rss
         return $feed;
     }
 
-    private static function fromRss($xml)
+    private function fromRss(SimpleXMLElement $xml)
     {
         $channel = [
             'title'         => (string) $xml->channel->title,
@@ -75,7 +77,7 @@ final class Rss
         return $channel;
     }
 
-    private static function fromAtom(SimpleXMLElement $xml)
+    private function fromAtom(SimpleXMLElement $xml)
     {
         $feed = [
             'title'         => (string) $xml->title,

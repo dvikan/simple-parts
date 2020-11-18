@@ -106,6 +106,7 @@ final class HttpClient
         $response = new Response($body, $code, $headers);
 
         if (! $response->isOk()) {
+
             throw new SimpleException(sprintf('The response for "%s" was not OK', $url), $code);
         }
 
