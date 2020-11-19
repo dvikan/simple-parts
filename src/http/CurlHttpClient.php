@@ -13,6 +13,9 @@ final class CurlHttpClient implements HttpClient
         $this->ch = null;
     }
 
+    /**
+     * @throws SimpleException
+     */
     public function get(string $url): Response
     {
         if (!isset($this->ch)) {
@@ -22,6 +25,9 @@ final class CurlHttpClient implements HttpClient
         return $this->execute($url);
     }
 
+    /**
+     * @throws SimpleException
+     */
     public function post(string $url, array $vars = []): Response
     {
         if ($this->ch === null) {
@@ -91,7 +97,7 @@ final class CurlHttpClient implements HttpClient
         $code = curl_getinfo($this->ch, CURLINFO_RESPONSE_CODE);
         $response = new Response($body, $code, $headers);
 
-        if (! $response->isOk()) {
+        if (! $response->ok()) {
             throw new SimpleException(sprintf('The response for "%s" was not OK', $url), $code);
         }
 

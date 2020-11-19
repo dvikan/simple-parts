@@ -9,7 +9,7 @@ class NullCache implements Cache
         return false;
     }
 
-    public function get(string $key)
+    public function get(string $key, $default = null)
     {
         return null;
     }

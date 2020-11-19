@@ -37,7 +37,7 @@ final class ErrorHandler
         ];
 
         $this->logger->log(
-            Logger::ERROR,
+            SimpleLogger::ERROR,
             sprintf('%s: %s in %s:%s', $errorStrings[$code] ?? $code, $message, $file, $line)
         );
 
@@ -47,7 +47,7 @@ final class ErrorHandler
     public function handleException($e)
     {
         $this->logger->log(
-            Logger::ERROR,
+            SimpleLogger::ERROR,
             sprintf('Uncaught Exception %s: "%s" at %s line %s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine())
         );
 
@@ -59,7 +59,7 @@ final class ErrorHandler
         $err = error_get_last();
 
         if ($err) {
-            $this->logger->log(Logger::ERROR, $err['message']);
+            $this->logger->log(SimpleLogger::ERROR, $err['message']);
         }
     }
 }

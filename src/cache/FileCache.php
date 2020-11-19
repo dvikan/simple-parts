@@ -11,7 +11,7 @@ class FileCache implements Cache
     private $prefix;
     private $memory;
 
-    public function __construct(string $filePath, string $prefix = '')
+    public function __construct(string $filePath, string $prefix = null)
     {
         $this->storage = new JsonFile($filePath);
         $this->prefix = $prefix;
@@ -24,10 +24,12 @@ class FileCache implements Cache
         return $fileCache;
     }
 
-    public function get(string $key)
+    public function get(string $key, $default = null)
     {
         $this->load();
-        guard($this->has($key));
+        if (! $this->has($key)) {
+            return $default;
+        }
         return $this->memory[$this->key($key)];
     }
 
@@ -64,6 +66,9 @@ class FileCache implements Cache
 
     private function key(string $key)
     {
-        return $this->prefix . '_' . $key;
+        if (isset($this->prefix)) {
+            return $this->prefix . '_' . $key;
+        }
+        return $key;
     }
 }

@@ -18,6 +18,9 @@ final class Rss
         $this->client = $client ?: new CurlHttpClient();
     }
 
+    /**
+     * @throws SimpleException
+     */
     public function fromUrl(string $url): array
     {
         return $this->fromXml($this->client->get($url)->body());

@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-class PrintHandler
+class PrintHandler implements Handler
 {
     public function handle(array $record)
     {

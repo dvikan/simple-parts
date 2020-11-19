@@ -2,11 +2,11 @@
 
 namespace dvikan\SimpleParts;
 
-class LibNotifyHandler
+class LibNotifyHandler implements Handler
 {
     private $level;
 
-    public function __construct(int $level = Logger::INFO)
+    public function __construct(int $level = SimpleLogger::INFO)
     {
         $this->level = $level;
     }
@@ -20,6 +20,6 @@ class LibNotifyHandler
         $title = escapeshellarg($record['channel'] . '.' . $record['level_name']);
         $message = escapeshellarg($record['message']);
 
-        system(sprintf('notify-send -t 15000 %s %s', $title, $message));
+        guard(system(sprintf('notify-send -t 15000 %s %s', $title, $message)));
     }
 }

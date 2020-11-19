@@ -10,10 +10,13 @@ class Container implements ArrayAccess
     private $container = [];
     private $resolved = [];
 
+    /**
+     * @throws SimpleException
+     */
     public function offsetSet($name, $value)
     {
         if (isset($this[$name])) {
-            throw new SimpleException(sprintf('Container: already has a value stored in "%s"', $name));
+            throw new SimpleException(sprintf('Container: already has a value stored at "%s"', $name));
         }
 
         if ($value === null) {
@@ -27,6 +30,9 @@ class Container implements ArrayAccess
         $this->container[$name] = $value;
     }
 
+    /**
+     * @throws SimpleException
+     */
     public function offsetGet($name)
     {
         if (! isset($this[$name])) {

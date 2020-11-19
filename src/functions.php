@@ -2,7 +2,27 @@
 
 namespace dvikan\SimpleParts;
 
-function guard($value, $message = '')
+use Closure;
+
+/**
+ * @throws SimpleException
+ */
+function retry(int $count, Closure $fn)
+{
+    while($count !== 0) {
+        try {
+            return $fn();
+        } catch (SimpleException $e) {
+            $count--;
+        }
+    }
+    throw $e;
+}
+
+/**
+ * Guard aginst false values
+ */
+function guard($value, $message = 'Value was false')
 {
     if ($value === false) {
         throw new SimpleException($message);

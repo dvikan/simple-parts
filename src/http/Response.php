@@ -35,7 +35,7 @@ class Response
         return $this->headers;
     }
 
-    public function isOk(): bool
+    public function ok(): bool
     {
         return $this->code === 200;
     }
