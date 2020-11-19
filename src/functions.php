@@ -50,7 +50,7 @@ function response(string $body = '', int $code = 200, array $headers = []): Resp
 }
 
 /**
- * Escape variable for html context.
+ * Escape string for html context
  */
 function e(string $s): string
 {
@@ -62,6 +62,7 @@ function e(string $s): string
  */
 function session(string $name, $value = null)
 {
+    // todo: validate session started
     if ($value === null) {
         return $_SESSION[$name] ?? null;
     }

@@ -19,6 +19,11 @@ final class Console
         printf($line . "\n", ...$args);
     }
 
+    public function exit(int $status = 0)
+    {
+        exit($status);
+    }
+
     public function green(string $line, ...$args)
     {
         printf(self::GREEN . $line . self::NC, ...$args);

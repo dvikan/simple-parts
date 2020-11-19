@@ -37,100 +37,217 @@ Components:
 
 All classes reside under the `dvikan\SimpleParts` namespace.
 
+Here is the directory tree for `src/`:
+
+```shell
+$ tree src/
+src/
+├── cache
+│   ├── Cache.php
+│   ├── FileCache.php
+│   └── NullCache.php
+├── Console.php
+├── Container.php
+├── ErrorHandler.php
+├── functions.php
+├── http
+│   ├── CurlHttpClient.php
+│   ├── HttpClient.php
+│   ├── NullHttpClient.php
+│   ├── Request.php
+│   └── Response.php
+├── json
+│   ├── JsonFile.php
+│   └── Json.php
+├── logger
+│   ├── FileHandler.php
+│   ├── Handler.php
+│   ├── LibNotifyHandler.php
+│   ├── Logger.php
+│   ├── NullLogger.php
+│   ├── PrintHandler.php
+│   └── SimpleLogger.php
+├── Migrator.php
+├── Router.php
+├── Rss.php
+└── SimpleException.php
+
+5 directories, 26 files
+
+```
 ## Router
 
 The router accepts a regex and a handler. The handler MUST be
-an array with a class and a method.
+an array.
 
 ```php
+<?php
+
+use dvikan\SimpleParts\Router;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+class HttpController
+{
+    public function profile(array $args)
+    {
+        $id = $args[0];
+        return 'The profile id is '. $id;
+    }
+}
+
 $router = new Router();
 
-$router->map('/user/([0-9]+)', [UserController::class, 'profile']);
+$router->map('/user/([0-9]+)', [HttpController::class, 'profile']);
 
-$routeInfo = $router->match('/user/42');
+[$handler, $args] = $router->match('/user/42');
 
-$handler = $routeInfo[0];
-$args = $routeInfo[1];
+$class = $handler[0];
+$method = $handler[1];
+$controller = new $class();
 
-print $handler($args);
+print $controller->{$method}($args);
 ```
     
 ## Template engine
 
-The template engine interprets the template as php code and the `e()`
+The template engine is a function which accepts a template and a context. The `e()`
 function escapes for html context.
    
 ```php
-print render('index.tpl', [
-    'message' => 'Hello world <3',
+<?php
+
+use function dvikan\SimpleParts\render;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+print render('index.php', [
+    'message' => 'Welcome ' . ($_GET['name'] ?? 'anon'),
 ]);
 ```
-
-The template:
 
 ```php
 <?php use function \dvikan\SimpleParts\e; ?>
 
 <p>
-    Message of the day: <?= e($message) ?>
+    <?= e($message) ?>
 </p>
 ```
-    
 ## Dependency container
 
 The container stores reusable dependencies.
 
 ```php
+<?php
+
+use dvikan\SimpleParts\Container;
+
+require __DIR__ . '/../vendor/autoload.php';
+
 $container = new Container();
 
-$container['http_client_options'] = [
-    'connect_timeout' => 3,
-];
-
-$container['httpClient'] = function($c) {
-    return new CurlHttpClient($c['http_client_options']);
+$container['database'] = function($c) {
+    return new PDO($c['database_options']['dsn']);
 };
 
-$httpClient = $container['httpClient'];
+$container['database_options'] = [
+    'dsn' => 'sqlite::memory:',
+];
+
+/** @var PDO $database */
+$database = $container['database'];
 ```
 
 ## Request
 
 ```php
+<?php
+
+use dvikan\SimpleParts\Request;
+
+require __DIR__ . '/../vendor/autoload.php';
+
 $request = Request::fromGlobals();
 
-if ($request->isGet()) {
-    print $request->get('id');
-}
+$uri = $request->uri();
+$isGet = $request->isGet();
+$id = $request->get('id') ?? -1;
+$user = $request->post('user') ?? 'anon';
+
+var_dump($uri, $isGet, $id, $user);
 ```
    
 ## Response
 
 ```php
+<?php
+
+use dvikan\SimpleParts\Response;
+use function dvikan\SimpleParts\response;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$response = new Response();
+$response = response();
 $response = new Response('Hello world', 200, ['Content-type' => 'text/plain']);
 
-$response->send();
+// Text response
+$response->code(); // 200
+$response->body(); // 'Hello world'
+$response->ok(); // true
+//$response->send();
+
+// Json response
+$response = response()->withJson(['id' => 42]);
+$response->json(); //  ['id' => 42]
+$response->send(); // {"id": 42}
 ```
 
 ## HttpClient
 
 ```php
-$client = new CurlHttpClient();
+<?php
 
-$response = $client->get('https://example.com/');
-$response = $client->post('https://example.com/', ['foo' => 'bar']);
+use dvikan\SimpleParts\CurlHttpClient;
+use dvikan\SimpleParts\HttpClient;
+use dvikan\SimpleParts\SimpleException;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$client = new CurlHttpClient([
+    HttpClient::CONNECT_TIMEOUT => 3,
+    HttpClient::USERAGENT => 'Curl',
+]);
+
+try {
+    $response1 = $client->get('http://example.com/');
+    $response2 = $client->post('http://example.com/', ['foo' => 'bar']);
+
+    print $response1->body();
+    print $response2->body();
+} catch (SimpleException $e) {
+    print "Didn't get http 200\n";
+}
 ```
 
 ## Session
 
 ```php
-use function session;
+<?php
+
+use function dvikan\SimpleParts\session;
+
+require __DIR__ . '/../vendor/autoload.php';
 
 session_start();
 
-session('user', 'root');
+$counter = session('counter') ?? 0;
 
-print session('user');
+$counter++;
+
+session('counter', $counter);
+
+print "Status $counter\n";
 ```
 
 ## Logger
@@ -138,11 +255,18 @@ print session('user');
 The logger has three log levels `INFO`, `WARNING` and `ERROR` and accepts a name and an array of handlers in its constructor.
 
 ```php
-$logger = new SimpleLogger('default', [
-    new PrintHandler(),
-    new FileHandler('./error.log'),
-    new LibNotifyHandler()
-]);
+<?php
+
+use dvikan\SimpleParts\FileHandler;
+use dvikan\SimpleParts\PrintHandler;
+use dvikan\SimpleParts\SimpleLogger;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$fileHandler = new FileHandler('./error.log');
+$printHandler = new PrintHandler();
+
+$logger = new SimpleLogger('default', [$printHandler, $fileHandler]);
 
 $logger->info('hello');
 $logger->warning('hello');
@@ -184,12 +308,29 @@ try {
 The rss client parses rss 2.0 and atom feeds.
 
 ```php
+<?php
+
+use dvikan\SimpleParts\Rss;
+use dvikan\SimpleParts\SimpleException;
+
+require __DIR__ . '/../vendor/autoload.php';
+
 $rss = new Rss();
 
-$feed = $rss->fromUrl('https://www.reddit.com/r/php/.rss');
+try {
+    $feed = $rss->fromUrl('https://www.reddit.com/r/php/');
+} catch (SimpleException $e) {
+    printf("Unable to fetch feed: %s\n", $e->getMessage());
+    exit(0);
+}
 
 foreach ($feed['items'] as $item) {
-    printf("%s %s %s\n", $item['date'], $item['title'], $item['link']);
+    printf(
+        "%s %s %s\n",
+        $item['date'],
+        $item['title'],
+        $item['link']
+    );
 }
 ```
 
@@ -199,9 +340,19 @@ The error handler registers itself for errors, exceptions and the shutdown funct
 All php errors and exceptions are passed off to the logger with severity `error`.
 
 ```php
-$logger = new Logger([new PrintHandler()]);
+<?php
+
+use dvikan\SimpleParts\ErrorHandler;
+use dvikan\SimpleParts\PrintHandler;
+use dvikan\SimpleParts\SimpleLogger;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$logger = new SimpleLogger('default', [new PrintHandler()]);
 
 ErrorHandler::initialize($logger);
+
+print $foo;
 ```
 
 ## Json
@@ -209,8 +360,19 @@ ErrorHandler::initialize($logger);
 The `Json` class encodes and decodes json and will always throw exception on failure.
 
 ```php
-print Json::encode(['hello']);
-print Json::decode('{"foo":"bar"}');
+<?php
+
+use dvikan\SimpleParts\Json;
+use dvikan\SimpleParts\SimpleException;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+try {
+    $json = Json::encode(['message' => 'hello']);
+    print Json::decode($json)['message'] . "\n";
+} catch (SimpleException $e) {
+    printf("Unable to encode/decode json\n");
+}
 ```
 
 ## JsonFile
@@ -218,7 +380,13 @@ print Json::decode('{"foo":"bar"}');
 Read/write to a json file.
 
 ```php
-$storage = new JsonFile('./numbers.json');
+<?php
+
+use dvikan\SimpleParts\JsonFile;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$storage = new JsonFile('./var/numbers.json');
 
 $storage->putContents([1,2,3]);
 
@@ -228,16 +396,28 @@ print_r($storage->getContents());
 ## FileCache
 
 ```php
-$cache = new FileCache('/cache.json');
+<?php
+
+use dvikan\SimpleParts\FileCache;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$cache = new FileCache('./var/cache.json');
 
 $cache->set('foo', 'bar');
 
-print $cache->get('foo');
+if ($cache->has('foo')) {
+    print $cache->get('foo') . "\n";
+}
+
+$cache->delete('foo');
+
+$newCacheWithKeyPrefixes = $cache->withPrefix('aaa');
 ```
 
 ## Console
 
-The `Console` component writes text to stdout. It can also render a table.
+The `Console` component writes text to stdout. It can also render tables.
 
 ```php
 <?php
@@ -263,6 +443,8 @@ $rows = [
 ];
 
 $console->table($headers, $rows);
+
+$console->exit(1);
 ```
 
 ```
