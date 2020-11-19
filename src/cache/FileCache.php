@@ -7,59 +7,63 @@ namespace dvikan\SimpleParts;
  */
 class FileCache implements Cache
 {
-    private $memory;
     private $storage;
+    private $prefix;
+    private $memory;
 
-    public function __construct(string $filePath)
+    public function __construct(string $filePath, string $prefix = '')
     {
         $this->storage = new JsonFile($filePath);
+        $this->prefix = $prefix;
     }
 
-    public function has(string $key): bool
+    public function withPrefix(string $prefix): Cache
     {
-        $this->load();
-        return isset($this->memory[$key]);
+        $fileCache = clone $this;
+        $fileCache->prefix = $prefix;
+        return $fileCache;
     }
 
     public function get(string $key)
     {
         $this->load();
+        guard($this->has($key));
+        return $this->memory[$this->key($key)];
+    }
 
-        if (! $this->has($key)) {
-            throw new SimpleException(sprintf('Non-existing key "%s"', $key), SimpleException::NOT_FOUND);
-        }
-
-        return $this->memory[$key];
+    public function has(string $key): bool
+    {
+        $this->load();
+        return isset($this->memory[$this->key($key)]);
     }
 
     public function set(string $key, $value)
     {
         $this->load();
-        $this->memory[$key] = $value;
+        $this->memory[$this->key($key)] = $value;
         $this->write();
     }
 
     public function delete(string $key)
     {
         $this->load();
-
-        if (! $this->has($key)) {
-            throw new SimpleException(sprintf('Non-existing key "%s"', $key), SimpleException::NOT_FOUND);
-        }
-
-        unset($this->memory[$key]);
+        guard($this->has($key));
+        unset($this->memory[$this->key($key)]);
         $this->write();
     }
 
     private function load()
     {
-        if(! isset($this->memory)) {
-            $this->memory = $this->storage->getContents();
-        }
+        $this->memory = $this->storage->getContents();
     }
 
     private function write()
     {
         $this->storage->putContents($this->memory);
+    }
+
+    private function key(string $key)
+    {
+        return $this->prefix . '_' . $key;
     }
 }

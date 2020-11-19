@@ -19,6 +19,7 @@ class Container implements ArrayAccess
         if ($value === null) {
             throw new SimpleException('Container: null is not allowed');
         }
+
         if (! $value instanceof Closure) {
             $this->resolved[$name] = $value;
         }

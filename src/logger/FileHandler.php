@@ -13,10 +13,8 @@ class FileHandler
 
     public function handle(array $record)
     {
-        file_put_contents(
-            $this->filePath,
-            sprintf("[%s] %s.%s %s\n", $record['datetime']->format('Y-m-d H:i:s'), $record['channel'], $record['level_name'], $record['message']),
-            FILE_APPEND
-        );
+        $data = sprintf("[%s] %s.%s %s\n", $record['datetime']->format('Y-m-d H:i:s'), $record['channel'], $record['level_name'], $record['message']);
+
+        guard(file_put_contents($this->filePath, $data, FILE_APPEND | LOCK_EX));
     }
 }

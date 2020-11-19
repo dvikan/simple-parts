@@ -23,4 +23,9 @@ class NullCache implements Cache
     {
         // noop
     }
+
+    public function withPrefix(string $prefix): Cache
+    {
+        return $this;
+    }
 }

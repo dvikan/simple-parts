@@ -9,9 +9,11 @@ use SimpleXMLElement;
 final class Rss
 {
     const DATE_FORMAT = 'Y-m-d H:i:s';
+
+    /** @var HttpClient */
     private $client;
 
-    public function __construct(CurlHttpClient $client = null)
+    public function __construct(HttpClient $client = null)
     {
         $this->client = $client ?: new CurlHttpClient();
     }

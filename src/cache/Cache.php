@@ -11,4 +11,6 @@ interface Cache
     public function set(string $key, $value);
 
     public function delete(string $key);
+
+    public function withPrefix(string $prefix): Cache;
 }

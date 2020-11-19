@@ -12,7 +12,7 @@ final class ErrorHandler
 
     private function __construct() {}
 
-    public static function initialize($logger = null, array $options = []): void
+    public static function initialize($logger = null, array $options = [])
     {
         $errorHandler = new self();
 
@@ -22,6 +22,8 @@ final class ErrorHandler
         set_error_handler([$errorHandler, 'handleError']);
         set_exception_handler([$errorHandler, 'handleException']);
         register_shutdown_function([$errorHandler, 'handleShutdown']);
+
+        return $errorHandler;
     }
 
     public function handleError($code, $message, $file, $line)

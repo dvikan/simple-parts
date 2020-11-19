@@ -2,6 +2,15 @@
 
 namespace dvikan\SimpleParts;
 
+function guard($value, $message = '')
+{
+    if ($value === false) {
+        throw new SimpleException($message);
+    }
+
+    return $value;
+}
+
 function render(string $template, array $vars = []): string
 {
     extract($vars);

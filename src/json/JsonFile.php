@@ -17,11 +17,7 @@ final class JsonFile
             return [];
         }
 
-        $contents = file_get_contents($this->filePath);
-
-        if ($contents === false) {
-            throw new SimpleException(sprintf('Unable to read contents of "%s"', $this->filePath));
-        }
+        $contents = guard(file_get_contents($this->filePath));
 
         if ($contents === '') {
             return [];
@@ -32,10 +28,6 @@ final class JsonFile
 
     public function putContents(array $data): void
     {
-        $bytesWritten = file_put_contents($this->filePath, Json::encode($data));
-
-        if ($bytesWritten === false || $bytesWritten === 0) {
-            throw new SimpleException(sprintf('Unable to put contents to "%s"', $this->filePath));
-        }
+        guard(file_put_contents($this->filePath, Json::encode($data), LOCK_EX));
     }
 }
