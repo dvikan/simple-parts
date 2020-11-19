@@ -4,8 +4,19 @@ namespace dvikan\SimpleParts;
 
 class PrintHandler implements Handler
 {
+    private $level;
+
+    public function __construct(int $level = Logger::INFO)
+    {
+        $this->level = $level;
+    }
+
     public function handle(array $record)
     {
+        if ($record['level'] < $this->level) {
+            return;
+        }
+
         fprintf(
             STDERR,
             "[%s] %s.%s %s\n",

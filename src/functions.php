@@ -4,19 +4,21 @@ namespace dvikan\SimpleParts;
 
 use Closure;
 
+
 /**
  * @throws SimpleException
  */
-function retry(int $count, Closure $fn)
+function retry(int $count, Closure $fn, Closure $fail)
 {
-    while($count !== 0) {
+    while ($count !== 0) {
         try {
-            return $fn();
+            $fn();
         } catch (SimpleException $e) {
             $count--;
         }
     }
-    throw $e;
+
+    $fail($e);
 }
 
 /**

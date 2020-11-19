@@ -10,14 +10,6 @@ interface HttpClient
     public const CLIENT_ID         = 'client_id';
     public const AUTH_BEARER       = 'auth_bearer';
 
-    public const OPTIONS = [
-        self::USERAGENT         => 'HttpClient',
-        self::CONNECT_TIMEOUT   => 10,
-        self::TIMEOUT           => 10,
-        self::CLIENT_ID         => null,
-        self::AUTH_BEARER       => null,
-    ];
-
     public function get(string $url): Response;
 
     public function post(string $url, array $vars = []): Response;

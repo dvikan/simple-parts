@@ -14,7 +14,7 @@
             ]
         },
         "files": [
-            "src/utils.php"
+            "src/functions.php"
         ]
     },
     "require-dev": {
@@ -29,6 +29,7 @@
       "ext-simplexml": "*",
       "ext-imap": "*",
       "ext-pdo": "*",
-      "ext-libxml": "*"
+      "ext-libxml": "*",
+      "ext-mbstring": "*"
     }
 }

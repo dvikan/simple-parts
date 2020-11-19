@@ -9,16 +9,16 @@ interface Logger
     public const ERROR      = 30;
 
     public const LOG_LEVELS = [
-        self::INFO      => 'info',
-        self::WARNING   => 'warning',
-        self::ERROR     => 'error',
+        self::INFO      => 'INFO',
+        self::WARNING   => 'WARNING',
+        self::ERROR     => 'ERROR',
     ];
 
-    public function info(string $message);
+    public function info(string $message, array $context = []);
 
-    public function warning(string $message);
+    public function warning(string $message, array $context = []);
 
-    public function error(string $message);
+    public function error(string $message, array $context = []);
 
-    public function log(int $level, string $message);
+    public function log(int $level, string $message, array $context = []);
 }

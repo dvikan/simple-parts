@@ -10,28 +10,28 @@ class SimpleLogger implements Logger
     /**
      * @param Handler[] $handlers
      */
-    public function __construct(string $name, array $handlers = [])
+    public function __construct(string $name = 'default', array $handlers = [])
     {
         $this->name = $name;
         $this->handlers = $handlers;
     }
 
-    public function info(string $message)
+    public function info(string $message, array $context = [])
     {
-        $this->log(self::INFO, $message);
+        $this->log(self::INFO, $message, $context);
     }
 
-    public function warning(string $message)
+    public function warning(string $message, array $context = [])
     {
-        $this->log(self::WARNING, $message);
+        $this->log(self::WARNING, $message, $context);
     }
 
-    public function error(string $message)
+    public function error(string $message, array $context = [])
     {
-        $this->log(self::ERROR, $message);
+        $this->log(self::ERROR, $message, $context);
     }
 
-    public function log(int $level, string $message)
+    public function log(int $level, string $message, array $context = [])
     {
         foreach ($this->handlers as $handler) {
             $handler->handle([
@@ -39,6 +39,7 @@ class SimpleLogger implements Logger
                 'level'         => $level,
                 'level_name'    => self::LOG_LEVELS[$level],
                 'message'       => $message,
+                'context'       => $context,
                 'datetime'      => new \DateTime(),
             ]);
         }

@@ -6,7 +6,7 @@ class LibNotifyHandler implements Handler
 {
     private $level;
 
-    public function __construct(int $level = SimpleLogger::INFO)
+    public function __construct(int $level = Logger::INFO)
     {
         $this->level = $level;
     }

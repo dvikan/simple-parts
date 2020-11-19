@@ -4,6 +4,12 @@ namespace dvikan\SimpleParts;
 
 final class CurlHttpClient implements HttpClient
 {
+    private const OPTIONS = [
+        HttpClient::USERAGENT         => 'HttpClient',
+        HttpClient::CONNECT_TIMEOUT   => 10,
+        HttpClient::TIMEOUT           => 10,
+    ];
+
     private $options;
     private $ch;
 

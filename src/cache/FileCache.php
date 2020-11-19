@@ -24,7 +24,7 @@ class FileCache implements Cache
         return $fileCache;
     }
 
-    public function get(string $key, $default = null)
+    public function get($key, $default = null)
     {
         $this->load();
         if (! $this->has($key)) {
@@ -33,20 +33,20 @@ class FileCache implements Cache
         return $this->memory[$this->key($key)];
     }
 
-    public function has(string $key): bool
+    public function has($key): bool
     {
         $this->load();
         return isset($this->memory[$this->key($key)]);
     }
 
-    public function set(string $key, $value)
+    public function set($key, $value = true)
     {
         $this->load();
         $this->memory[$this->key($key)] = $value;
         $this->write();
     }
 
-    public function delete(string $key)
+    public function delete($key)
     {
         $this->load();
         guard($this->has($key));
@@ -64,7 +64,7 @@ class FileCache implements Cache
         $this->storage->putContents($this->memory);
     }
 
-    private function key(string $key)
+    private function key($key)
     {
         if (isset($this->prefix)) {
             return $this->prefix . '_' . $key;
