@@ -6,19 +6,19 @@ Components:
 
 * Router
 * Template engine
-* Container
+* Dependency container
 * Request
 * Response
 * HttpClient
 * Session
 * Logger
-* Migrator
+* Migrator (database migrations)
 * Rss
 * ErrorHandler
 * Json
 * JsonFile
 * FileCache
-* Console (todo)
+* Console
 * git wrapper (todo)
 * irc client (todo)
 * socket wrapper (todo)
@@ -30,6 +30,10 @@ Components:
 * DataMapper (ORM, todo)
 * Dotenv (todo)
 * EventDispatcher (todo)
+* Validator (todo)
+* Random (todo)
+* Guid (todo)
+* Shell command
 
 All classes reside under the `dvikan\SimpleParts` namespace.
 
@@ -72,7 +76,7 @@ The template:
 </p>
 ```
     
-## Container
+## Dependency container
 
 The container stores reusable dependencies.
 
@@ -84,7 +88,7 @@ $container['http_client_options'] = [
 ];
 
 $container['httpClient'] = function($c) {
-    return new HttpClient($c['http_client_options']);
+    return new CurlHttpClient($c['http_client_options']);
 };
 
 $httpClient = $container['httpClient'];
@@ -95,10 +99,9 @@ $httpClient = $container['httpClient'];
 ```php
 $request = Request::fromGlobals();
 
-print $request->get('id');
-print $request->post('message');
-print $request->body();
-print $request->json();
+if ($request->isGet()) {
+    print $request->get('id');
+}
 ```
    
 ## Response
@@ -132,10 +135,10 @@ print session('user');
 
 ## Logger
 
-The logger has three severity levels and accepts an array of handlers in its constructor.
+The logger has three log levels `INFO`, `WARNING` and `ERROR` and accepts a name and an array of handlers in its constructor.
 
 ```php
-$logger = new Logger([
+$logger = new SimpleLogger('default', [
     new PrintHandler(),
     new FileHandler('./error.log'),
     new LibNotifyHandler()
@@ -148,30 +151,34 @@ $logger->error('hello');
 
 ## Migrator (database migrations)
 
-The migrator assumes that your migrations are stored as `.sql` files in `./migrations`
-and that your persistent folder is at `./var`.
+The migrator looks for `.sql` files in the provided folder.
 
 ```php
-$migrator = new Migrator(new PDO('sqlite:db.sqlite'));
+<?php
 
-$migrator->migrate();
-```
+use dvikan\SimpleParts\Migrator;
+use dvikan\SimpleParts\SimpleException;
 
-Example:
+require __DIR__ . '/../vendor/autoload.php';
 
-```console
-$ cat migrations/001-init.sql
-create table user (
-    id integer primary key,
-    name text,
-    mobile text,
-    email text,
-    created_at text
+$migrator = new Migrator(
+    new PDO('sqlite:' . __DIR__ . '/var/app.db'),
+    __DIR__ . '/var/migrations/'
 );
 
-$ ./bin/migrate.php
-```
+try {
+    $messages = $migrator->migrate();
 
+    if ($messages === []) {
+        printf("No pending migrations\n");
+    } else {
+        printf("%s\n", implode("\n", $messages));
+    }
+} catch (SimpleException $e) {
+    printf("Migration failure: %s\n", $e->getMessage());
+}
+
+```
 ## Rss
 
 The rss client parses rss 2.0 and atom feeds.
@@ -226,4 +233,47 @@ $cache = new FileCache('/cache.json');
 $cache->set('foo', 'bar');
 
 print $cache->get('foo');
+```
+
+## Console
+
+The `Console` component writes text to stdout. It can also render a table.
+
+```php
+<?php
+
+use dvikan\SimpleParts\Console;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$console = new Console();
+
+$console->write('Hello');
+$console->writeln(' world!');
+
+$console->greenln('Success');
+$console->redln('Failure');
+
+$headers = ['Id', 'User', 'Created'];
+
+$rows = [
+    ['1', 'root', '2020-11-01'],
+    ['1000', 'joe', '2020-11-02'],
+    ['1001', 'bob', '2020-11-03'],
+];
+
+$console->table($headers, $rows);
+```
+
+```
+Hello world!
+Success
+Failure
++------------+------------+------------+
+| Id         | User       | Created    |
++------------+------------+------------+
+| 1          | root       | 2020-11-01 |
+| 1000       | joe        | 2020-11-02 |
+| 1001       | bob        | 2020-11-03 |
++------------+------------+------------+
 ```
