@@ -60,7 +60,7 @@ final class Console
         $columnWidth = 3;
         foreach (array_merge($rows, [$headers]) as $values) {
             foreach ($values as $value) {
-                $columnWidth = max($columnWidth, mb_strlen($value));
+                $columnWidth = max($columnWidth, mb_strlen((string) $value));
             }
         }
         // Enforce a maximum of 30
@@ -74,6 +74,7 @@ final class Console
         // Truncate row values
         foreach ($rows as $i => $row) {
             foreach ($row as $j => $value) {
+                $value = (string) $value;
                 $rows[$i][$j] = $this->truncate($value, $columnWidth);
             }
         }
@@ -98,6 +99,11 @@ final class Console
         }
 
         $this->writeln($bar);
+    }
+
+    public function tree(array $tree)
+    {
+        // todo
     }
 
     private function truncate(string $str, int $length, $placeholder = '..'): string

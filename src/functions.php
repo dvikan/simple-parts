@@ -3,6 +3,7 @@
 namespace dvikan\SimpleParts;
 
 use Closure;
+use DateTime;
 
 
 /**
@@ -68,4 +69,9 @@ function session(string $name, $value = null)
     }
 
     $_SESSION[$name] = $value;
+}
+
+function now(): DateTime
+{
+    return new DateTime();
 }

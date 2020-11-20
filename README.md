@@ -2,8 +2,6 @@
 
 Intentionally simple components for building applications.
 
-Components:
-
 * Router
 * Template engine
 * Dependency container
@@ -19,6 +17,7 @@ Components:
 * JsonFile
 * FileCache
 * Console
+* Twitch api client
 * git wrapper (todo)
 * irc client (todo)
 * socket wrapper (todo)
@@ -30,7 +29,7 @@ Components:
 * DataMapper (ORM, todo)
 * Dotenv (todo)
 * EventDispatcher (todo)
-* Validator (todo)
+* Validator, validate values, validate array structure (todo)
 * Random (todo)
 * Guid (todo)
 * Shell command
@@ -412,6 +411,8 @@ if ($cache->has('foo')) {
 
 $cache->delete('foo');
 
+$cache->clear();
+
 $newCacheWithKeyPrefixes = $cache->withPrefix('aaa');
 ```
 
@@ -458,4 +459,31 @@ Failure
 | 1000       | joe        | 2020-11-02 |
 | 1001       | bob        | 2020-11-03 |
 +------------+------------+------------+
+```
+
+## Twitch api client
+
+https://dev.twitch.tv/docs/api/reference
+
+```php
+<?php
+
+use dvikan\SimpleParts\TwitchClient;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$accessToken = `secret twitch_access_token`;
+$clientId = `secret twitch_client_id`;
+$clientSecret = `secret twitch_client_secret`;
+
+$client = new TwitchClient($clientId, $clientSecret, $accessToken);
+
+/**
+ * Persist this for reuse
+ */
+//$accessToken = $twitchClient->accessToken();
+
+$result = $client->streams();
+
+print_r($result);
 ```
