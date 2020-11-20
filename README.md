@@ -472,9 +472,9 @@ use dvikan\SimpleParts\TwitchClient;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$accessToken = `secret twitch_access_token`;
-$clientId = `secret twitch_client_id`;
-$clientSecret = `secret twitch_client_secret`;
+$accessToken = '';
+$clientId = '';
+$clientSecret = '';
 
 $client = new TwitchClient($clientId, $clientSecret, $accessToken);
 
@@ -486,4 +486,106 @@ $client = new TwitchClient($clientId, $clientSecret, $accessToken);
 $result = $client->streams();
 
 print_r($result);
+```
+
+## Yahoo finance client
+
+```php
+<?php
+
+use dvikan\SimpleParts\SimpleException;
+use dvikan\SimpleParts\YahooFinanceClient;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$client = new YahooFinanceClient();
+
+try {
+    $quote = $client->quote(['AAPL', '^GSPC']);
+
+    foreach ($quote as $result) {
+        printf(
+            "%s %s (%s%%)\n",
+            $result['symbol'],
+            $result['regularMarketPrice'],
+            $result['regularMarketChangePercent'],
+        );
+    }
+} catch (SimpleException $e) {
+    printf("Unable to fetch quotes: %s\n", $e->getMessage());
+}
+```
+
+Example response for AAPL:
+```
+[language] => en-US
+[region] => US
+[quoteType] => EQUITY
+[quoteSourceName] => Nasdaq Real Time Price
+[triggerable] => 1
+[currency] => USD
+[exchange] => NMS
+[shortName] => Apple Inc.
+[longName] => Apple Inc.
+[messageBoardId] => finmb_24937
+[exchangeTimezoneName] => America/New_York
+[exchangeTimezoneShortName] => EST
+[gmtOffSetMilliseconds] => -18000000
+[market] => us_market
+[esgPopulated] => 
+[marketState] => REGULAR
+[priceHint] => 2
+[firstTradeDateMilliseconds] => 345479400000
+[regularMarketChange] => -0.6791992
+[regularMarketChangePercent] => -0.57248753
+[regularMarketTime] => 1605891653
+[regularMarketPrice] => 117.9608
+[regularMarketDayHigh] => 118.77
+[regularMarketDayRange] => 117.84 - 118.77
+[regularMarketDayLow] => 117.84
+[regularMarketVolume] => 32115496
+[regularMarketPreviousClose] => 118.64
+[bid] => 118.12
+[ask] => 118.13
+[bidSize] => 10
+[askSize] => 14
+[fullExchangeName] => NasdaqGS
+[financialCurrency] => USD
+[regularMarketOpen] => 118.64
+[averageDailyVolume3Month] => 154613424
+[averageDailyVolume10Day] => 93837362
+[fiftyTwoWeekLowChange] => 64.808304
+[fiftyTwoWeekLowChangePercent] => 1.2192899
+[fiftyTwoWeekRange] => 53.1525 - 137.98
+[fiftyTwoWeekHighChange] => -20.019196
+[fiftyTwoWeekHighChangePercent] => -0.14508766
+[fiftyTwoWeekLow] => 53.1525
+[fiftyTwoWeekHigh] => 137.98
+[dividendDate] => 1605139200
+[earningsTimestamp] => 1603989000
+[earningsTimestampStart] => 1611658740
+[earningsTimestampEnd] => 1612180800
+[trailingAnnualDividendRate] => 0.795
+[trailingPE] => 35.963657
+[trailingAnnualDividendYield] => 0.006700944
+[epsTrailingTwelveMonths] => 3.28
+[epsForward] => 4.33
+[epsCurrentYear] => 3.96
+[priceEpsCurrentYear] => 29.78808
+[sharesOutstanding] => 17102499840
+[bookValue] => 3.849
+[fiftyDayAverage] => 116.655
+[fiftyDayAverageChange] => 1.3058014
+[fiftyDayAverageChangePercent] => 0.011193703
+[twoHundredDayAverage] => 103.28055
+[twoHundredDayAverageChange] => 14.680252
+[twoHundredDayAverageChangePercent] => 0.14213957
+[marketCap] => 2005545910272
+[forwardPE] => 27.24268
+[priceToBook] => 30.64713
+[sourceInterval] => 15
+[exchangeDataDelayedBy] => 0
+[tradeable] => 
+[displayName] => Apple
+[symbol] => AAPL
 ```
