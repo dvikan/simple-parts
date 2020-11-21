@@ -11,7 +11,9 @@
               "src/json/",
               "src/http/",
               "src/cache/",
-              "src/twitch"
+              "src/rss",
+              "src/twitch",
+              "src/yahoo-finance"
             ]
         },
         "files": [

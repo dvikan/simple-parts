@@ -23,7 +23,8 @@ final class Rss
      */
     public function fromUrl(string $url): array
     {
-        return $this->fromXml($this->client->get($url)->body());
+        $xml = $this->client->get($url)->body();
+        return $this->fromXml($xml);
     }
 
     private function fromFile(string $file): array

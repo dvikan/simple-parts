@@ -12,7 +12,7 @@ final class ErrorHandler
 
     private function __construct() {}
 
-    public static function initialize($logger = null, array $options = [])
+    public static function initialize(Logger $logger = null, array $options = [])
     {
         $errorHandler = new self();
 
