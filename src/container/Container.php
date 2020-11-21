@@ -5,22 +5,22 @@ namespace dvikan\SimpleParts;
 use ArrayAccess;
 use Closure;
 
-class Container implements ArrayAccess
+final class Container implements ArrayAccess
 {
     private $container = [];
     private $resolved = [];
 
     /**
-     * @throws SimpleException
+     * @throws ContainerException
      */
     public function offsetSet($name, $value)
     {
         if (isset($this[$name])) {
-            throw new SimpleException(sprintf('Container: already has a value stored at "%s"', $name));
+            throw new ContainerException(sprintf('Already has a value stored at "%s"', $name));
         }
 
         if ($value === null) {
-            throw new SimpleException('Container: null is not allowed');
+            throw new ContainerException('null is not allowed');
         }
 
         if (! $value instanceof Closure) {
@@ -31,12 +31,12 @@ class Container implements ArrayAccess
     }
 
     /**
-     * @throws SimpleException
+     * @throws ContainerException
      */
     public function offsetGet($name)
     {
         if (! isset($this[$name])) {
-            throw new SimpleException(sprintf('Container: dependency "%s" not found', $name));
+            throw new ContainerException(sprintf('Dependency "%s" not found', $name));
         }
 
         if (isset($this->resolved[$name])) {

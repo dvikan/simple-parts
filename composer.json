@@ -5,19 +5,25 @@
     "autoload": {
         "psr-4": {
             "dvikan\\SimpleParts\\": [
-              "tests/",
-              "src/",
-              "src/logger/",
-              "src/json/",
-              "src/http/",
-              "src/cache/",
+              "src",
+              "src/cache",
+              "src/common",
+              "src/container",
+              "src/file",
+              "src/http",
+              "src/logger",
+              "src/migrator",
               "src/rss",
+              "src/session",
+              "src/template",
               "src/twitch",
               "src/yahoo-finance"
             ]
         },
         "files": [
-            "src/functions.php"
+            "src/http/functions.php",
+            "src/template/functions.php",
+            "src/template/functions.php"
         ]
     },
     "require-dev": {

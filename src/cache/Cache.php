@@ -4,13 +4,13 @@ namespace dvikan\SimpleParts;
 
 interface Cache
 {
-    public function has($key): bool;
+    public function set($key, $value = true): void;
 
     public function get($key, $default = null);
 
-    public function set($key, $value = true);
+    public function has($key): bool;
 
-    public function delete($key);
+    public function delete($key): void;
 
-    public function withPrefix(string $prefix): Cache;
+    public function clear(): void;
 }

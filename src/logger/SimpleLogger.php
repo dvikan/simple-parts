@@ -10,10 +10,10 @@ class SimpleLogger implements Logger
     /**
      * @param Handler[] $handlers
      */
-    public function __construct(string $name = 'default', array $handlers = [])
+    public function __construct(string $name = 'default', array $handlers = null)
     {
         $this->name = $name;
-        $this->handlers = $handlers;
+        $this->handlers = $handlers ?? [new PrintHandler()];
     }
 
     public function info(string $message, array $context = [])

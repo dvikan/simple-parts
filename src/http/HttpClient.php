@@ -4,6 +4,16 @@ namespace dvikan\SimpleParts;
 
 interface HttpClient
 {
+    public const OK                     = 200;
+    public const BAD_REQUEST            = 400;
+    public const INTERNAL_SERVER_ERROR  = 500;
+
+    public const LINES = [
+        self::OK                    => '200 OK',
+        self::BAD_REQUEST           => '400 Bad Request',
+        self::INTERNAL_SERVER_ERROR => '500 Internal Server Error',
+    ];
+
     public const USERAGENT         = 'useragent';
     public const CONNECT_TIMEOUT   = 'connect_timeout';
     public const TIMEOUT           = 'timeout';

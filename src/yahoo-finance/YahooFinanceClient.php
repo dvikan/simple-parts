@@ -16,10 +16,12 @@ class YahooFinanceClient
 
     public function quote(array $symbols)
     {
-        $symbols = implode(',', $symbols);
+        $url = sprintf('%s/quote?symbols=%s', self::API, implode(',', $symbols));
 
-        $response = $this->client->get(sprintf("%s/quote?symbols=%s", self::API, $symbols));
+        $response = $this->client->get($url);
 
-        return $response->json()['quoteResponse']['result'];
+        $quote = $response->json();
+
+        return $quote['quoteResponse']['result'];
     }
 }

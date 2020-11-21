@@ -2,6 +2,7 @@
 
 Intentionally simple components for building applications.
 
+* `Cache`
 * Router
 * Template engine
 * Dependency container
@@ -14,15 +15,14 @@ Intentionally simple components for building applications.
 * Rss
 * ErrorHandler
 * Json
-* JsonFile
-* FileCache
+* File
 * Console
 * Twitch api client
 * git wrapper (todo)
 * irc client (todo)
 * socket wrapper (todo)
 * web framework (todo)
-* Url (todo)
+* Url,Uri, (todo)
 * Csv (todo)
 * Collection (todo)
 * ImapClient (todo)
@@ -33,6 +33,7 @@ Intentionally simple components for building applications.
 * Random (todo)
 * Guid (todo)
 * Shell command
+* File
 
 All classes reside under the `dvikan\SimpleParts` namespace.
 
@@ -349,7 +350,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $logger = new SimpleLogger('default', [new PrintHandler()]);
 
-ErrorHandler::initialize($logger);
+ErrorHandler::create($logger);
 
 print $foo;
 ```
@@ -374,9 +375,9 @@ try {
 }
 ```
 
-## JsonFile
+## File
 
-Read/write to a json file.
+The `JsonFile` follows the `File` contract.
 
 ```php
 <?php
@@ -387,33 +388,34 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $storage = new JsonFile('./var/numbers.json');
 
-$storage->putContents([1,2,3]);
+$storage->write([1,2,3]);
 
-print_r($storage->getContents());
+print_r($storage->read());
 ```
 
-## FileCache
+## Cache
+
+The `FileCache`, `ArrayCache` and `NullCache` follow the same contract.
 
 ```php
 <?php
 
 use dvikan\SimpleParts\FileCache;
+use dvikan\SimpleParts\JsonFile;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$cache = new FileCache('./var/cache.json');
+$cache = new FileCache(new JsonFile('cache.json'));
 
 $cache->set('foo', 'bar');
 
-if ($cache->has('foo')) {
-    print $cache->get('foo') . "\n";
-}
+print $cache->get('aaaa', 'default');
+
+$hasFoo = $cache->has('foo');
 
 $cache->delete('foo');
 
 $cache->clear();
-
-$newCacheWithKeyPrefixes = $cache->withPrefix('aaa');
 ```
 
 ## Console

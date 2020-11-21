@@ -101,11 +101,6 @@ final class Console
         $this->writeln($bar);
     }
 
-    public function tree(array $tree)
-    {
-        // todo
-    }
-
     private function truncate(string $str, int $length, $placeholder = '..'): string
     {
         if (mb_strlen($str) > $length) {

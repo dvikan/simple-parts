@@ -10,18 +10,14 @@ final class CurlHttpClient implements HttpClient
         HttpClient::TIMEOUT           => 10,
     ];
 
-    private $options;
     private $ch;
+    private $options;
 
     public function __construct(array $options = [])
     {
         $this->options = array_merge(self::OPTIONS, $options);
-        $this->ch = null;
     }
 
-    /**
-     * @throws SimpleException
-     */
     public function get(string $url): Response
     {
         if (!isset($this->ch)) {
@@ -31,9 +27,6 @@ final class CurlHttpClient implements HttpClient
         return $this->execute($url);
     }
 
-    /**
-     * @throws SimpleException
-     */
     public function post(string $url, array $vars = []): Response
     {
         if ($this->ch === null) {
@@ -50,7 +43,7 @@ final class CurlHttpClient implements HttpClient
         $ch = curl_init();
 
         if ($ch === false) {
-            throw new SimpleException('Call to curl_init() failed');
+            throw new SimpleException('curl_init()');
         }
 
         curl_setopt($ch, CURLOPT_USERAGENT, $this->options[self::USERAGENT]);
@@ -97,17 +90,16 @@ final class CurlHttpClient implements HttpClient
         $body = curl_exec($this->ch);
 
         if ($body === false) {
-            throw new SimpleException(curl_error($this->ch));
+            throw new HttpException(sprintf('%s: %s', $url, curl_error($this->ch)));
         }
 
-        $code = curl_getinfo($this->ch, CURLINFO_RESPONSE_CODE);
-        $response = new Response($body, $code, $headers);
+        $response = response($body, curl_getinfo($this->ch, CURLINFO_RESPONSE_CODE), $headers);
 
-        if (! $response->ok()) {
-            throw new SimpleException(sprintf('The response for "%s" was not OK', $url), $code);
+        if ($response->ok()) {
+            return $response;
         }
 
-        return $response;
+        throw new HttpException(sprintf('%s: %s', $url, $response->statusLine()), $response->code());
     }
 
     public function __destruct()

@@ -2,84 +2,95 @@
 
 namespace dvikan\SimpleParts;
 
-/**
- * FileCache is a simple key-value cache with a json file as persistent storage.
- */
 class FileCache implements Cache
 {
     private const DATE_FORMAT = 'Y-m-d H:i:s';
 
-    private $storage;
+    private $file;
     private $prefix;
-    private $memory;
 
-    public function __construct(string $filePath, string $prefix = null)
+    /** @var array */
+    private $data;
+
+    public function __construct(File $file, string $prefix = null)
     {
-        $this->storage = new JsonFile($filePath);
+        $this->file = $file;
         $this->prefix = $prefix;
     }
 
-    public function withPrefix(string $prefix): Cache
+    public function set($key, $value = true): void
     {
-        $fileCache = clone $this;
-        $fileCache->prefix = $prefix;
-
-        return $fileCache;
-    }
-
-    public function get($key, $default = null)
-    {
-        $this->load();
-        if (! $this->has($key)) {
-            return $default;
-        }
-        return $this->memory[$this->key($key)]['value'];
-    }
-
-    public function has($key): bool
-    {
-        $this->load();
-        return isset($this->memory[$this->key($key)]);
-    }
-
-    public function set($key, $value = true)
-    {
-        $this->load();
-        $this->memory[$this->key($key)] = [
+        $this->read();
+        $this->data[$this->key($key)] = [
             'value' => $value,
-            'created_at' => now()->format(self::DATE_FORMAT),
+            'created_at' => (new \DateTime())->format(self::DATE_FORMAT),
         ];
         $this->write();
     }
 
-    public function delete($key)
+    public function get($key, $default = null)
     {
-        $this->load();
-        unset($this->memory[$this->key($key)]);
+        $this->read();
+        if (! $this->has($key)) {
+            return $default;
+        }
+        return $this->data[$this->key($key)]['value'];
+    }
+
+    public function has($key): bool
+    {
+        $this->read();
+        return isset($this->data[$this->key($key)]);
+    }
+
+    public function delete($key): void
+    {
+        $this->read();
+        unset($this->data[$this->key($key)]);
         $this->write();
     }
 
-    public function clear()
+    public function clear(): void
     {
-        $this->memory = [];
+        $this->data = [];
         $this->write();
     }
 
-    private function load()
+    private function read()
     {
-        $this->memory = $this->storage->getContents();
+        $json = $this->file->read();
+
+        if ($json === '') {
+            $this->data = [];
+            return;
+        }
+
+        $this->data = Json::decode($json);
     }
 
     private function write()
     {
-        $this->storage->putContents($this->memory);
+        $this->file->write(Json::encode($this->data));
     }
 
-    private function key($key)
+    private function key($key): string
     {
+        if ((string) $key === '') {
+            throw new CacheException(
+                sprintf('The key cannot evaluate to the empty string: "%s" (%s)', $key, gettype($key))
+            );
+        }
         if (isset($this->prefix)) {
             return sprintf('%s_%s', $this->prefix, $key);
         }
         return $key;
+    }
+
+    private function prepareValue($value)
+    {
+        if ($value === null) {
+            throw new CacheException('The value cannot be null');
+        }
+        return $value;
     }
 }

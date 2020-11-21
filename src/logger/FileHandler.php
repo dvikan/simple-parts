@@ -4,12 +4,12 @@ namespace dvikan\SimpleParts;
 
 class FileHandler implements Handler
 {
-    private $filePath;
+    private $file;
     private $level;
 
-    public function __construct(string $filePath, int $level = Logger::INFO)
+    public function __construct(File $file, int $level = Logger::INFO)
     {
-        $this->filePath = $filePath;
+        $this->file = $file;
         $this->level = $level;
     }
 
@@ -20,7 +20,7 @@ class FileHandler implements Handler
         }
 
         $line = sprintf(
-            "[%s] %s.%s %s %s\n",
+            "[%s] %s.%s %s %s",
             $record['datetime']->format('Y-m-d H:i:s'),
             $record['channel'],
             $record['level_name'],
@@ -28,6 +28,6 @@ class FileHandler implements Handler
             $record['context'] ? Json::encode($record['context']) : '',
         );
 
-        guard(file_put_contents($this->filePath, $line, FILE_APPEND | LOCK_EX));
+        $this->file->append($line);
     }
 }

@@ -20,6 +20,6 @@ class LibNotifyHandler implements Handler
         $title = escapeshellarg($record['channel'] . '.' . $record['level_name']);
         $message = escapeshellarg($record['message']);
 
-        guard(system(sprintf('notify-send -t 15000 %s %s', $title, $message)));
+        system(sprintf('notify-send -t 15000 %s %s', $title, $message));
     }
 }

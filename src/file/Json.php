@@ -2,9 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-use JsonException;
-
-class Json
+final class Json
 {
     /**
      * @throws SimpleException
@@ -19,19 +17,20 @@ class Json
                 | JSON_UNESCAPED_SLASHES
                 | JSON_UNESCAPED_UNICODE
             );
-        } catch (JsonException $e) {
+        } catch (\JsonException $e) {
             throw new SimpleException($e->getMessage(), $e->getCode());
         }
     }
 
     /**
      * @throws SimpleException
+     * @return mixed
      */
     public static function decode(string $json)
     {
         try {
             return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
+        } catch (\JsonException $e) {
             throw new SimpleException($e->getMessage(), $e->getCode());
         }
     }

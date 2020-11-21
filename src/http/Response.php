@@ -8,11 +8,15 @@ class Response
     private $code;
     private $headers;
 
-    public function __construct(string $body = '', int $code = 200, array $headers = [])
+    public function __construct(string $body = '', int $code = HttpClient::OK, array $headers = [])
     {
         $this->body = $body;
         $this->code = $code;
         $this->headers = $headers;
+
+        if (!isset(HttpClient::LINES[$code])) {
+            throw new HttpException(sprintf('Illegal status code "%s"', $code));
+        }
     }
 
     public function body(): string
@@ -30,6 +34,11 @@ class Response
         return $this->code;
     }
 
+    public function statusLine(): string
+    {
+        return HttpClient::LINES[$this->code];
+    }
+
     public function headers(): array
     {
         return $this->headers;
@@ -37,7 +46,7 @@ class Response
 
     public function ok(): bool
     {
-        return $this->code === 200;
+        return $this->code === HttpClient::OK;
     }
 
     public function withJson(array $data): self

@@ -3,7 +3,6 @@
 namespace dvikan\SimpleParts;
 
 use DateTime;
-use Exception;
 use SimpleXMLElement;
 
 final class Rss
@@ -23,15 +22,15 @@ final class Rss
      */
     public function fromUrl(string $url): array
     {
-        $xml = $this->client->get($url)->body();
-        return $this->fromXml($xml);
+        $response = $this->client->get($url);
+        return $this->fromXml($response->body());
     }
 
     private function fromFile(string $file): array
     {
         $xml = file_get_contents($file);
         if ($xml === false) {
-            throw new SimpleException('Call to file_get_contents() failed');
+            throw new SimpleException('file_get_contents()');
         }
         return self::fromXml($xml);
     }
@@ -42,7 +41,7 @@ final class Rss
 
         try {
             $xml = new SimpleXMLElement($xml);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new SimpleException(sprintf('Unable to parse xml: '. $e->getMessage()));
         } finally {
             libxml_use_internal_errors($previous);

@@ -4,20 +4,16 @@ namespace dvikan\SimpleParts;
 
 final class ErrorHandler
 {
-    const OPTIONS = [
-    ];
-
-    private $options;
+    /** @var Logger */
     private $logger;
 
     private function __construct() {}
 
-    public static function initialize(Logger $logger = null, array $options = [])
+    public static function create(Logger $logger = null)
     {
         $errorHandler = new self();
 
-        $errorHandler->logger = $logger ?: new NullLogger();
-        $errorHandler->options = array_merge(self::OPTIONS, $options);
+        $errorHandler->logger = $logger ?: new SimpleLogger();
 
         set_error_handler([$errorHandler, 'handleError']);
         set_exception_handler([$errorHandler, 'handleException']);
@@ -28,17 +24,15 @@ final class ErrorHandler
 
     public function handleError($code, $message, $file, $line)
     {
-        $errorStrings = [
-            E_ERROR => 'Error',
-            E_WARNING => 'Warning',
-            E_NOTICE => 'Notice',
-            E_DEPRECATED => 'Deprecated',
-            E_RECOVERABLE_ERROR => 'Recoverable error',
-        ];
-
         $this->logger->log(
-            SimpleLogger::ERROR,
-            sprintf('%s: %s in %s:%s', $errorStrings[$code] ?? $code, $message, $file, $line)
+            $this->codeToLevel($code),
+            sprintf(
+                '%s: %s in %s:%s',
+                $this->codeToString($code),
+                $message,
+                $file,
+                $line
+            )
         );
 
         exit(1);
@@ -47,8 +41,14 @@ final class ErrorHandler
     public function handleException($e)
     {
         $this->logger->log(
-            SimpleLogger::ERROR,
-            sprintf('Uncaught Exception %s: "%s" at %s line %s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine())
+            Logger::ERROR, // An exception is always an error
+            sprintf(
+                'Uncaught Exception %s: "%s" at %s line %s',
+                get_class($e),
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            )
         );
 
         exit(1);
@@ -59,7 +59,30 @@ final class ErrorHandler
         $err = error_get_last();
 
         if ($err) {
-            $this->logger->log(SimpleLogger::ERROR, $err['message']);
+            $this->logger->log(
+                $this->codeToLevel($err['code']),
+                $err['message']
+            );
         }
+    }
+
+    private function codeToLevel($code): int
+    {
+        static $map = [
+            E_NOTICE => Logger::INFO,
+        ];
+        return $map[$code] ?? Logger::ERROR;
+    }
+
+    private function codeToString(int $code): string
+    {
+        static $map = [
+            E_ERROR             => 'Error',
+            E_WARNING           => 'Warning',
+            E_NOTICE            => 'Notice',
+            E_RECOVERABLE_ERROR => 'Recoverable error',
+            E_DEPRECATED        => 'Deprecated',
+        ];
+        return $map[$code] ?? (string) $code;
     }
 }

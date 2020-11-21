@@ -12,13 +12,8 @@ class Migrator
 
     public function __construct(PDO $pdo, string $folder) {
         $this->pdo = $pdo;
-        $this->folder = rtrim($folder, '/');
-
-        if (! is_dir($this->folder)) {
-            throw new SimpleException(sprintf('Not a folder: "%s"', $this->folder));
-        }
-
-        $this->cache = new FileCache($this->folder . '/.migrations.json');
+        $this->folder = $folder;
+        $this->cache = new FileCache(new JsonFile($folder . '/migrations.json'));
     }
 
     /**
@@ -26,11 +21,15 @@ class Migrator
      */
     public function migrate(): array
     {
+        if (! is_dir($this->folder)) {
+            throw new SimpleException(sprintf('Not a folder: "%s"', $this->folder));
+        }
+
         $messages = [];
 
         foreach (glob($this->folder . '/*.sql') as $migration) {
             $filename = basename($migration);
-            $sql = guard(file_get_contents($migration));
+            $sql = file_get_contents($migration);
 
             if ($this->cache->has($filename)) {
                 continue;

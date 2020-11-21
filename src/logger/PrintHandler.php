@@ -23,7 +23,7 @@ class PrintHandler implements Handler
             (new \DateTime())->format('Y-m-d H:i:s'),
             $record['channel'],
             $record['level_name'],
-            $record['message']
+            $record['message'],
         );
     }
 }

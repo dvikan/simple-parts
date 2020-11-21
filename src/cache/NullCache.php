@@ -4,28 +4,28 @@ namespace dvikan\SimpleParts;
 
 class NullCache implements Cache
 {
+    public function set($key, $value = true): void
+    {
+        // noop
+    }
+
+    public function get($key, $default = null)
+    {
+        return $default;
+    }
+
     public function has($key): bool
     {
         return false;
     }
 
-    public function get($key, $default = null)
-    {
-        return null;
-    }
-
-    public function set( $key, $value = true)
+    public function delete($key): void
     {
         // noop
     }
 
-    public function delete($key)
+    public function clear(): void
     {
         // noop
-    }
-
-    public function withPrefix(string $prefix): Cache
-    {
-        return $this;
     }
 }
