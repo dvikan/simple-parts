@@ -18,7 +18,7 @@ class FileCache implements Cache
         $this->prefix = $prefix;
     }
 
-    public function set($key, $value = true): void
+    public function set(string $key, $value = true): void
     {
         $this->read();
         $this->data[$this->key($key)] = [
@@ -28,7 +28,7 @@ class FileCache implements Cache
         $this->write();
     }
 
-    public function get($key, $default = null)
+    public function get(string $key, $default = null)
     {
         $this->read();
         if (! $this->has($key)) {
@@ -37,13 +37,13 @@ class FileCache implements Cache
         return $this->data[$this->key($key)]['value'];
     }
 
-    public function has($key): bool
+    public function has(string $key): bool
     {
         $this->read();
         return isset($this->data[$this->key($key)]);
     }
 
-    public function delete($key): void
+    public function delete(string $key): void
     {
         $this->read();
         unset($this->data[$this->key($key)]);
@@ -73,24 +73,14 @@ class FileCache implements Cache
         $this->file->write(Json::encode($this->data));
     }
 
-    private function key($key): string
+    private function key(string $key): string
     {
-        if ((string) $key === '') {
-            throw new CacheException(
-                sprintf('The key cannot evaluate to the empty string: "%s" (%s)', $key, gettype($key))
-            );
+        if ($key === '') {
+            throw new CacheException('The key cannot be the empty string');
         }
         if (isset($this->prefix)) {
             return sprintf('%s_%s', $this->prefix, $key);
         }
         return $key;
-    }
-
-    private function prepareValue($value)
-    {
-        if ($value === null) {
-            throw new CacheException('The value cannot be null');
-        }
-        return $value;
     }
 }

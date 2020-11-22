@@ -11,12 +11,12 @@ class MemoryCache implements Cache
         $this->memory = [];
     }
 
-    public function set($key, $value = true): void
+    public function set(string $key, $value = true): void
     {
-        $this->memory[$this->key($key)] = $this->prepareValue($value);
+        $this->memory[$this->key($key)] = $value;
     }
 
-    public function get($key, $default = null)
+    public function get(string $key, $default = null)
     {
         if (!$this->has($key)) {
             return $default;
@@ -25,12 +25,12 @@ class MemoryCache implements Cache
         return $this->memory[$this->key($key)];
     }
 
-    public function has($key): bool
+    public function has(string $key): bool
     {
         return isset($this->memory[$this->key($key)]);
     }
 
-    public function delete($key): void
+    public function delete(string $key): void
     {
         unset($this->memory[$this->key($key)]);
     }
@@ -40,21 +40,11 @@ class MemoryCache implements Cache
         $this->memory = [];
     }
 
-    private function key($key): string
+    private function key(string $key): string
     {
-        if ((string) $key === '') {
-            throw new CacheException(
-                sprintf('The key cannot evaluate to the empty string: "%s" (%s)', $key, gettype($key))
-            );
+        if ($key === '') {
+            throw new CacheException('The key cannot evaluate to the empty string');
         }
-        return (string) $key;
-    }
-
-    private function prepareValue($value)
-    {
-        if ($value === null) {
-            throw new CacheException('The value cannot be null');
-        }
-        return $value;
+        return $key;
     }
 }

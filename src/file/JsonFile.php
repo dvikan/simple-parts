@@ -30,10 +30,11 @@ final class JsonFile implements File
         if ($data === false) {
             throw new FileException(sprintf('Unable to read from "%s"', $this->filePath));
         }
-        if ($data === '') return '';
 
-        return $decode = $this->decode($data);
-        return $data;
+        if ($data === '') {
+            return '';
+        }
+        return implode('', $this->decode($data));
     }
 
     /**
@@ -41,21 +42,32 @@ final class JsonFile implements File
      */
     public function write(string $data): void
     {
-        if (file_put_contents($this->filePath, $this->encode($data), LOCK_EX) === false) {
+        if (file_put_contents($this->filePath, $this->encode([$data]), LOCK_EX) === false) {
             throw new FileException(sprintf('Unable to write to "%s"', $this->filePath));
         }
     }
 
     public function append(string $data): void
     {
-        if ($this->exists()) {
-            $old = $this->decode($this->read());
-            $new = Json::encode($data);
-
-            $data = array_merge($old, $new);
+        if (!$this->exists()) {
+            $this->write($data);
+            return;
         }
 
-        if (file_put_contents($this->filePath, $this->encode($data), LOCK_EX) === false) {
+        $old = file_get_contents($this->filePath);
+
+        if ($old === false) {
+            throw new FileException(sprintf('Unable to read from "%s"', $this->filePath));
+        }
+
+        if ($old === '') {
+            $old = [''];
+        } else {
+            $old = $this->decode($old);
+        }
+        $old[] = $data;
+
+        if (file_put_contents($this->filePath, $this->encode($old), LOCK_EX) === false) {
             throw new FileException(sprintf('Unable to write to "%s"', $this->filePath));
         }
     }

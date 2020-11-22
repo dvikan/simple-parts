@@ -23,14 +23,16 @@ class LineFile implements File
         }
 
         $lines = file($this->filePath);
-        foreach ($lines as &$line) {
-            $line = rtrim($line, "\n");
-        }
 
         if ($lines === false) {
             throw new FileException(sprintf('Unable to read from "%s"', $this->filePath));
         }
-        return implode("", $lines);
+
+        foreach ($lines as &$line) {
+            $line = rtrim($line, "\n");
+        }
+
+        return implode('', $lines);
     }
 
     public function write(string $data): void

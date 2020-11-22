@@ -4,7 +4,6 @@ namespace dvikan\SimpleParts;
 
 class MemoryFile implements File
 {
-
     private $memory;
 
     public function __construct()

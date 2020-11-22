@@ -18,7 +18,7 @@ final class Json
                 | JSON_UNESCAPED_UNICODE
             );
         } catch (\JsonException $e) {
-            throw new SimpleException($e->getMessage(), $e->getCode());
+            throw new SimpleException('json_encode: ' . $e->getMessage(), $e->getCode());
         }
     }
 
@@ -31,7 +31,7 @@ final class Json
         try {
             return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            throw new SimpleException($e->getMessage(), $e->getCode());
+            throw new SimpleException('json_decode: ' . $e->getMessage(), $e->getCode());
         }
     }
 }

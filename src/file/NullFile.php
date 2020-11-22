@@ -11,14 +11,16 @@ class NullFile implements File
 
     public function read(): string
     {
-        return '';
+        throw new FileException('NullFile doesnt exists');
     }
 
     public function write(string $data): void
     {
+        // noop
     }
 
     public function append(string $data): void
     {
+        // noop
     }
 }
