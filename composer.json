@@ -8,6 +8,7 @@
               "src",
               "src/cache",
               "src/common",
+              "src/console",
               "src/container",
               "src/file",
               "src/http",
