@@ -7,13 +7,13 @@ namespace dvikan\SimpleParts;
  *
  * @return mixed
  */
-function session(string $name, $value = null)
+function session(string $name, $newValue = null)
 {
     // todo: validate session started
-    if ($value === null) {
+    if ($newValue === null) {
         return $_SESSION[$name] ?? null;
     }
 
-    $_SESSION[$name] = $value;
+    $_SESSION[$name] = $newValue;
     return null;
 }

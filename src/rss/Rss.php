@@ -15,7 +15,7 @@ final class Rss
 
     public function __construct(HttpClient $client = null)
     {
-        $this->client = $client ?: new CurlHttpClient();
+        $this->client = $client ?: new CurlHttpClient([HttpClient::USERAGENT => 'Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0']);
     }
 
     /**
@@ -70,12 +70,17 @@ final class Rss
         ];
 
         foreach ($xml->channel->item as $item) {
+
             $_item = [
-                'title'         => (string) $item->title,
-                'link'          => (string) $item->link,
+                'title'         => $item->title,
+                'link'          => null,
                 'date'          => DateTime::createFromFormat(DATE_RSS, (string) $item->pubDate)->format(DATE_FORMAT),
                 'description'   => (string) $item->description,
             ];
+
+            if (isset($item->link)) {
+                $_item['link'] = (string) $item->link;
+            }
 
             $channel['items'][] = $_item;
         }

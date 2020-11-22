@@ -27,7 +27,7 @@ final class StreamFile implements File
     public function read(): string
     {
         if (!$this->exists()) {
-            throw new FileException(sprintf('File "%s" doesnt exists', $this->filePath));
+            return '';
         }
 
         $data = file_get_contents($this->filePath);
