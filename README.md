@@ -192,14 +192,14 @@ try {
 <?php
 
 use dvikan\SimpleParts\Json;
-use dvikan\SimpleParts\SimpleException;
+use dvikan\SimpleParts\JsonException;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 try {
     $json = Json::encode(['message' => 'hello']);
-    print Json::decode($json)['message'] . "\n";
-} catch (SimpleException $e) {
+    print_r(Json::decode($json);
+} catch (JsonException $e) {
     printf("Unable to encode/decode json\n");
 }
 ```

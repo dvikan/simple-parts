@@ -2,8 +2,6 @@
 
 namespace dvikan\SimpleParts;
 
-use JsonException;
-
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
@@ -12,7 +10,7 @@ use const JSON_UNESCAPED_UNICODE;
 final class Json
 {
     /**
-     * @throws SimpleException
+     * @throws JsonException
      */
     public static function encode($object): string
     {
@@ -24,21 +22,21 @@ final class Json
                 | JSON_UNESCAPED_SLASHES
                 | JSON_UNESCAPED_UNICODE
             );
-        } catch (JsonException $e) {
-            throw new SimpleException('json_encode(): ' . $e->getMessage(), $e->getCode());
+        } catch (\JsonException $e) {
+            throw new JsonException('json_encode(): ' . $e->getMessage(), $e->getCode());
         }
     }
 
     /**
-     * @throws SimpleException
+     * @throws JsonException
      * @return mixed
      */
     public static function decode(string $json)
     {
         try {
             return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
-            throw new SimpleException('json_decode(): ' . $e->getMessage(), $e->getCode());
+        } catch (\JsonException $e) {
+            throw new JsonException('json_decode(): ' . $e->getMessage(), $e->getCode());
         }
     }
 }
