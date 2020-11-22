@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
@@ -34,7 +34,9 @@ final class JsonFile implements File
         if ($data === '') {
             return '';
         }
-        return implode('', $this->decode($data));
+        $pieces = $this->decode($data);
+        $implode = implode('', $pieces);
+        return $implode;
     }
 
     /**
