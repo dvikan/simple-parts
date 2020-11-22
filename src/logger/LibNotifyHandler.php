@@ -20,6 +20,6 @@ final class LibNotifyHandler implements Handler
         $title = $record['channel'] . '.' . $record['level_name'];
 
         $shell = new Shell();
-        $shell->execute('notify-send -t', [15000, $title, $record['message']]);
+        $shell->execute('notify-send -t', ['15000', $title, $record['message']]);
     }
 }

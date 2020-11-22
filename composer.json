@@ -10,6 +10,7 @@
               "src/common",
               "src/console",
               "src/container",
+              "src/error-handler",
               "src/file",
               "src/http",
               "src/json",
@@ -26,9 +27,8 @@
         "files": [
             "src/common/constants.php",
             "src/http/functions.php",
-            "src/session/functions.php",
-            "src/template/functions.php",
-            "src/template/functions.php"
+            "src/session/session.php",
+            "src/template/template.php"
         ]
     },
     "require-dev": {

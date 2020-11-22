@@ -14,7 +14,7 @@ final class Shell
     {
         array_walk($arguments, function ($n) {
             if (!is_string($n)) {
-                throw new SimpleException;
+                throw new SimpleException('All arguments must be strings. Got: ' . $n . ' ' . gettype($n));
             }
         });
 
