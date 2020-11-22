@@ -2,6 +2,9 @@
 
 namespace dvikan\SimpleParts;
 
+use function curl_close;
+use function curl_init;
+
 final class CurlHttpClient implements HttpClient
 {
     private const OPTIONS = [

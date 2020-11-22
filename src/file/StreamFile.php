@@ -2,7 +2,12 @@
 
 namespace dvikan\SimpleParts;
 
-final class JsonFile implements File
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
+use const LOCK_EX;
+
+final class StreamFile implements File
 {
     private $filePath;
 
@@ -31,12 +36,7 @@ final class JsonFile implements File
             throw new FileException(sprintf('Unable to read from "%s"', $this->filePath));
         }
 
-        if ($data === '') {
-            return '';
-        }
-        $pieces = $this->decode($data);
-        $implode = implode('', $pieces);
-        return $implode;
+        return $data;
     }
 
     /**
@@ -44,51 +44,18 @@ final class JsonFile implements File
      */
     public function write(string $data): void
     {
-        if (file_put_contents($this->filePath, $this->encode([$data]), LOCK_EX) === false) {
+        if (file_put_contents($this->filePath, $data, LOCK_EX) === false) {
             throw new FileException(sprintf('Unable to write to "%s"', $this->filePath));
         }
     }
 
+    /**
+     * @throws FileException
+     */
     public function append(string $data): void
     {
-        if (!$this->exists()) {
-            $this->write($data);
-            return;
-        }
-
-        $old = file_get_contents($this->filePath);
-
-        if ($old === false) {
-            throw new FileException(sprintf('Unable to read from "%s"', $this->filePath));
-        }
-
-        if ($old === '') {
-            $old = [''];
-        } else {
-            $old = $this->decode($old);
-        }
-        $old[] = $data;
-
-        if (file_put_contents($this->filePath, $this->encode($old), LOCK_EX) === false) {
+        if (file_put_contents($this->filePath, $data, FILE_APPEND | LOCK_EX) === false) {
             throw new FileException(sprintf('Unable to write to "%s"', $this->filePath));
-        }
-    }
-
-    private function decode(string $data)
-    {
-        try {
-            return Json::decode($data);
-        } catch (SimpleException $e) {
-            throw new FileException($e->getMessage());
-        }
-    }
-
-    private function encode($data): string
-    {
-        try {
-            return Json::encode($data);
-        } catch (SimpleException $e) {
-            throw new FileException($e->getMessage());
         }
     }
 }

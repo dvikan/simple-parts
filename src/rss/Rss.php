@@ -3,12 +3,13 @@
 namespace dvikan\SimpleParts;
 
 use DateTime;
+use Exception;
 use SimpleXMLElement;
+use function file_get_contents;
+use function libxml_use_internal_errors;
 
 final class Rss
 {
-    const DATE_FORMAT = 'Y-m-d H:i:s';
-
     /** @var HttpClient */
     private $client;
 
@@ -41,7 +42,7 @@ final class Rss
 
         try {
             $xml = new SimpleXMLElement($xml);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new SimpleException(sprintf('Unable to parse xml: '. $e->getMessage()));
         } finally {
             libxml_use_internal_errors($previous);
@@ -72,7 +73,7 @@ final class Rss
             $_item = [
                 'title'         => (string) $item->title,
                 'link'          => (string) $item->link,
-                'date'          => DateTime::createFromFormat(DATE_RSS, (string) $item->pubDate)->format(self::DATE_FORMAT),
+                'date'          => DateTime::createFromFormat(DATE_RSS, (string) $item->pubDate)->format(DATE_FORMAT),
                 'description'   => (string) $item->description,
             ];
 
@@ -98,9 +99,9 @@ final class Rss
             ];
 
             if ($entry->published) {
-                $item['date'] = DateTime::createFromFormat(DATE_ATOM, (string) $entry->published)->format(self::DATE_FORMAT);
+                $item['date'] = DateTime::createFromFormat(DATE_ATOM, (string) $entry->published)->format(DATE_FORMAT);
             } else {
-                $item['date'] = DateTime::createFromFormat(DATE_ATOM, (string) $entry->updated)->format(self::DATE_FORMAT);
+                $item['date'] = DateTime::createFromFormat(DATE_ATOM, (string) $entry->updated)->format(DATE_FORMAT);
             }
 
             $feed['items'][] = $item;

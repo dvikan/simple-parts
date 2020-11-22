@@ -2,6 +2,15 @@
 
 namespace dvikan\SimpleParts;
 
+use function count;
+use function max;
+use function mb_strlen;
+use function mb_substr;
+use function min;
+use function printf;
+use function range;
+use function str_repeat;
+
 final class Console
 {
     private const NC = "\033[0m";

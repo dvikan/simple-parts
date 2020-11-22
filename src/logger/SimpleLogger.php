@@ -2,6 +2,8 @@
 
 namespace dvikan\SimpleParts;
 
+use DateTime;
+
 class SimpleLogger implements Logger
 {
     private $handlers;
@@ -16,22 +18,22 @@ class SimpleLogger implements Logger
         $this->handlers = $handlers ?? [new PrintHandler()];
     }
 
-    public function info(string $message, array $context = [])
+    public function info(string $message, array $context = []): void
     {
         $this->log(self::INFO, $message, $context);
     }
 
-    public function warning(string $message, array $context = [])
+    public function warning(string $message, array $context = []): void
     {
         $this->log(self::WARNING, $message, $context);
     }
 
-    public function error(string $message, array $context = [])
+    public function error(string $message, array $context = []): void
     {
         $this->log(self::ERROR, $message, $context);
     }
 
-    public function log(int $level, string $message, array $context = [])
+    public function log(int $level, string $message, array $context = []): void
     {
         foreach ($this->handlers as $handler) {
             $handler->handle([
@@ -40,7 +42,7 @@ class SimpleLogger implements Logger
                 'level_name'    => self::LOG_LEVELS[$level],
                 'message'       => $message,
                 'context'       => $context,
-                'datetime'      => new \DateTime(),
+                'datetime'      => new DateTime(),
             ]);
         }
     }

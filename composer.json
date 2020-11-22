@@ -16,12 +16,14 @@
               "src/migrator",
               "src/rss",
               "src/session",
+              "src/shell",
               "src/template",
               "src/twitch",
               "src/yahoo-finance"
             ]
         },
         "files": [
+            "src/common/constants.php",
             "src/http/functions.php",
             "src/template/functions.php",
             "src/template/functions.php"

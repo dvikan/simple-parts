@@ -2,7 +2,10 @@
 
 namespace dvikan\SimpleParts;
 
-class PrintHandler implements Handler
+use function fprintf;
+use const STDERR;
+
+final class PrintHandler implements Handler
 {
     private $level;
 
@@ -11,9 +14,14 @@ class PrintHandler implements Handler
         $this->level = $level;
     }
 
-    public function handle(array $record)
+    public function handle(array $record): void
     {
         if ($record['level'] < $this->level) {
+            return;
+        }
+
+        // Ignore this xdebug bug
+        if (strpos($record['message'], 'Header may not contain NUL bytes') !== false) {
             return;
         }
 

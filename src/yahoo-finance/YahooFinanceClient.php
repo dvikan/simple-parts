@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-class YahooFinanceClient
+final class YahooFinanceClient
 {
     private const API = 'https://query1.finance.yahoo.com/v7/finance';
 

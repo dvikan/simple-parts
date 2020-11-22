@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-class FileHandler implements Handler
+final class FileHandler implements Handler
 {
     private $file;
     private $level;
@@ -13,7 +13,7 @@ class FileHandler implements Handler
         $this->level = $level;
     }
 
-    public function handle(array $record)
+    public function handle(array $record): void
     {
         if ($record['level'] < $this->level) {
             return;

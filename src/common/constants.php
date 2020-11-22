@@ -2,7 +2,4 @@
 
 namespace dvikan\SimpleParts;
 
-final class CacheException extends SimpleException
-{
-
-}
+const DATE_FORMAT = 'Y-m-d H:i:s';

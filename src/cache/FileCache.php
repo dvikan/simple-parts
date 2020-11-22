@@ -2,10 +2,11 @@
 
 namespace dvikan\SimpleParts;
 
-class FileCache implements Cache
-{
-    private const DATE_FORMAT = 'Y-m-d H:i:s';
+use DateTime;
+use function sprintf;
 
+final class FileCache implements Cache
+{
     private $file;
     private $prefix;
 
@@ -23,7 +24,7 @@ class FileCache implements Cache
         $this->read();
         $this->data[$this->key($key)] = [
             'value' => $value,
-            'created_at' => (new \DateTime())->format(self::DATE_FORMAT),
+            'created_at' => (new DateTime())->format(DATE_FORMAT),
         ];
         $this->write();
     }
@@ -58,14 +59,7 @@ class FileCache implements Cache
 
     private function read()
     {
-        $json = $this->file->read();
-
-        if ($json === '') {
-            $this->data = [];
-            return;
-        }
-
-        $this->data = Json::decode($json);
+        $this->data = Json::decode($this->file->read() ?: '[]');
     }
 
     private function write()
@@ -78,9 +72,11 @@ class FileCache implements Cache
         if ($key === '') {
             throw new CacheException('The key cannot be the empty string');
         }
+
         if (isset($this->prefix)) {
             return sprintf('%s_%s', $this->prefix, $key);
         }
+
         return $key;
     }
 }

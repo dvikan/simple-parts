@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-class MemoryFile implements File
+final class MemoryFile implements File
 {
     private $memory;
 

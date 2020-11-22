@@ -4,5 +4,5 @@ namespace dvikan\SimpleParts;
 
 interface Handler
 {
-    public function handle(array $record);
+    public function handle(array $record): void;
 }

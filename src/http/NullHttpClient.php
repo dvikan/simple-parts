@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-class NullHttpClient implements HttpClient
+final class NullHttpClient implements HttpClient
 {
     public function get(string $url): Response
     {

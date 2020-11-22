@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-class Request
+final class Request
 {
     private $get;
     private $post;

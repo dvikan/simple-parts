@@ -2,10 +2,12 @@
 
 namespace dvikan\SimpleParts;
 
+use function http_build_query;
+
 /**
  * https://dev.twitch.tv/docs/api/reference
  */
-class TwitchClient
+final class TwitchClient
 {
     private $clientId;
     private $clientSecret;

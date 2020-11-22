@@ -11,7 +11,7 @@ class CacheTest extends TestCase
         $this->_testCache(new MemoryCache());
         $this->_testCache(new FileCache(new MemoryFile()));
         $this->_testCache(new FileCache(new LineFile(tempnam(sys_get_temp_dir(), 'FileTest_'))));
-        $this->_testCache(new FileCache(new JsonFile(tempnam(sys_get_temp_dir(), 'FileTest_'))));
+        $this->_testCache(new FileCache(new StreamFile(tempnam(sys_get_temp_dir(), 'FileTest_'))));
     }
 
     private function _testCache(Cache $sut): void

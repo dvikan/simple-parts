@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-class NullCache implements Cache
+final class NullCache implements Cache
 {
     public function set(string $key, $value = true): void
     {

@@ -2,9 +2,10 @@
 
 namespace dvikan\SimpleParts;
 
-
 /**
  * Get or set session variable.
+ *
+ * @return mixed
  */
 function session(string $name, $value = null)
 {
@@ -14,4 +15,5 @@ function session(string $name, $value = null)
     }
 
     $_SESSION[$name] = $value;
+    return null;
 }

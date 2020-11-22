@@ -2,7 +2,11 @@
 
 namespace dvikan\SimpleParts;
 
-class LineFile implements File
+use function file;
+use function file_exists;
+use function file_put_contents;
+
+final class LineFile implements File
 {
     private $filePath;
 
@@ -29,7 +33,7 @@ class LineFile implements File
         }
 
         foreach ($lines as &$line) {
-            $line = rtrim($line, "\n");
+            $line = rtrim($line, "\n"); // perhaps not trim too much here
         }
 
         return implode('', $lines);

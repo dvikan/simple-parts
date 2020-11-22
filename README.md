@@ -34,45 +34,10 @@ Intentionally simple components for building applications.
 * Guid (todo)
 * Shell command
 * File
+* Flat file database
 
 All classes reside under the `dvikan\SimpleParts` namespace.
 
-Here is the directory tree for `src/`:
-
-```shell
-$ tree src/
-src/
-├── cache
-│   ├── Cache.php
-│   ├── FileCache.php
-│   └── NullCache.php
-├── Console.php
-├── Container.php
-├── ErrorHandler.php
-├── functions.php
-├── http
-│   ├── CurlHttpClient.php
-│   ├── HttpClient.php
-│   ├── NullHttpClient.php
-│   ├── Request.php
-│   └── Response.php
-├── json
-│   ├── JsonFile.php
-│   └── Json.php
-├── logger
-│   ├── FileHandler.php
-│   ├── Handler.php
-│   ├── LibNotifyHandler.php
-│   ├── Logger.php
-│   ├── NullLogger.php
-│   ├── PrintHandler.php
-│   └── SimpleLogger.php
-├── Migrator.php
-├── Router.php
-├── Rss.php
-└── SimpleException.php
-
-5 directories, 26 files
 
 ```
 ## Router
@@ -382,11 +347,11 @@ The `JsonFile` follows the `File` contract.
 ```php
 <?php
 
-use dvikan\SimpleParts\JsonFile;
+use dvikan\SimpleParts\StreamFile;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$storage = new JsonFile('./var/numbers.json');
+$storage = new StreamFile('./var/numbers.json');
 
 $storage->write([1,2,3]);
 
@@ -401,11 +366,11 @@ The `FileCache`, `ArrayCache` and `NullCache` follow the same contract.
 <?php
 
 use dvikan\SimpleParts\FileCache;
-use dvikan\SimpleParts\JsonFile;
+use dvikan\SimpleParts\StreamFile;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$cache = new FileCache(new JsonFile('cache.json'));
+$cache = new FileCache(new StreamFile('cache.json'));
 
 $cache->set('foo', 'bar');
 

@@ -2,7 +2,10 @@
 
 namespace dvikan\SimpleParts;
 
-class Response
+use function header;
+use function http_response_code;
+
+final class Response
 {
     private $body;
     private $code;

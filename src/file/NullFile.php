@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-class NullFile implements File
+final class NullFile implements File
 {
     public function exists(): bool
     {

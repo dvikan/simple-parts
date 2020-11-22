@@ -10,8 +10,7 @@ final class ShellTest extends TestCase
     {
         $sut = new Shell();
 
-        self::assertEquals('', $sut->execute('echo;id'));
-        self::assertEquals('aaa', $sut->execute('echo', ['aaa']));
-        self::assertEquals("1\n2\n3", $sut->execute('seq', [1, 3]));
+        self::assertEquals('hello world', $sut->execute('echo', ['hello', 'world']));
+        self::assertEquals("1\n2\n3", $sut->execute('seq', ['1', '3']));
     }
 }

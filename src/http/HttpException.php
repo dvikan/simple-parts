@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-class HttpException extends SimpleException
+final class HttpException extends SimpleException
 {
 
 }

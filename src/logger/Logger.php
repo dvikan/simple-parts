@@ -14,11 +14,11 @@ interface Logger
         self::ERROR     => 'ERROR',
     ];
 
-    public function info(string $message, array $context = []);
+    public function info(string $message, array $context = []): void;
 
-    public function warning(string $message, array $context = []);
+    public function warning(string $message, array $context = []): void;
 
-    public function error(string $message, array $context = []);
+    public function error(string $message, array $context = []): void;
 
-    public function log(int $level, string $message, array $context = []);
+    public function log(int $level, string $message, array $context = []): void;
 }

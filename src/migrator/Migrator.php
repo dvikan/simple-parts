@@ -3,8 +3,11 @@
 namespace dvikan\SimpleParts;
 
 use PDO;
+use function basename;
+use function file_get_contents;
+use function is_dir;
 
-class Migrator
+final class Migrator
 {
     private $pdo;
     private $folder;
@@ -13,7 +16,7 @@ class Migrator
     public function __construct(PDO $pdo, string $folder) {
         $this->pdo = $pdo;
         $this->folder = $folder;
-        $this->cache = new FileCache(new JsonFile($folder . '/migrations.json'));
+        $this->cache = new FileCache(new StreamFile($folder . '/migrations.json'));
     }
 
     /**
@@ -21,7 +24,7 @@ class Migrator
      */
     public function migrate(): array
     {
-        if (! is_dir($this->folder)) {
+        if (!is_dir($this->folder)) {
             throw new SimpleException(sprintf('Not a folder: "%s"', $this->folder));
         }
 

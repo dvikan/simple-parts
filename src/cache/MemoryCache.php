@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-class MemoryCache implements Cache
+final class MemoryCache implements Cache
 {
     private $memory;
 
@@ -45,6 +45,7 @@ class MemoryCache implements Cache
         if ($key === '') {
             throw new CacheException('The key cannot evaluate to the empty string');
         }
+
         return $key;
     }
 }

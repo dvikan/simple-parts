@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-class ContainerException extends SimpleException
+final class ContainerException extends SimpleException
 {
 
 }

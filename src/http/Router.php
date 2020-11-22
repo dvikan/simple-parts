@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-class Router
+final class Router
 {
     private $routes;
 

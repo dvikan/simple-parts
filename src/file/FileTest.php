@@ -10,7 +10,7 @@ class FileTest extends TestCase
     {
         $this->_testFile(new MemoryFile());
         $this->_testFile(new LineFile(tempnam(sys_get_temp_dir(), 'FileTest_')));
-        $this->_testFile(new JsonFile(tempnam(sys_get_temp_dir(), 'FileTest_')));
+        $this->_testFile(new StreamFile(tempnam(sys_get_temp_dir(), 'FileTest_')));
     }
 
     private function _testFile(File $sut): void
@@ -26,15 +26,5 @@ class FileTest extends TestCase
         self::assertSame('aaa', $sut->read());
         $sut->append('aaa');
         self::assertSame('aaaaaa', $sut->read());
-    }
-
-    function testfu()
-    {
-        $sut = new JsonFile(tempnam(sys_get_temp_dir(), 'FileTest_'));
-        $sut->write('');
-        self::assertSame('', $sut->read());
-        $sut->append('a');
-        $sut->append('a');
-        self::assertSame('aa', $sut->read());
     }
 }

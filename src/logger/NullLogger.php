@@ -2,24 +2,24 @@
 
 namespace dvikan\SimpleParts;
 
-class NullLogger implements Logger
+final class NullLogger implements Logger
 {
-    public function info(string $message, array $context = [])
+    public function info(string $message, array $context = []): void
     {
         // noop
     }
 
-    public function warning(string $message, array $context = [])
+    public function warning(string $message, array $context = []): void
     {
         // noop
     }
 
-    public function error(string $message, array $context = [])
+    public function error(string $message, array $context = []): void
     {
         // noop
     }
 
-    public function log(int $level, string $message, array $context = [])
+    public function log(int $level, string $message, array $context = []): void
     {
         // noop
     }

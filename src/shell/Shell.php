@@ -2,13 +2,27 @@
 
 namespace dvikan\SimpleParts;
 
+use function escapeshellarg;
+use function exec;
+
 final class Shell
 {
-    public function execute(string $program, array $args = []): string
+    /**
+     * @param string[] $arguments
+     */
+    public function execute(string $command, array $arguments = []): string
     {
-        $command = $program . ' ' . implode(' ', $args);
+        array_walk($arguments, function ($n) {
+            if (!is_string($n)) {
+                throw new SimpleException;
+            }
+        });
 
-        exec(escapeshellcmd($command), $output, $status);
+        foreach ($arguments as $argument) {
+            $command .= ' ' . escapeshellarg($argument);
+        }
+
+        exec($command, $output, $status);
 
         if ($status === 0) {
             return implode("\n", $output);
@@ -16,9 +30,9 @@ final class Shell
 
         switch ($status) {
             case 127:
-                throw new SimpleException('Command not found: ' . $command);
+                throw new SimpleException('Not found: ' . $command);
             default:
-                throw new SimpleException("exec(): $status");
+                throw new SimpleException('Unsuccessful: ' . $command);
         }
     }
 }
