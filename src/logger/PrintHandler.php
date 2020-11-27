@@ -25,13 +25,12 @@ final class PrintHandler implements Handler
             return;
         }
 
-        fprintf(
-            STDERR,
-            "[%s] %s.%s %s\n",
-            (new \DateTime())->format('Y-m-d H:i:s'),
+        printf(
+            "%s.%s %s %s\n",
             $record['channel'],
             $record['level_name'],
             $record['message'],
+            Json::encode($record['context'] ?: []),
         );
     }
 }
