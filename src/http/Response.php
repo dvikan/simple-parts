@@ -18,7 +18,7 @@ final class Response
         $this->headers = $headers;
 
         if (!isset(HttpClient::LINES[$code])) {
-            throw new HttpException(sprintf('Illegal status code "%s"', $code));
+            throw new SimpleException(sprintf('Illegal status code "%s"', $code));
         }
     }
 

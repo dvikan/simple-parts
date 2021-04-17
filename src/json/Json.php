@@ -9,9 +9,6 @@ use const JSON_UNESCAPED_UNICODE;
 
 final class Json
 {
-    /**
-     * @throws JsonException
-     */
     public static function encode($object): string
     {
         try {
@@ -23,12 +20,11 @@ final class Json
                 | JSON_UNESCAPED_UNICODE
             );
         } catch (\JsonException $e) {
-            throw new JsonException('json_encode(): ' . $e->getMessage(), $e->getCode());
+            throw new SimpleException('json_encode(): ' . $e->getMessage(), $e->getCode());
         }
     }
 
     /**
-     * @throws JsonException
      * @return mixed
      */
     public static function decode(string $json)
@@ -36,7 +32,7 @@ final class Json
         try {
             return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            throw new JsonException('json_decode(): ' . $e->getMessage(), $e->getCode());
+            throw new SimpleException('json_decode(): ' . $e->getMessage(), $e->getCode());
         }
     }
 }

@@ -10,17 +10,14 @@ final class Container implements ArrayAccess
     private $container = [];
     private $resolved = [];
 
-    /**
-     * @throws ContainerException
-     */
     public function offsetSet($name, $value)
     {
         if (isset($this[$name])) {
-            throw new ContainerException(sprintf('Already has a value stored at "%s"', $name));
+            throw new SimpleException(sprintf('Already has a value stored at "%s"', $name));
         }
 
         if ($value === null) {
-            throw new ContainerException('null is not allowed');
+            throw new SimpleException('null is not allowed');
         }
 
         if (! $value instanceof Closure) {
@@ -30,13 +27,10 @@ final class Container implements ArrayAccess
         $this->container[$name] = $value;
     }
 
-    /**
-     * @throws ContainerException
-     */
     public function offsetGet($name)
     {
         if (! isset($this[$name])) {
-            throw new ContainerException(sprintf('Dependency "%s" not found', $name));
+            throw new SimpleException(sprintf('Dependency "%s" not found', $name));
         }
 
         if (isset($this->resolved[$name])) {

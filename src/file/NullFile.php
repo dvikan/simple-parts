@@ -11,7 +11,7 @@ final class NullFile implements File
 
     public function read(): string
     {
-        throw new FileException('NullFile doesnt exists');
+        throw new SimpleException('NullFile doesnt exists');
     }
 
     public function write(string $data): void

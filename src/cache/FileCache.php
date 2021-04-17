@@ -70,7 +70,7 @@ final class FileCache implements Cache
     private function key(string $key): string
     {
         if ($key === '') {
-            throw new CacheException('The key cannot be the empty string');
+            throw new SimpleException('The key cannot be the empty string');
         }
 
         if (isset($this->prefix)) {

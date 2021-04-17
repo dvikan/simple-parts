@@ -85,7 +85,7 @@ final class CurlHttpClient implements HttpClient
         $body = curl_exec($this->ch);
 
         if ($body === false) {
-            throw new HttpException(sprintf('%s: %s', $url, curl_error($this->ch)));
+            throw new SimpleException(sprintf('%s: %s', $url, curl_error($this->ch)));
         }
 
         $statusCode = curl_getinfo($this->ch, CURLINFO_RESPONSE_CODE);
@@ -96,7 +96,7 @@ final class CurlHttpClient implements HttpClient
             return $response;
         }
 
-        throw new HttpException(sprintf('%s: %s', $url, $response->statusLine()), $response->code());
+        throw new SimpleException(sprintf('%s: %s', $url, $response->statusLine()), $response->code());
     }
 
     public function __destruct()

@@ -23,13 +23,13 @@ final class LineFile implements File
     public function read(): string
     {
         if (!$this->exists()) {
-            throw new FileException(sprintf('File "%s" doesnt exists', $this->filePath));
+            throw new SimpleException(sprintf('File "%s" doesnt exists', $this->filePath));
         }
 
         $lines = file($this->filePath);
 
         if ($lines === false) {
-            throw new FileException(sprintf('Unable to read from "%s"', $this->filePath));
+            throw new SimpleException(sprintf('Unable to read from "%s"', $this->filePath));
         }
 
         foreach ($lines as &$line) {
@@ -42,14 +42,14 @@ final class LineFile implements File
     public function write(string $data): void
     {
         if (file_put_contents($this->filePath, $data . "\n", LOCK_EX) === false) {
-            throw new FileException(sprintf('Unable to write to "%s"', $this->filePath));
+            throw new SimpleException(sprintf('Unable to write to "%s"', $this->filePath));
         }
     }
 
     public function append(string $data): void
     {
         if (file_put_contents($this->filePath, $data . "\n", FILE_APPEND | LOCK_EX) === false) {
-            throw new FileException(sprintf('Unable to write to "%s"', $this->filePath));
+            throw new SimpleException(sprintf('Unable to write to "%s"', $this->filePath));
         }
     }
 }

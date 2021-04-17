@@ -21,9 +21,6 @@ final class StreamFile implements File
         return file_exists($this->filePath) === true;
     }
 
-    /**
-     * @throws FileException
-     */
     public function read(): string
     {
         if (!$this->exists()) {
@@ -33,29 +30,23 @@ final class StreamFile implements File
         $data = file_get_contents($this->filePath);
 
         if ($data === false) {
-            throw new FileException(sprintf('Unable to read from "%s"', $this->filePath));
+            throw new SimpleException(sprintf('Unable to read from "%s"', $this->filePath));
         }
 
         return $data;
     }
 
-    /**
-     * @throws FileException
-     */
     public function write(string $data): void
     {
         if (file_put_contents($this->filePath, $data, LOCK_EX) === false) {
-            throw new FileException(sprintf('Unable to write to "%s"', $this->filePath));
+            throw new SimpleException(sprintf('Unable to write to "%s"', $this->filePath));
         }
     }
 
-    /**
-     * @throws FileException
-     */
     public function append(string $data): void
     {
         if (file_put_contents($this->filePath, $data, FILE_APPEND | LOCK_EX) === false) {
-            throw new FileException(sprintf('Unable to write to "%s"', $this->filePath));
+            throw new SimpleException(sprintf('Unable to write to "%s"', $this->filePath));
         }
     }
 }
