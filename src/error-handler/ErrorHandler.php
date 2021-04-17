@@ -23,8 +23,9 @@ final class ErrorHandler
     ];
 
     private const EXIT_MAP = [
-        E_NOTICE => true,
+        E_RECOVERABLE_ERROR => true,
         E_WARNING => true,
+        E_NOTICE => true,
     ];
 
     /** @var Logger */

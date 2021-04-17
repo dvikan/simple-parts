@@ -7,10 +7,12 @@ use function curl_init;
 
 final class CurlHttpClient implements HttpClient
 {
-    private const OPTIONS = [
+    private const DEFAULT_OPTIONS = [
         HttpClient::USERAGENT         => 'HttpClient',
         HttpClient::CONNECT_TIMEOUT   => 10,
         HttpClient::TIMEOUT           => 10,
+            'headers' => [
+        ]
     ];
 
     private $ch;
@@ -18,44 +20,41 @@ final class CurlHttpClient implements HttpClient
 
     public function __construct(array $options = [])
     {
-        $this->options = array_merge(self::OPTIONS, $options);
-    }
+        $this->options = array_merge(self::DEFAULT_OPTIONS, $options);
 
-    public function get(string $url): Response
-    {
-        if (!isset($this->ch)) {
-            $this->ch = $this->createCurlHandle();
-        }
+        $this->ch = curl_init();
 
-        return $this->execute($url);
-    }
-
-    public function post(string $url, array $vars = []): Response
-    {
-        if ($this->ch === null) {
-            $this->ch = $this->createCurlHandle();
-        }
-
-        curl_setopt($this->ch, CURLOPT_POSTFIELDS, $vars);
-
-        return $this->execute($url);
-    }
-
-    private function createCurlHandle()
-    {
-        $ch = curl_init();
-
-        if ($ch === false) {
+        if ($this->ch === false) {
             throw new SimpleException('curl_init()');
         }
+    }
 
-        curl_setopt($ch, CURLOPT_USERAGENT, $this->options[self::USERAGENT]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->options[self::CONNECT_TIMEOUT]);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $this->options[self::TIMEOUT]);
-        curl_setopt($ch, CURLOPT_HEADER, false);
+    public function get(string $url, array $options = []): Response
+    {
+        return $this->request('GET', $url, $options);
+    }
 
-        $headers = [];
+    public function post(string $url, array $options = []): Response
+    {
+        return $this->request('POST', $url, $options);
+    }
+
+    private function request(string $method, string $url, array $options)
+    {
+        $this->options = array_merge($this->options, $options);
+
+        curl_setopt($this->ch, CURLOPT_URL, $url);
+        curl_setopt($this->ch, CURLOPT_USERAGENT, $this->options[self::USERAGENT]);
+        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, $this->options[self::CONNECT_TIMEOUT]);
+        curl_setopt($this->ch, CURLOPT_TIMEOUT, $this->options[self::TIMEOUT]);
+        curl_setopt($this->ch, CURLOPT_HEADER, false);
+
+        if ($method === 'POST') {
+            curl_setopt($this->ch, CURLOPT_POSTFIELDS, $this->options[HttpClient::BODY]);
+        }
+
+        $headers = $this->options['headers'] ?? [];
 
         if (isset($this->options[self::AUTH_BEARER])) {
             $headers[] = sprintf('Authorization: Bearer %s', $this->options[self::AUTH_BEARER]);
@@ -65,14 +64,7 @@ final class CurlHttpClient implements HttpClient
             $headers[] = sprintf('client-id: %s', $this->options[self::CLIENT_ID]);
         }
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        return $ch;
-    }
-
-    private function execute(string $url): Response
-    {
-        curl_setopt($this->ch, CURLOPT_URL, $url);
+        curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
 
         $headers = [];
         curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$headers) {
@@ -96,7 +88,9 @@ final class CurlHttpClient implements HttpClient
             throw new HttpException(sprintf('%s: %s', $url, curl_error($this->ch)));
         }
 
-        $response = response($body, curl_getinfo($this->ch, CURLINFO_RESPONSE_CODE), $headers);
+        $statusCode = curl_getinfo($this->ch, CURLINFO_RESPONSE_CODE);
+
+        $response = response($body, $statusCode, $headers);
 
         if ($response->ok()) {
             return $response;

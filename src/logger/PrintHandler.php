@@ -2,9 +2,6 @@
 
 namespace dvikan\SimpleParts;
 
-use function fprintf;
-use const STDERR;
-
 final class PrintHandler implements Handler
 {
     private $level;

@@ -198,7 +198,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 try {
     $json = Json::encode(['message' => 'hello']);
-    print_r(Json::decode($json);
+    print_r(Json::decode($json));
 } catch (JsonException $e) {
     printf("Unable to encode/decode json\n");
 }

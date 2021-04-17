@@ -14,13 +14,14 @@ interface HttpClient
         self::INTERNAL_SERVER_ERROR => '500 Internal Server Error',
     ];
 
-    public const USERAGENT         = 'useragent';
-    public const CONNECT_TIMEOUT   = 'connect_timeout';
-    public const TIMEOUT           = 'timeout';
-    public const CLIENT_ID         = 'client_id';
-    public const AUTH_BEARER       = 'auth_bearer';
+    public const BODY               = 'body';
+    public const USERAGENT          = 'useragent';
+    public const CONNECT_TIMEOUT    = 'connect_timeout';
+    public const TIMEOUT            = 'timeout';
+    public const CLIENT_ID          = 'client_id';
+    public const AUTH_BEARER        = 'auth_bearer';
 
-    public function get(string $url): Response;
+    public function get(string $url, array $options = []): Response;
 
-    public function post(string $url, array $vars = []): Response;
+    public function post(string $url, array $options = []): Response;
 }
