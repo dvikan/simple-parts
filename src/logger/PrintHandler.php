@@ -24,7 +24,7 @@ final class PrintHandler implements Handler
 
         // Special case for records that are caused by exception
         if (isset($record['context']['exception'])) {
-            $context = "\n" . $record['context']['exception']->getTraceAsString();
+            $context = "\nStack trace:\n" . $record['context']['exception']->getTraceAsString();
         } else {
             $context = Json::encode($record['context'] ?: []);
         }
