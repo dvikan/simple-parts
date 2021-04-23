@@ -13,21 +13,11 @@ final class TwitchClient
     private $clientSecret;
     private $accessToken;
 
-    /** @var HttpClient */
-    private $client;
-
     public function __construct(string $clientId, string $clientSecret, string $accessToken = null)
     {
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
         $this->accessToken = $accessToken;
-
-        $this->createClient();
-    }
-
-    public function accessToken(): string
-    {
-        return $this->accessToken;
     }
 
     /**
@@ -37,39 +27,33 @@ final class TwitchClient
      */
     public function streams(array $query = []): array
     {
-        $response = $this->client->get(sprintf('https://api.twitch.tv/helix/streams?%s', http_build_query($query)));
+        if ($this->accessToken === null) {
+            $client = new CurlHttpClient();
 
-        return $response->json();
-    }
+            $response = $client->post('https://id.twitch.tv/oauth2/token', [
+                'body' => [
+                    'client_id'     => $this->clientId,
+                    'client_secret' => $this->clientSecret,
+                    'grant_type'    => 'client_credentials',
+                ]
+            ]);
 
-    private function createClient(): void
-    {
-        if (isset($this->client)) {
-            return;
-        }
+            $token = $response->json();
 
-        if (! isset($this->accessToken)) {
-            $token = $this->fetchAccessToken();
             $this->accessToken = $token['access_token'];
         }
 
-        $this->client = new CurlHttpClient([
-            HttpClient::CLIENT_ID => $this->clientId,
+        $client = new CurlHttpClient([
+            HttpClient::CLIENT_ID   => $this->clientId,
             HttpClient::AUTH_BEARER => $this->accessToken,
         ]);
-    }
-
-    private function fetchAccessToken(): array
-    {
-        $client = new CurlHttpClient();
-
-        $response = $client->post('https://id.twitch.tv/oauth2/token', [
-            'grant_type' => 'client_credentials',
-            'client_id' => $this->clientId,
-            'client_secret' => $this->clientSecret,
-        ]);
+        $response = $client->get(sprintf('https://api.twitch.tv/helix/streams?%s', http_build_query($query)));
 
         return $response->json();
+    }
 
+    public function accessToken(): string
+    {
+        return $this->accessToken;
     }
 }

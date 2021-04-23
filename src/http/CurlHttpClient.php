@@ -101,7 +101,16 @@ final class CurlHttpClient implements HttpClient
             return $this->request($method, $foundUrl, $options);
         }
 
-        throw new SimpleException($response->statusLine(), $response->code());
+        throw new SimpleException(
+            sprintf(
+                "%s %s\n%s\n\n%s",
+                $url,
+                $response->statusLine(),
+                Json::encode($response->headers()),
+                $response->body()
+            ),
+            $response->code(),
+        );
     }
 
     public function __destruct()
