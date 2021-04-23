@@ -2,9 +2,6 @@
 
 namespace dvikan\SimpleParts;
 
-use function escapeshellarg;
-use function exec;
-
 final class Shell
 {
     /**
@@ -13,7 +10,7 @@ final class Shell
     public function execute(string $command, array $arguments = []): string
     {
         array_walk($arguments, function ($n) {
-            if (!is_string($n)) {
+            if (! is_string($n)) {
                 throw new SimpleException('All arguments must be strings. Got: ' . $n . ' ' . gettype($n));
             }
         });

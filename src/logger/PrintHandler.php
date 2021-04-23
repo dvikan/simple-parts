@@ -22,12 +22,14 @@ final class PrintHandler implements Handler
             return;
         }
 
+        $context = Json::encode($record['context'] ?: []);
+
         printf(
             "%s.%s %s %s\n",
             $record['channel'],
             $record['level_name'],
             $record['message'],
-            Json::encode($record['context'] ?: []),
+            $context
         );
     }
 }

@@ -9,11 +9,12 @@ namespace dvikan\SimpleParts;
  */
 function session(string $name, $newValue = null)
 {
-    // todo: validate session started
+    // todo: validate session started?
     if ($newValue === null) {
         return $_SESSION[$name] ?? null;
     }
 
     $_SESSION[$name] = $newValue;
+
     return null;
 }

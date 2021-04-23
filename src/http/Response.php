@@ -17,7 +17,7 @@ final class Response
         $this->code = $code;
         $this->headers = $headers;
 
-        if (!isset(HttpClient::LINES[$code])) {
+        if (! isset(HttpClient::STATUS_LINES[$code])) {
             throw new SimpleException(sprintf('Illegal status code "%s"', $code));
         }
     }
@@ -39,7 +39,7 @@ final class Response
 
     public function statusLine(): string
     {
-        return HttpClient::LINES[$this->code];
+        return HttpClient::STATUS_LINES[$this->code];
     }
 
     public function headers(): array

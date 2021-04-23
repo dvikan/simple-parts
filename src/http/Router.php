@@ -16,9 +16,11 @@ final class Router
         foreach ($this->routes as $regex => $handler) {
             if (preg_match('#^'.$regex.'$#', $uri, $matches) === 1) {
                 array_shift($matches);
+
                 return [$handler, $matches];
             }
         }
+
         return [];
     }
 }

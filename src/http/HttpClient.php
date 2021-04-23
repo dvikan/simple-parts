@@ -8,7 +8,7 @@ interface HttpClient
     public const BAD_REQUEST            = 400;
     public const INTERNAL_SERVER_ERROR  = 500;
 
-    public const LINES = [
+    public const STATUS_LINES = [
         self::OK                    => '200 OK',
         self::BAD_REQUEST           => '400 Bad Request',
         self::INTERNAL_SERVER_ERROR => '500 Internal Server Error',

@@ -2,11 +2,6 @@
 
 namespace dvikan\SimpleParts;
 
-use const JSON_PRETTY_PRINT;
-use const JSON_THROW_ON_ERROR;
-use const JSON_UNESCAPED_SLASHES;
-use const JSON_UNESCAPED_UNICODE;
-
 final class Json
 {
     public static function encode($object): string
@@ -24,9 +19,6 @@ final class Json
         }
     }
 
-    /**
-     * @return mixed
-     */
     public static function decode(string $json)
     {
         try {

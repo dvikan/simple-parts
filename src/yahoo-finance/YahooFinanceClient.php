@@ -4,7 +4,7 @@ namespace dvikan\SimpleParts;
 
 final class YahooFinanceClient
 {
-    private const API = 'https://query1.finance.yahoo.com/v7/finance';
+    private const URL = 'https://query1.finance.yahoo.com/v7/finance';
 
     /** @var HttpClient  */
     private $client;
@@ -16,7 +16,7 @@ final class YahooFinanceClient
 
     public function quote(array $symbols)
     {
-        $url = sprintf('%s/quote?symbols=%s', self::API, implode(',', $symbols));
+        $url = sprintf('%s/quote?symbols=%s', self::URL, implode(',', $symbols));
 
         $response = $this->client->get($url);
 

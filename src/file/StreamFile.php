@@ -38,15 +38,19 @@ final class StreamFile implements File
 
     public function write(string $data): void
     {
-        if (file_put_contents($this->filePath, $data, LOCK_EX) === false) {
+        $result = file_put_contents($this->filePath, $data, LOCK_EX);
+
+        if ($result === false) {
             throw new SimpleException(sprintf('Unable to write to "%s"', $this->filePath));
         }
     }
 
     public function append(string $data): void
     {
-        if (file_put_contents($this->filePath, $data, FILE_APPEND | LOCK_EX) === false) {
-            throw new SimpleException(sprintf('Unable to write to "%s"', $this->filePath));
+        $result = file_put_contents($this->filePath, $data, FILE_APPEND | LOCK_EX);
+
+        if ($result === false) {
+            throw new SimpleException(sprintf('Unable to append to "%s"', $this->filePath));
         }
     }
 }

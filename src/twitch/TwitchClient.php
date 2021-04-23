@@ -38,6 +38,7 @@ final class TwitchClient
     public function streams(array $query = []): array
     {
         $response = $this->client->get(sprintf('https://api.twitch.tv/helix/streams?%s', http_build_query($query)));
+
         return $response->json();
     }
 
@@ -47,7 +48,7 @@ final class TwitchClient
             return;
         }
 
-        if (!isset($this->accessToken)) {
+        if (! isset($this->accessToken)) {
             $token = $this->fetchAccessToken();
             $this->accessToken = $token['access_token'];
         }

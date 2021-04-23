@@ -2,16 +2,14 @@
 
 namespace dvikan\SimpleParts;
 
-use function curl_close;
-use function curl_init;
-
 final class CurlHttpClient implements HttpClient
 {
     private const DEFAULT_OPTIONS = [
         HttpClient::USERAGENT         => 'HttpClient',
         HttpClient::CONNECT_TIMEOUT   => 10,
         HttpClient::TIMEOUT           => 10,
-            'headers' => [
+        'headers' => [
+
         ]
     ];
 
@@ -90,7 +88,7 @@ final class CurlHttpClient implements HttpClient
 
         $statusCode = curl_getinfo($this->ch, CURLINFO_RESPONSE_CODE);
 
-        $response = response($body, $statusCode, $headers);
+        $response = new Response($body, $statusCode, $headers);
 
         if ($response->ok()) {
             return $response;

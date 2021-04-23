@@ -6,11 +6,11 @@ final class NullHttpClient implements HttpClient
 {
     public function get(string $url, array $options = []): Response
     {
-        return response();
+        return new Response();
     }
 
     public function post(string $url, array $vars = [], array $options = []): Response
     {
-        return response();
+        return new Response();
     }
 }

@@ -5,11 +5,11 @@ namespace dvikan\SimpleParts;
 use DateTime;
 use Exception;
 use SimpleXMLElement;
-use function file_get_contents;
-use function libxml_use_internal_errors;
 
 final class Rss
 {
+    const DATE_FORMAT = 'Y-m-d H:i:s';
+
     /** @var HttpClient */
     private $client;
 
@@ -24,15 +24,18 @@ final class Rss
     public function fromUrl(string $url): array
     {
         $response = $this->client->get($url);
+
         return $this->fromXml($response->body());
     }
 
     private function fromFile(string $file): array
     {
         $xml = file_get_contents($file);
+
         if ($xml === false) {
             throw new SimpleException('file_get_contents()');
         }
+
         return self::fromXml($xml);
     }
 
@@ -70,11 +73,10 @@ final class Rss
         ];
 
         foreach ($xml->channel->item as $item) {
-
             $_item = [
                 'title'         => $item->title,
                 'link'          => null,
-                'date'          => DateTime::createFromFormat(DATE_RSS, (string) $item->pubDate)->format(DATE_FORMAT),
+                'date'          => DateTime::createFromFormat(DATE_RSS, (string) $item->pubDate)->format(self::DATE_FORMAT),
                 'description'   => (string) $item->description,
             ];
 
@@ -104,9 +106,9 @@ final class Rss
             ];
 
             if ($entry->published) {
-                $item['date'] = DateTime::createFromFormat(DATE_ATOM, (string) $entry->published)->format(DATE_FORMAT);
+                $item['date'] = DateTime::createFromFormat(DATE_ATOM, (string) $entry->published)->format(self::DATE_FORMAT);
             } else {
-                $item['date'] = DateTime::createFromFormat(DATE_ATOM, (string) $entry->updated)->format(DATE_FORMAT);
+                $item['date'] = DateTime::createFromFormat(DATE_ATOM, (string) $entry->updated)->format(self::DATE_FORMAT);
             }
 
             $feed['items'][] = $item;

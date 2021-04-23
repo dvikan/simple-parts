@@ -2,38 +2,36 @@
 
 namespace dvikan\SimpleParts;
 
-use function error_get_last;
-use function register_shutdown_function;
-use function set_error_handler;
-use function set_exception_handler;
-
 final class ErrorHandler
 {
     private const ERROR_STRINGS = [
-        E_ERROR => 'Error',
-        E_WARNING => 'Warning',
-        E_NOTICE => 'Notice',
+        E_ERROR             => 'Error',
+        E_WARNING           => 'Warning',
+        E_NOTICE            => 'Notice',
         E_RECOVERABLE_ERROR => 'Recoverable error',
-        E_DEPRECATED => 'Deprecated',
+        E_DEPRECATED        => 'Deprecated',
     ];
 
     private const LEVEL_MAP = [
-        E_NOTICE => Logger::INFO,
-        E_WARNING => Logger::WARNING,
+        E_NOTICE            => Logger::INFO,
+        E_WARNING           => Logger::WARNING,
     ];
 
     private const EXIT_MAP = [
         E_RECOVERABLE_ERROR => true,
-        E_WARNING => true,
-        E_NOTICE => true,
+        E_WARNING           => true,
+        E_NOTICE            => true,
     ];
 
     /** @var Logger */
     private $logger;
 
-    private function __construct() {}
+    private function __construct()
+    {
+        // noop
+    }
 
-    public static function create(Logger $logger = null)
+    public static function create(Logger $logger = null): self
     {
         $handler = new self();
 
@@ -84,17 +82,19 @@ final class ErrorHandler
     {
         $err = error_get_last();
 
-        if ($err) {
-            $this->logger->log(
-                self::LEVEL_MAP[$err['type']] ?? Logger::ERROR,
-                sprintf(
-                    '%s: %s in %s:%s',
-                    self::ERROR_STRINGS[$err['type']] ?? (string)($err['type']),
-                    $err['message'],
-                    $err['file'],
-                    $err['line']
-                )
-            );
+        if (!$err) {
+            return;
         }
+
+        $this->logger->log(
+            self::LEVEL_MAP[$err['type']] ?? Logger::ERROR,
+            sprintf(
+                '%s: %s in %s:%s',
+                self::ERROR_STRINGS[$err['type']] ?? (string)($err['type']),
+                $err['message'],
+                $err['file'],
+                $err['line']
+            )
+        );
     }
 }

@@ -10,10 +10,10 @@ final class Container implements ArrayAccess
     private $container = [];
     private $resolved = [];
 
-    public function offsetSet($name, $value)
+    public function offsetSet($offset, $value)
     {
-        if (isset($this[$name])) {
-            throw new SimpleException(sprintf('Already has a value stored at "%s"', $name));
+        if (isset($this[$offset])) {
+            throw new SimpleException(sprintf('Already has a value stored at "%s"', $offset));
         }
 
         if ($value === null) {
@@ -21,33 +21,35 @@ final class Container implements ArrayAccess
         }
 
         if (! $value instanceof Closure) {
-            $this->resolved[$name] = $value;
+            $this->resolved[$offset] = $value;
         }
 
-        $this->container[$name] = $value;
+        $this->container[$offset] = $value;
     }
 
-    public function offsetGet($name)
+    public function offsetGet($offset)
     {
-        if (! isset($this[$name])) {
-            throw new SimpleException(sprintf('Dependency "%s" not found', $name));
+        if (! isset($this[$offset])) {
+            throw new SimpleException(sprintf('Dependency "%s" not found', $offset));
         }
 
-        if (isset($this->resolved[$name])) {
-            return $this->resolved[$name];
+        if (isset($this->resolved[$offset])) {
+            return $this->resolved[$offset];
         }
 
-        return $this->resolved[$name] = $this->container[$name]($this);
+        $this->resolved[$offset] = $this->container[$offset]($this);
+
+        return $this->resolved[$offset];
     }
 
-    public function offsetExists($name)
+    public function offsetExists($offset): bool
     {
-        return isset($this->container[$name]);
+        return isset($this->container[$offset]);
     }
 
-    public function offsetUnset($name)
+    public function offsetUnset($offset)
     {
-        unset($this->container[$name]);
-        unset($this->resolved[$name]);
+        unset($this->container[$offset]);
+        unset($this->resolved[$offset]);
     }
 }

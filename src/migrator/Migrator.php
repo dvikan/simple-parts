@@ -24,7 +24,7 @@ final class Migrator
      */
     public function migrate(): array
     {
-        if (!is_dir($this->folder)) {
+        if (! is_dir($this->folder)) {
             throw new SimpleException(sprintf('Not a folder: "%s"', $this->folder));
         }
 
