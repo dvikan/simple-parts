@@ -67,7 +67,7 @@ final class ErrorHandler
         $this->logger->log(
             Logger::ERROR, // An exception is always an error
             sprintf(
-                'Uncaught Exception %s: "%s" at %s line %s',
+                'Uncaught Exception %s: "%s" in %s line:%s',
                 get_class($e),
                 $e->getMessage(),
                 $e->getFile(),
