@@ -37,6 +37,7 @@ TODO:
 * Random (todo)
 * Guid (todo)
 * Flat file database
+* vardumper
 
 All classes reside under the `dvikan\SimpleParts` namespace.
 

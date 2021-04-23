@@ -9,7 +9,6 @@ final class CurlHttpClient implements HttpClient
         HttpClient::CONNECT_TIMEOUT   => 10,
         HttpClient::TIMEOUT           => 10,
         'headers' => [
-
         ]
     ];
 
@@ -23,18 +22,18 @@ final class CurlHttpClient implements HttpClient
         $this->ch = curl_init();
 
         if ($this->ch === false) {
-            throw new SimpleException('curl_init()');
+            throw new SimpleException();
         }
     }
 
     public function get(string $url, array $options = []): Response
     {
-        return $this->request('GET', $url, $options);
+        return $this->request(HttpClient::GET, $url, $options);
     }
 
     public function post(string $url, array $options = []): Response
     {
-        return $this->request('POST', $url, $options);
+        return $this->request(HttpClient::POST, $url, $options);
     }
 
     private function request(string $method, string $url, array $options)
@@ -48,7 +47,7 @@ final class CurlHttpClient implements HttpClient
         curl_setopt($this->ch, CURLOPT_TIMEOUT, $this->options[self::TIMEOUT]);
         curl_setopt($this->ch, CURLOPT_HEADER, false);
 
-        if ($method === 'POST') {
+        if ($method === HttpClient::POST) {
             curl_setopt($this->ch, CURLOPT_POSTFIELDS, $this->options[HttpClient::BODY]);
         }
 
@@ -65,16 +64,17 @@ final class CurlHttpClient implements HttpClient
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
 
         $headers = [];
-        curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$headers) {
-            $len = strlen($header);
-            $header = explode(':', $header);
+        curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, function ($ch, $rawHeader) use (&$headers) {
+            $len = strlen($rawHeader);
+            $header = explode(':', $rawHeader); // todo: regex
 
-            if (count($header) !== 2) {
+            if (count($header) === 1) {
+                // Discard the status line and malformed headers
                 return $len;
             }
 
             $name = strtolower(trim($header[0]));
-            $value = trim($header[1]);
+            $value = trim(implode(':', array_slice($header, 1)));
             $headers[$name] = $value;
 
             return $len;
@@ -83,7 +83,7 @@ final class CurlHttpClient implements HttpClient
         $body = curl_exec($this->ch);
 
         if ($body === false) {
-            throw new SimpleException(sprintf('%s: %s', $url, curl_error($this->ch)));
+            throw new SimpleException(curl_error($this->ch));
         }
 
         $statusCode = curl_getinfo($this->ch, CURLINFO_RESPONSE_CODE);
@@ -94,7 +94,14 @@ final class CurlHttpClient implements HttpClient
             return $response;
         }
 
-        throw new SimpleException(sprintf('%s: %s', $url, $response->statusLine()), $response->code());
+        if ($response->isRedirect()) {
+            $foundUrl = $response->headers()[HttpClient::LOCATION];
+
+            // warning: infinite loop
+            return $this->request($method, $foundUrl, $options);
+        }
+
+        throw new SimpleException($response->statusLine(), $response->code());
     }
 
     public function __destruct()

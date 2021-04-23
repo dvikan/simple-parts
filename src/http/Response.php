@@ -2,23 +2,23 @@
 
 namespace dvikan\SimpleParts;
 
-use function header;
-use function http_response_code;
-
 final class Response
 {
     private $body;
     private $code;
     private $headers;
 
-    public function __construct(string $body = '', int $code = HttpClient::OK, array $headers = [])
-    {
+    public function __construct(
+        string $body = '',
+        int $code = HttpClient::OK,
+        array $headers = []
+    ) {
         $this->body = $body;
         $this->code = $code;
         $this->headers = $headers;
 
         if (! isset(HttpClient::STATUS_LINES[$code])) {
-            throw new SimpleException(sprintf('Illegal status code "%s"', $code));
+            throw new SimpleException(sprintf('Invalid status code "%s"', $code));
         }
     }
 
@@ -50,6 +50,11 @@ final class Response
     public function ok(): bool
     {
         return $this->code === HttpClient::OK;
+    }
+
+    public function isRedirect()
+    {
+        return $this->code === HttpClient::FOUND;
     }
 
     public function withJson(array $data): self
