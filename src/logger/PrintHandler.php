@@ -22,7 +22,12 @@ final class PrintHandler implements Handler
             return;
         }
 
-        $context = Json::encode($record['context'] ?: []);
+        // Special case for records that are caused by exception
+        if (isset($record['context']['exception'])) {
+            $context = "\n" . $record['context']['exception']->getTraceAsString();
+        } else {
+            $context = Json::encode($record['context'] ?: []);
+        }
 
         printf(
             "%s.%s %s %s\n",

@@ -72,7 +72,8 @@ final class ErrorHandler
                 $e->getMessage(),
                 $e->getFile(),
                 $e->getLine()
-            )
+            ),
+            ['exception' => $e]
         );
 
         exit(1);
