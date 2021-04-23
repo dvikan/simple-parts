@@ -3,50 +3,66 @@
 namespace dvikan\SimpleParts;
 
 use PDO;
-use function basename;
-use function file_get_contents;
-use function is_dir;
 
 final class Migrator
 {
     private $pdo;
-    private $folder;
-    private $cache;
+    private $migrationsFolder;
+    private $cacheFolder;
 
-    public function __construct(PDO $pdo, string $folder) {
+    public function __construct(
+        PDO $pdo,
+        string $migrationsFolder = './',
+        string $cacheFolder = './'
+    ) {
         $this->pdo = $pdo;
-        $this->folder = $folder;
-        $this->cache = new FileCache(new StreamFile($folder . '/migrations.json'));
+        $this->migrationsFolder = $migrationsFolder;
+        $this->cacheFolder = $cacheFolder;
+
     }
 
-    /**
-     * @throws SimpleException
-     */
     public function migrate(): array
     {
-        if (! is_dir($this->folder)) {
-            throw new SimpleException(sprintf('Not a folder: "%s"', $this->folder));
+        if (! is_dir($this->migrationsFolder)) {
+            throw new SimpleException(sprintf('Not a folder: "%s"', $this->migrationsFolder));
         }
 
-        $messages = [];
+        if (! is_dir($this->cacheFolder)) {
+            throw new SimpleException(sprintf('Not a folder: "%s"', $this->cacheFolder));
+        }
 
-        foreach (glob($this->folder . '/*.sql') as $migration) {
-            $filename = basename($migration);
-            $sql = file_get_contents($migration);
+        $result = [];
 
-            if ($this->cache->has($filename)) {
+        $migrations = glob($this->migrationsFolder . '/*.sql');
+
+        if ($migrations === false) {
+            throw new SimpleException(sprintf('Error reading migrations folder: "%s"', $this->migrationsFolder));
+        }
+
+        if ($migrations === []) {
+            throw new SimpleException('Zero migrations found.');
+        }
+
+        $cache = new FileCache(new TextFile($this->cacheFolder . '/migrations.json'));
+
+        foreach ($migrations as $migration) {
+            $fileName = basename($migration);
+
+            if ($cache->has($fileName)) {
                 continue;
             }
 
+            $sql = file_get_contents($migration);
+
             if ($this->pdo->exec($sql) === false) {
-                throw new SimpleException(sprintf('"%s": %s', $filename, $this->pdo->errorInfo()[2]));
+                throw new SimpleException(sprintf('%s: %s', $fileName, $this->pdo->errorInfo()[2]));
             }
 
-            $messages[] = sprintf('Migrated "%s"', $filename);
+            $result[] = sprintf('Migrated "%s"', $fileName);
 
-            $this->cache->set($filename, true);
+            $cache->set($fileName);
         }
 
-        return $messages;
+        return $result;
     }
 }

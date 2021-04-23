@@ -18,7 +18,8 @@ final class Response
         $this->headers = $headers;
 
         if (! isset(HttpClient::STATUS_LINES[$code])) {
-            throw new SimpleException(sprintf('Invalid status code "%s"', $code));
+            // Consider dropping this
+            //throw new SimpleException(sprintf('Invalid status code "%s"', $code));
         }
     }
 
@@ -54,7 +55,10 @@ final class Response
 
     public function isRedirect()
     {
-        return $this->code === HttpClient::FOUND;
+        return in_array($this->code, [
+            HttpClient::MOVED_PERMANENTLY,
+            HttpClient::FOUND,
+        ]);
     }
 
     public function withJson(array $data): self

@@ -13,6 +13,10 @@ final class MemoryCache implements Cache
 
     public function set(string $key, $value = true): void
     {
+        if ($value === null) {
+            throw new SimpleException('null is not allowed as value');
+        }
+
         $this->memory[$this->key($key)] = $value;
     }
 

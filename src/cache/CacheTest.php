@@ -10,8 +10,7 @@ class CacheTest extends TestCase
     {
         $this->_testCache(new MemoryCache());
         $this->_testCache(new FileCache(new MemoryFile()));
-        $this->_testCache(new FileCache(new LineFile(tempnam(sys_get_temp_dir(), 'FileTest_'))));
-        $this->_testCache(new FileCache(new StreamFile(tempnam(sys_get_temp_dir(), 'FileTest_'))));
+        $this->_testCache(new FileCache(new TextFile(tempnam(sys_get_temp_dir(), 'FileTest_'))));
     }
 
     private function _testCache(Cache $sut): void
@@ -26,7 +25,6 @@ class CacheTest extends TestCase
         $sut->delete('key1');
         self::assertFalse($sut->has('key1'));
         self::assertSame(true, $sut->get('key2'));
-        self::assertSame(null, $sut->get('key3'));
         self::assertSame('default', $sut->get('key3', 'default'));
     }
 }

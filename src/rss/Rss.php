@@ -28,9 +28,10 @@ final class Rss
         return $this->fromXml($response->body());
     }
 
-    private function fromFile(string $file): array
+    private function fromFile(string $fileName): array
     {
-        $xml = file_get_contents($file);
+        // todo: replace with TextFile
+        $xml = file_get_contents($fileName);
 
         if ($xml === false) {
             throw new SimpleException('file_get_contents()');

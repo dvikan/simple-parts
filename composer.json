@@ -18,14 +18,10 @@
               "src/migrator",
               "src/rss",
               "src/session",
-              "src/shell",
-              "src/template",
-              "src/twitch",
-              "src/yahoo-finance"
+              "src/shell"
             ]
         },
         "files": [
-            "src/session/session.php",
             "src/template/template.php"
         ]
     },

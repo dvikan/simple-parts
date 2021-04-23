@@ -8,6 +8,7 @@ interface HttpClient
     public const POST   = 'post';
 
     public const OK                     = 200;
+    public const MOVED_PERMANENTLY      = 301;
     public const FOUND                  = 302;
     public const BAD_REQUEST            = 400;
     public const UNAUTHORIZED           = 401;
@@ -15,6 +16,7 @@ interface HttpClient
 
     public const STATUS_LINES = [
         self::OK                    => '200 OK',
+        self::MOVED_PERMANENTLY     => '301 Moved Permanently',
         self::FOUND                 => '302 Found',
         self::BAD_REQUEST           => '400 Bad Request',
         self::UNAUTHORIZED          => '401 Unauthorized',

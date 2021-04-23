@@ -54,7 +54,16 @@ final class ErrorHandler
                 $message,
                 $file,
                 $line
-            )
+            ),
+            [
+                'code' => $code,
+                'message' => $message,
+                'file' => $file,
+                'line' => $line,
+                'stacktrace' => array_map(function ($e) {
+                    return ($e['file'] ?? ''). ':' . ($e['line'] ?? '');
+                }, debug_backtrace()),
+            ]
         );
 
         if (self::EXIT_MAP[$code]) {
@@ -67,7 +76,7 @@ final class ErrorHandler
         $this->logger->log(
             Logger::ERROR, // An exception is always an error
             sprintf(
-                'Uncaught Exception %s: "%s" in %s line:%s',
+                'Uncaught Exception %s: %s in %s:%s',
                 get_class($e),
                 $e->getMessage(),
                 $e->getFile(),
@@ -90,12 +99,21 @@ final class ErrorHandler
         $this->logger->log(
             self::LEVEL_MAP[$err['type']] ?? Logger::ERROR,
             sprintf(
-                '%s: %s in %s:%s',
+                '(shutdown_function) %s: %s in %s:%s',
                 self::ERROR_STRINGS[$err['type']] ?? (string)($err['type']),
                 $err['message'],
                 $err['file'],
                 $err['line']
-            )
+            ),
+            [
+                'code' => $code,
+                'message' => $message,
+                'file' => $file,
+                'line' => $line,
+                'stacktrace' => array_map(function ($e) {
+                    return ($e['file'] ?? ''). ':' . ($e['line'] ?? '');
+                }, debug_backtrace()),
+            ]
         );
     }
 }

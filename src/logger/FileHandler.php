@@ -2,32 +2,35 @@
 
 namespace dvikan\SimpleParts;
 
+/**
+ * Stores log records in a file
+ */
 final class FileHandler implements Handler
 {
     private $file;
-    private $level;
 
-    public function __construct(File $file, int $level = Logger::INFO)
+    public function __construct(File $file)
     {
         $this->file = $file;
-        $this->level = $level;
     }
 
     public function handle(array $record): void
     {
-        if ($record['level'] < $this->level) {
-            return;
+        if (isset($record['context']['exception'])) {
+            $context = "\nStack trace:\n" . $record['context']['exception']->getTraceAsString();
+        } else {
+            $context = Json::encode($record['context'] ?: []);
         }
 
-        $line = sprintf(
-            "[%s] %s.%s %s %s",
+        $item = sprintf(
+            "[%s] %s.%s %s %s\n",
             $record['datetime']->format('Y-m-d H:i:s'),
             $record['channel'],
             $record['level_name'],
             $record['message'],
-            $record['context'] ? Json::encode($record['context']) : '',
+            $context,
         );
 
-        $this->file->append($line);
+        $this->file->append($item);
     }
 }

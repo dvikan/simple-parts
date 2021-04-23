@@ -4,7 +4,7 @@ namespace dvikan\SimpleParts;
 
 use DateTime;
 
-class SimpleLogger implements Logger
+final class SimpleLogger implements Logger
 {
     private $handlers;
     private $name;

@@ -13,11 +13,11 @@ final class Container implements ArrayAccess
     public function offsetSet($offset, $value)
     {
         if (isset($this[$offset])) {
-            throw new SimpleException(sprintf('Already has a value stored at "%s"', $offset));
+            throw new SimpleException(sprintf('Already has a value stored in "%s"', $offset));
         }
 
         if ($value === null) {
-            throw new SimpleException('null is not allowed');
+            throw new SimpleException('null is not allowed as value');
         }
 
         if (! $value instanceof Closure) {

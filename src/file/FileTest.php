@@ -9,8 +9,7 @@ class FileTest extends TestCase
     public function testMemoryFile()
     {
         $this->_testFile(new MemoryFile());
-        $this->_testFile(new LineFile(tempnam(sys_get_temp_dir(), 'FileTest_')));
-        $this->_testFile(new StreamFile(tempnam(sys_get_temp_dir(), 'FileTest_')));
+        $this->_testFile(new TextFile(tempnam(sys_get_temp_dir(), 'FileTest_')));
     }
 
     private function _testFile(File $sut): void

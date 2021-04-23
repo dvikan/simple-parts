@@ -4,14 +4,15 @@ namespace dvikan\SimpleParts;
 
 use DateTime;
 
+/**
+ * Stores all cached items as json
+ */
 final class FileCache implements Cache
 {
     const DATE_FORMAT = 'Y-m-d H:i:s';
 
     private $file;
     private $prefix;
-
-    /** @var array */
     private $data;
 
     public function __construct(File $file, string $prefix = null)
@@ -22,6 +23,10 @@ final class FileCache implements Cache
 
     public function set(string $key, $value = true): void
     {
+        if (in_array(null, [$key, $value])) {
+            throw new SimpleException('pls no null');
+        }
+
         $this->read();
 
         $this->data[$this->key($key)] = [
@@ -34,13 +39,21 @@ final class FileCache implements Cache
 
     public function get(string $key, $default = null)
     {
-        $this->read();
-
-        if (! $this->has($key)) {
-            return $default;
+        if ($key === null) {
+            throw new SimpleException('pls no null');
         }
 
-        return $this->data[$this->key($key)]['value'];
+        $this->read();
+
+        if ($this->has($key)) {
+            return $this->data[$this->key($key)]['value'];
+        }
+
+        if ($default === null) {
+            throw new SimpleException('pls no null');
+        }
+
+        return $default;
     }
 
     public function has(string $key): bool

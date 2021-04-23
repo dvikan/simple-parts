@@ -20,14 +20,22 @@ final class Request
         return new Request($_GET, $_POST, $_SERVER);
     }
 
-    public function get(string $name): ?string
+    public function get(string $key): ?string
     {
-        return $this->get[$name] ?? null;
+        if (! isset($this->get[$key])) {
+            throw new SimpleException('Unknown key');
+        }
+
+        return $this->get[$key];
     }
 
-    public function post(string $name): ?string
+    public function post(string $key): ?string
     {
-        return $this->post[$name] ?? null;
+        if (! isset($this->get[$key])) {
+            throw new SimpleException('Unknown key');
+        }
+
+        return $this->post[$key];
     }
 
     public function isGet(): bool

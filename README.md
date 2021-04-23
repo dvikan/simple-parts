@@ -2,23 +2,21 @@
 
 Intentionally simple components for building applications.
 
-* `Cache`
+* `Cache`, `FileCache`, `MemoryCache`, `NullCache`
 * `Console`
 * `Container`
 * `ErrorHandler`
-* `File`
-* `HttpClient`
+* `File`, `TextFile`, `MemoryFile`, `NullFile`
+* `HttpClient`, `CurlHttpClient`, `NullHttpClient`
 * `Json`
-* `Request`/`Response`
+* `Request`, `Response`
 * `Router`
-* `Logger`
+* `Logger`, `SimpleLogger`, `NullLogger`, `Handler`, `PrintHandler`, `FileHandler`
 * `Migrator`
 * `Rss`
-* Session
+* `Session`
 * `Shell`
-* Template engine
-* `TwitchClient`
-* `YahooFinanceClient`
+* `Template`
 
 TODO:
 
@@ -38,20 +36,24 @@ TODO:
 * Guid (todo)
 * Flat file database
 * vardumper
+* throttling
+* captcha
 
 All classes reside under the `dvikan\SimpleParts` namespace.
 
 ## Cache
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use dvikan\SimpleParts\FileCache;
-use dvikan\SimpleParts\StreamFile;
+use dvikan\SimpleParts\TextFile;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-$cache = new FileCache(new StreamFile('cache.json'));
+$cache = new FileCache(new TextFile('cache.json'));
+
+print $cache->get('foo', 'default') . "\n";
 
 $cache->set('foo', 'bar');
 
@@ -59,21 +61,18 @@ if ($cache->has('foo')) {
     print $cache->get('foo') . "\n";
 }
 
-$cache->delete('foo');
-
-print $cache->get('foo', 'default') . "\n";
-
-$cache->clear();
+// $cache->delete('foo');
+// $cache->clear();
 ```
 
 ## Console
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use dvikan\SimpleParts\Console;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 $console = new Console();
 
@@ -81,51 +80,29 @@ $console->write('Hello');
 $console->writeln(' world!');
 
 $console->greenln('Success');
-$console->redln('Failure');
-
-$headers = ['Id', 'User', 'Created'];
-
-$rows = [
-    ['1', 'root', '2020-11-01'],
-    ['1000', 'joe', '2020-11-02'],
-    ['1001', 'bob', '2020-11-03'],
-];
-
-$console->table($headers, $rows);
-$console->exit();
 ```
 
 ```
 Hello world!
 Success
-Failure
-+------------+------------+------------+
-| Id         | User       | Created    |
-+------------+------------+------------+
-| 1          | root       | 2020-11-01 |
-| 1000       | joe        | 2020-11-02 |
-| 1001       | bob        | 2020-11-03 |
-+------------+------------+------------+
 ```
 
 ## Container
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use dvikan\SimpleParts\Container;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 $container = new Container();
 
-$container['database'] = function($c) {
-    return new PDO($c['database_options']['dsn']);
+$container['database'] = function($container) {
+    return new PDO($container['dsn']);
 };
 
-$container['database_options'] = [
-    'dsn' => 'sqlite::memory:',
-];
+$container['dsn'] = 'sqlite::memory:';
 
 /** @var PDO $database */
 $database = $container['database'];
@@ -134,104 +111,103 @@ $database = $container['database'];
 ## ErrorHandler
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use dvikan\SimpleParts\ErrorHandler;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 $errorHandler = ErrorHandler::create();
 
-print $foo;
+print foo();
+```
+```
+default.ERROR Uncaught Exception Error: Call to undefined function foo() in test.php:9
 ```
 
 ## File
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
-use dvikan\SimpleParts\StreamFile;
+use dvikan\SimpleParts\TextFile;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-$file = new StreamFile('test.txt');
+$file = new TextFile('./application.log');
 
 $file->write('hello ');
 $file->append('world');
 
 if ($file->exists()) {
-    print $file->read() . "\n";
+    print $file->read();
 }
 ```
 
 ## HttpClient
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use dvikan\SimpleParts\CurlHttpClient;
-use dvikan\SimpleParts\SimpleException;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 $client = new CurlHttpClient();
 
-try {
-    $response1 = $client->get('http://example.com/');
-    $response2 = $client->post('http://example.com/', ['foo' => 'bar']);
+$response = $client->get('https://example.com');
 
-    print $response1->body();
-    print $response2->body();
-} catch (SimpleException $e) {
-    print "Didn't get http 200\n";
-}
+print $response->body();
 ```
 
 ## Json
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use dvikan\SimpleParts\Json;
-use dvikan\SimpleParts\SimpleException;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-try {
-    $json = Json::encode(['message' => 'hello']);
-    print_r(Json::decode($json));
-} catch (SimpleException $e) {
-    printf("Unable to encode/decode json\n");
-}
+print Json::encode(['message' => 'hello']);
 ```
 
-## Request/Response
+## Request
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use dvikan\SimpleParts\Request;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-$request = Request::fromGlobals();
+$request = new Request([
+    'id' => '6',
+], [
+    'user' => 'bob',
+], [
+    'REQUEST_METHOD' => 'POST',
+    'REQUEST_URI' => '/about',
+]);
 
 $uri = $request->uri();
 $isGet = $request->isGet();
-$id = $request->get('id') ?? -1;
-$user = $request->post('user') ?? 'anon';
-
-var_dump($uri, $isGet, $id, $user);
+$id = $request->get('id');
+$user = $request->post('user');
 ```
 
+## Response
+
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use dvikan\SimpleParts\Response;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-$response = new Response('hello world', 200, ['Content-Type' => 'text/html']);
+$response = new Response();
+
+$response = new Response("Hello\nworld", 200, ['Content-Type' => 'text/plain']);
 
 $response->send();
 ```
@@ -239,41 +215,53 @@ $response->send();
 ## Router
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use dvikan\SimpleParts\Router;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-class HttpController
+class Controller
 {
-    public function profile(array $args)
+    public function profile(array $vars)
     {
-        return 'The profile id is '. $args[0];
+        $id = $vars[0];
+        return "The user id is {$id}";
     }
 }
 
-$router = new Router();
+$routes = [
+    '/profile/([0-9]+)' => [Controller::class, 'profile'],
+];
 
-$router->map('/user/([0-9]+)', [HttpController::class, 'profile']);
+$router = new Router($routes);
 
-[$handler, $args] = $router->match('/user/42');
+$route = $router->match('/profile/3');
 
-$class = $handler[0];
-$method = $handler[1];
-$controller = new $class();
+if ($route === []) {
+    exit("404");
+}
 
-print $controller->{$method}($args) . "\n";
+$handler = $route[0];
+$args = $route[1];
+
+$handlerClass = $handler[0];
+$handlerMethod = $handler[1];
+$handlerObject = new $handlerClass();
+
+$result = $handlerObject->{$handlerMethod}($args);
+
+print $result;
 ```
     
 ## Logger
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use dvikan\SimpleParts\SimpleLogger;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 $logger = new SimpleLogger();
 
@@ -290,50 +278,39 @@ $logger->error('hello');
 ## Migrator
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use dvikan\SimpleParts\Migrator;
-use dvikan\SimpleParts\SimpleException;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-$pdo = new PDO('sqlite:' . __DIR__ . '/var/app.db');
-$folder = __DIR__ . '/var/migrations/';
-$migrator = new Migrator($pdo, $folder);
+$pdo = new PDO('sqlite:' . __DIR__ . '/application.db');
 
-try {
-    $messages = $migrator->migrate();
+$migrator = new Migrator($pdo);
 
-    if ($messages === []) {
-        print "No pending migrations\n";
-    } else {
-        print implode("\n", $messages) . "\n";
-    }
-} catch (SimpleException $e) {
-    print $e->getMessage() . "\n";
+$result = $migrator->migrate();
+
+if ($result === []) {
+    exit;
 }
+
+print implode("\n", $result) . "\n";
 ```
 
 ## Rss
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use dvikan\SimpleParts\Rss;
-use dvikan\SimpleParts\SimpleException;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 $rss = new Rss();
 
-$feed = 'https://github.com/sebastianbergmann/phpunit/releases.atom';
+$url = 'https://github.com/sebastianbergmann/phpunit/releases.atom';
 
-try {
-    $feed = $rss->fromUrl($feed);
-} catch (SimpleException $e) {
-    printf("Unable to fetch feed: %s\n", $e->getMessage());
-    exit(0);
-}
+$feed = $rss->fromUrl($url);
 
 foreach ($feed['items'] as $item) {
     printf(
@@ -348,109 +325,51 @@ foreach ($feed['items'] as $item) {
 ## Session
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
-use function dvikan\SimpleParts\session;
+use dvikan\SimpleParts\Session;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-session_start();
+$session = new Session();
 
-$counter = session('counter') ?? 0;
+$session->set('user', 'alice');
 
-$counter++;
-
-session('counter', $counter);
-
-print $counter;
+print 'Welcome, ' . $session->get('user', 'anon');
 ```
 
 ## Shell
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use dvikan\SimpleParts\Shell;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 $shell = new Shell();
 
-print $shell->execute('echo', ['hello', 'world']);
+print $shell->execute('echo', ['-n', 'hello', 'world']);
 ```
 
 ## Template engine
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 use function dvikan\SimpleParts\render;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 $name = $_GET['name'] ?? 'anon';
 
 print render('z.php', ['user' => $name]);
 ```
 
-z.php:
 ```php
 <?php use function \dvikan\SimpleParts\e; ?>
 
 <p>
     Welcome <?= e($user) ?>
 </p>
-```
-
-## TwitchClient
-
-```php
-<?php
-
-use dvikan\SimpleParts\TwitchClient;
-
-require __DIR__ . '/../vendor/autoload.php';
-
-$accessToken = `secret twitch_access_token`;
-$clientId = `secret twitch_client_id`;
-$clientSecret = `secret twitch_client_secret`;
-
-$client = new TwitchClient($clientId, $clientSecret, $accessToken);
-
-/**
- * Save this for reuse
- */
-var_dump($client->accessToken());
-
-$streams = $client->streams();
-
-print_r($streams);
-```
-
-## Yahoo finance client
-
-```php
-<?php
-
-use dvikan\SimpleParts\SimpleException;
-use dvikan\SimpleParts\YahooFinanceClient;
-
-require __DIR__ . '/../vendor/autoload.php';
-
-$client = new YahooFinanceClient();
-
-try {
-    $quote = $client->quote(['AAPL', '^GSPC']);
-
-    foreach ($quote as $result) {
-        printf(
-            "%s %s (%s%%)\n",
-            $result['symbol'],
-            $result['regularMarketPrice'],
-            $result['regularMarketChangePercent'],
-        );
-    }
-} catch (SimpleException $e) {
-    printf("Unable to fetch quotes: %s\n", $e->getMessage());
-}
 ```

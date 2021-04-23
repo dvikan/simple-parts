@@ -31,17 +31,17 @@ final class Console
 
     public function greenln(string $line, ...$args)
     {
-        printf(self::GREEN . $line . self::NC . "\n", ...$args);
+        $this->green($line . "\n", ...$args);
     }
 
     public function yellow(string $line, ...$args)
     {
-        sprintf(self::YELLOW . $line . self::NC, ...$args);
+        printf(self::YELLOW . $line . self::NC, ...$args);
     }
 
     public function yellowln(string $line, ...$args)
     {
-        printf(self::YELLOW . $line . self::NC . "\n", ...$args);
+        $this->yellow($line . "\n", ...$args);
     }
 
     public function red(string $line, ...$args)
@@ -51,7 +51,7 @@ final class Console
 
     public function redln(string $line, ...$args)
     {
-        printf(self::RED . $line . self::NC . "\n", ...$args);
+        $this->red($line . "\n", ...$args);
     }
 
     public function table(array $headers, array $rows)

@@ -102,13 +102,14 @@ final class CurlHttpClient implements HttpClient
         }
 
         throw new SimpleException(
-            sprintf(
-                "%s %s\n%s\n\n%s",
-                $url,
-                $response->statusLine(),
-                Json::encode($response->headers()),
-                $response->body()
-            ),
+            'WTF',
+//            sprintf(
+//                "%s %s\n%s\n\n%s",
+//                $url,
+//                $response->statusLine(),
+//                Json::encode($response->headers()),
+//                $response->body()
+//            ),
             $response->code(),
         );
     }

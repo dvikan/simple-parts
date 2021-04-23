@@ -2,11 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-use function file;
-use function file_exists;
-use function file_put_contents;
-
-final class LineFile implements File
+final class TextFile implements File
 {
     private $filePath;
 
@@ -23,25 +19,21 @@ final class LineFile implements File
     public function read(): string
     {
         if (!$this->exists()) {
-            throw new SimpleException(sprintf('File "%s" do not exists', $this->filePath));
+            return '';
         }
 
-        $lines = file($this->filePath);
+        $data = file_get_contents($this->filePath);
 
-        if ($lines === false) {
+        if ($data === false) {
             throw new SimpleException(sprintf('Unable to read from "%s"', $this->filePath));
         }
 
-        foreach ($lines as &$line) {
-            $line = rtrim($line, "\n"); // perhaps not trim too much here
-        }
-
-        return implode('', $lines);
+        return $data;
     }
 
     public function write(string $data): void
     {
-        $result = file_put_contents($this->filePath, $data . "\n", LOCK_EX);
+        $result = file_put_contents($this->filePath, $data, LOCK_EX);
 
         if ($result === false) {
             throw new SimpleException(sprintf('Unable to write to "%s"', $this->filePath));
@@ -50,10 +42,10 @@ final class LineFile implements File
 
     public function append(string $data): void
     {
-        $result = file_put_contents($this->filePath, $data . "\n", FILE_APPEND | LOCK_EX);
+        $result = file_put_contents($this->filePath, $data, FILE_APPEND | LOCK_EX);
 
         if ($result === false) {
-            throw new SimpleException(sprintf('Unable to write to "%s"', $this->filePath));
+            throw new SimpleException(sprintf('Unable to append to "%s"', $this->filePath));
         }
     }
 }

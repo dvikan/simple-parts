@@ -6,9 +6,9 @@ final class Router
 {
     private $routes;
 
-    public function map(string $regex, array $handler)
+    public function __construct(array $routes)
     {
-        $this->routes[$regex] = $handler;
+        $this->routes = $routes;
     }
 
     public function match(string $uri): array
