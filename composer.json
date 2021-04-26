@@ -16,13 +16,15 @@
               "src/json",
               "src/logger",
               "src/migrator",
+              "src/router/",
               "src/rss",
               "src/session",
+              "src/template/",
               "src/shell"
             ]
         },
         "files": [
-            "src/template/template.php"
+            "src/template/functions.php"
         ]
     },
     "require-dev": {

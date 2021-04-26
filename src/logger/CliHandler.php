@@ -2,15 +2,8 @@
 
 namespace dvikan\SimpleParts;
 
-final class FileHandler
+final class CliHandler
 {
-    private $file;
-
-    public function __construct(TextFile $file)
-    {
-        $this->file = $file;
-    }
-
     public function handle(array $record): void
     {
         try {
@@ -19,15 +12,21 @@ final class FileHandler
             $context = 'Unable to encode context as json';
         }
 
-        $item = sprintf(
+        if (in_array(PHP_SAPI, ['cli-server'])) {
+            print '<pre>';
+        }
+
+        printf(
             "[%s] %s.%s %s %s\n",
             $record['datetime']->format('Y-m-d H:i:s'),
             $record['channel'],
             $record['level_name'],
             $record['message'],
-            $context,
+            $context
         );
 
-        $this->file->append($item);
+        if (in_array(PHP_SAPI, ['cli-server'])) {
+            print '</pre>';
+        }
     }
 }

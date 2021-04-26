@@ -10,21 +10,17 @@ final class Container implements ArrayAccess
     private $container = [];
     private $resolved = [];
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $fn)
     {
+        if (! $fn instanceof Closure) {
+            throw new SimpleException('Container value must be a closure');
+        }
+
         if (isset($this[$offset])) {
             throw new SimpleException(sprintf('Already has a value stored in "%s"', $offset));
         }
 
-        if ($value === null) {
-            throw new SimpleException('null is not allowed as value');
-        }
-
-        if (! $value instanceof Closure) {
-            $this->resolved[$offset] = $value;
-        }
-
-        $this->container[$offset] = $value;
+        $this->container[$offset] = $fn;
     }
 
     public function offsetGet($offset)
@@ -37,9 +33,7 @@ final class Container implements ArrayAccess
             return $this->resolved[$offset];
         }
 
-        $this->resolved[$offset] = $this->container[$offset]($this);
-
-        return $this->resolved[$offset];
+        return $this->resolved[$offset] = $this->container[$offset]($this); // Intentional assignment
     }
 
     public function offsetExists($offset): bool

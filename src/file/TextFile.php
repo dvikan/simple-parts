@@ -2,12 +2,13 @@
 
 namespace dvikan\SimpleParts;
 
-final class TextFile implements File
+final class TextFile
 {
     private $filePath;
 
     public function __construct(string $filePath)
     {
+        // todo: validate filepath
         $this->filePath = $filePath;
     }
 
@@ -18,8 +19,8 @@ final class TextFile implements File
 
     public function read(): string
     {
-        if (!$this->exists()) {
-            return '';
+        if (! $this->exists()) {
+            throw new SimpleException(sprintf('File do not exists: "%s"', $this->filePath));
         }
 
         $data = file_get_contents($this->filePath);

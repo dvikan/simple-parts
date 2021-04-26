@@ -2,15 +2,52 @@
 
 namespace dvikan\SimpleParts;
 
-interface Cache
+final class Cache
 {
-    public function set(string $key, $value = true): void;
+    private $file;
+    private $data;
 
-    public function get(string $key, $default = null);
+    public function __construct(TextFile $file)
+    {
+        $this->file = $file;
 
-    public function has(string $key): bool;
+        if ($this->file->exists()) {
+            $this->data = Json::decode($this->file->read());
+            return;
+        }
+        $this->data = [];
+    }
 
-    public function delete(string $key): void;
+    public function set(string $key, $value = true, $ttl = null): void
+    {
+        $this->data[$key] = [
+            'value'         => $value,
+            'ttl'           => time() + $ttl,
+        ];
+    }
 
-    public function clear(): void;
+    public function get(string $key, $default = null)
+    {
+        if (isset($this->data[$key])) {
+            // todo: implement ttl check
+            return $this->data[$key]['value'];
+        }
+
+        return $default;
+    }
+
+    public function delete(string $key): void
+    {
+        unset($this->data[$key]);
+    }
+
+    public function clear(): void
+    {
+        $this->data = [];
+    }
+
+    public function __destruct()
+    {
+        $this->file->write(Json::encode($this->data));
+    }
 }

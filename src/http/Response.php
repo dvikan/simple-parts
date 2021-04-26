@@ -19,7 +19,7 @@ final class Response
 
         if (! isset(HttpClient::STATUS_LINES[$code])) {
             // Consider dropping this
-            //throw new SimpleException(sprintf('Invalid status code "%s"', $code));
+            throw new SimpleException(sprintf('Invalid status code "%s"', $code));
         }
     }
 
@@ -28,19 +28,9 @@ final class Response
         return $this->body;
     }
 
-    public function json(): array
-    {
-        return Json::decode($this->body);
-    }
-
     public function code(): int
     {
         return $this->code;
-    }
-
-    public function statusLine(): string
-    {
-        return HttpClient::STATUS_LINES[$this->code];
     }
 
     public function headers(): array
@@ -48,7 +38,17 @@ final class Response
         return $this->headers;
     }
 
-    public function ok(): bool
+    public function json(): array
+    {
+        return Json::decode($this->body);
+    }
+
+    public function statusLine(): string
+    {
+        return HttpClient::STATUS_LINES[$this->code];
+    }
+
+    public function isOk(): bool
     {
         return $this->code === HttpClient::OK;
     }
@@ -58,13 +58,29 @@ final class Response
         return in_array($this->code, [
             HttpClient::MOVED_PERMANENTLY,
             HttpClient::FOUND,
+            HttpClient::SEE_OTHER,
         ]);
+    }
+
+    // consider cloning self in with* methods
+    public function withCode(int $code): self
+    {
+        $this->code = $code;
+        return $this;
     }
 
     public function withJson(array $data): self
     {
         $this->body = Json::encode($data);
-        $this->headers['Content-type'] = 'application/json';
+        $this->headers['content-type'] = 'application/json';
+        return $this;
+    }
+
+    public function withRedirect(string $url): self
+    {
+        // todo: perhaps validate url
+        $this->code = HttpClient::FOUND;
+        $this->headers['location'] = $url;
         return $this;
     }
 

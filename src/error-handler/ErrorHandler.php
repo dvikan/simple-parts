@@ -4,7 +4,8 @@ namespace dvikan\SimpleParts;
 
 final class ErrorHandler
 {
-    private const ERROR_STRINGS = [
+    // Mapping from php error code to string
+    private const ERROR_MAP = [
         E_ERROR             => 'Error',
         E_WARNING           => 'Warning',
         E_NOTICE            => 'Notice',
@@ -12,15 +13,17 @@ final class ErrorHandler
         E_DEPRECATED        => 'Deprecated',
     ];
 
+    // Mapping from php error code to logger log level
     private const LEVEL_MAP = [
         E_NOTICE            => Logger::INFO,
         E_WARNING           => Logger::WARNING,
     ];
 
+    // Exit on these php error codes
     private const EXIT_MAP = [
-        E_RECOVERABLE_ERROR => true,
-        E_WARNING           => true,
         E_NOTICE            => true,
+        E_WARNING           => true,
+        E_RECOVERABLE_ERROR => true,
     ];
 
     /** @var Logger */
@@ -31,89 +34,139 @@ final class ErrorHandler
         // noop
     }
 
-    public static function create(Logger $logger = null): self
+    public static function create(Logger $logger): self
     {
-        $handler = new self();
+        $errorHandler = new self();
 
-        $handler->logger = $logger ?: new SimpleLogger();
+        $errorHandler->logger = $logger;
 
-        set_error_handler([$handler, 'handleError']);
-        set_exception_handler([$handler, 'handleException']);
-        register_shutdown_function([$handler, 'handleShutdown']);
+        set_error_handler([$errorHandler, 'handleError']);
+        set_exception_handler([$errorHandler, 'handleException']);
+        register_shutdown_function([$errorHandler, 'handleShutdown']);
 
-        return $handler;
+        return $errorHandler;
     }
 
     public function handleError($code, $message, $file, $line)
     {
-        $this->logger->log(
-            self::LEVEL_MAP[$code] ?? Logger::ERROR,
-            sprintf(
-                '%s: %s in %s:%s',
-                self::ERROR_STRINGS[$code] ?? (string) $code,
-                $message,
-                $file,
-                $line
-            ),
-            [
-                'code' => $code,
-                'message' => $message,
-                'file' => $file,
-                'line' => $line,
-                'stacktrace' => array_map(function ($e) {
-                    return ($e['file'] ?? ''). ':' . ($e['line'] ?? '');
-                }, debug_backtrace()),
-            ]
+        $level = self::LEVEL_MAP[$code] ?? Logger::ERROR;
+        $codeName = self::ERROR_MAP[$code] ?? ((string)$code);
+
+        $formattedMessage = sprintf(
+            '%s: %s in %s:%s',
+            $codeName,
+            $message,
+            $file,
+            $line
         );
 
+        $context = [
+            'debug' => [
+                'message'       => $message,
+                'code'          => $code,
+                'file'          => $file,
+                'line'          => $line,
+                'stacktrace'    => $this->createStackTraceFromTrace(debug_backtrace()),
+            ]
+        ];
+
+        $this->logger->log($level, $formattedMessage, $context);
+
+        // Whether to exit based off of php error codes
         if (self::EXIT_MAP[$code]) {
             exit(1);
         }
     }
 
-    public function handleException($e)
+    public function handleException($exception)
     {
-        $this->logger->log(
-            Logger::ERROR, // An exception is always an error
-            sprintf(
-                'Uncaught Exception %s: %s in %s:%s',
-                get_class($e),
-                $e->getMessage(),
-                $e->getFile(),
-                $e->getLine()
-            ),
-            ['exception' => $e]
-        );
+        $level = Logger::ERROR;
+        $exceptionMessage = $exception->getMessage();
+        $code = $exception->getCode();
+        $file = $exception->getFile();
+        $line = $exception->getLine();
+        $exceptionClass = get_class($exception);
 
-        exit(1);
+        $message = sprintf('Exception %s: %s in %s:%s', $exceptionClass, $exceptionMessage, $file, $line);
+
+        $context = [
+            'debug' => [
+                'message'       => $exceptionMessage,
+                'code'          => $code,
+                'file'          => $file,
+                'line'          => $line,
+                'stacktrace'    => $this->createStackTraceFromTrace($exception->getTrace()),
+            ]
+        ];
+
+        // Append the stack frame where the exception was thrown
+        $context['debug']['stacktrace'][] = sprintf('%s %s:%s', $exceptionClass, $file, $line);
+
+        $this->logger->log($level, $message, $context);
+
+        exit(1); // I don't think this is necessary because the php engine quits after an exception
     }
 
     public function handleShutdown()
     {
         $err = error_get_last();
 
-        if (!$err) {
+        if (! $err) {
             return;
         }
 
-        $this->logger->log(
-            self::LEVEL_MAP[$err['type']] ?? Logger::ERROR,
-            sprintf(
-                '(shutdown_function) %s: %s in %s:%s',
-                self::ERROR_STRINGS[$err['type']] ?? (string)($err['type']),
-                $err['message'],
-                $err['file'],
-                $err['line']
-            ),
-            [
-                'code' => $code,
-                'message' => $message,
-                'file' => $file,
-                'line' => $line,
-                'stacktrace' => array_map(function ($e) {
-                    return ($e['file'] ?? ''). ':' . ($e['line'] ?? '');
-                }, debug_backtrace()),
-            ]
+        $errorMessage = $err['message'] ?? '';
+        $code = $err['type'] ?? '';
+        $file = $err['file'] ?? '';
+        $line = $err['line'] ?? '';
+
+        $level = self::LEVEL_MAP[$code] ?? Logger::ERROR;
+        $codeName = self::ERROR_MAP[$code] ?? ((string)($code));
+
+        $message = sprintf(
+            '%s: %s in %s:%s',
+            $codeName,
+            $errorMessage,
+            $file,
+            $line
         );
+
+        $context = [
+            'debug' => [
+                'message'       => $errorMessage,
+                'code'          => $code,
+                'file'          => $file,
+                'line'          => $line,
+                'stacktrace'    => $this->createStackTraceFromTrace(debug_backtrace()),
+            ]
+        ];
+
+        $this->logger->log($level, $message, $context);
+    }
+
+    private function createStackTraceFromTrace(array $backTrace): array
+    {
+        $stackTrace = [];
+
+        foreach ($backTrace as $trace) {
+            $file = $trace['file'];
+            $line = $trace['line'];
+            $function = $trace['function'];
+            $class = $trace['class'] ?? '';
+            //$object = $trace['object'];
+            $type = $trace['type'] ?? '';
+            //$args = $trace['args'];
+
+            $stackTrace[] = sprintf(
+                '%s%s%s() %s:%s',
+                $class,
+                $type,
+                $function,
+                $file,
+                $line
+            );
+        }
+
+        return array_reverse($stackTrace);
     }
 }

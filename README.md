@@ -1,19 +1,17 @@
 # Simple Parts
 
-Intentionally simple components for building applications.
+Simpler components for building applications.
 
-* `Cache`, `FileCache`, `MemoryCache`, `NullCache`
+* `Cache`
 * `Console`
 * `Container`
 * `ErrorHandler`
-* `File`, `TextFile`, `MemoryFile`, `NullFile`
-* `HttpClient`, `CurlHttpClient`, `NullHttpClient`
+* `TextFile`
+* `HttpClient`, `Request`, `Response`, `Router`
 * `Json`
-* `Request`, `Response`
-* `Router`
-* `Logger`, `SimpleLogger`, `NullLogger`, `Handler`, `PrintHandler`, `FileHandler`
+* `Logger`, `CliHandler`, `FileHandler`
 * `Migrator`
-* `Rss`
+* `RssClient`
 * `Session`
 * `Shell`
 * `Template`
@@ -38,6 +36,11 @@ TODO:
 * vardumper
 * throttling
 * captcha
+* i18n
+* String, truncate
+* html form, csrf
+* browser ua lib
+* ipv4 address to location lib
 
 All classes reside under the `dvikan\SimpleParts` namespace.
 
@@ -46,23 +49,21 @@ All classes reside under the `dvikan\SimpleParts` namespace.
 ```php
 <?php declare(strict_types=1);
 
-use dvikan\SimpleParts\FileCache;
+use dvikan\SimpleParts\Cache;
 use dvikan\SimpleParts\TextFile;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$cache = new FileCache(new TextFile('cache.json'));
+$cache = new Cache(new TextFile('./cache.json'));
 
 print $cache->get('foo', 'default') . "\n";
 
 $cache->set('foo', 'bar');
 
-if ($cache->has('foo')) {
-    print $cache->get('foo') . "\n";
-}
+print $cache->get('foo') . "\n";
 
-// $cache->delete('foo');
-// $cache->clear();
+$cache->delete('foo');
+$cache->clear();
 ```
 
 ## Console
@@ -98,14 +99,11 @@ require __DIR__ . '/vendor/autoload.php';
 
 $container = new Container();
 
-$container['database'] = function($container) {
-    return new PDO($container['dsn']);
+$container['config'] = function($c) {
+    return ['env' => 'dev'];
 };
 
-$container['dsn'] = 'sqlite::memory:';
-
-/** @var PDO $database */
-$database = $container['database'];
+print $container['config'];
 ```
 
 ## ErrorHandler
@@ -117,7 +115,7 @@ use dvikan\SimpleParts\ErrorHandler;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$errorHandler = ErrorHandler::create();
+ErrorHandler::create();
 
 print foo();
 ```
@@ -125,7 +123,7 @@ print foo();
 default.ERROR Uncaught Exception Error: Call to undefined function foo() in test.php:9
 ```
 
-## File
+## TextFile
 
 ```php
 <?php declare(strict_types=1);
@@ -134,7 +132,7 @@ use dvikan\SimpleParts\TextFile;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$file = new TextFile('./application.log');
+$file = new TextFile('./diary.txt');
 
 $file->write('hello ');
 $file->append('world');
@@ -142,34 +140,6 @@ $file->append('world');
 if ($file->exists()) {
     print $file->read();
 }
-```
-
-## HttpClient
-
-```php
-<?php declare(strict_types=1);
-
-use dvikan\SimpleParts\CurlHttpClient;
-
-require __DIR__ . '/vendor/autoload.php';
-
-$client = new CurlHttpClient();
-
-$response = $client->get('https://example.com');
-
-print $response->body();
-```
-
-## Json
-
-```php
-<?php declare(strict_types=1);
-
-use dvikan\SimpleParts\Json;
-
-require __DIR__ . '/vendor/autoload.php';
-
-print Json::encode(['message' => 'hello']);
 ```
 
 ## Request
@@ -210,6 +180,22 @@ $response = new Response();
 $response = new Response("Hello\nworld", 200, ['Content-Type' => 'text/plain']);
 
 $response->send();
+```
+
+## HttpClient
+
+```php
+<?php declare(strict_types=1);
+
+use dvikan\SimpleParts\HttpClient;
+
+require __DIR__ . '/vendor/autoload.php';
+
+$client = new HttpClient();
+
+$response = $client->get('https://example.com');
+
+print $response->body();
 ```
 
 ## Router
@@ -253,17 +239,30 @@ $result = $handlerObject->{$handlerMethod}($args);
 
 print $result;
 ```
-    
+
+## Json
+
+```php
+<?php declare(strict_types=1);
+
+use dvikan\SimpleParts\Json;
+
+require __DIR__ . '/vendor/autoload.php';
+
+print Json::encode(['message' => 'hello']);
+```
+
 ## Logger
 
 ```php
 <?php declare(strict_types=1);
 
-use dvikan\SimpleParts\SimpleLogger;
+use dvikan\SimpleParts\Logger;
+use dvikan\SimpleParts\CliHandler;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$logger = new SimpleLogger();
+$logger = new Logger('default', [new CliHandler()]);
 
 $logger->info('hello');
 $logger->warning('hello');
@@ -302,15 +301,14 @@ print implode("\n", $result) . "\n";
 ```php
 <?php declare(strict_types=1);
 
-use dvikan\SimpleParts\Rss;
+use dvikan\SimpleParts\RssClient;
+use dvikan\SimpleParts\HttpClient;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$rss = new Rss();
+$rssClient = new RssClient(new HttpClient());
 
-$url = 'https://github.com/sebastianbergmann/phpunit/releases.atom';
-
-$feed = $rss->fromUrl($url);
+$feed = $rssClient->fromUrl('https://github.com/sebastianbergmann/phpunit/releases.atom');
 
 foreach ($feed['items'] as $item) {
     printf(
@@ -357,19 +355,22 @@ print $shell->execute('echo', ['-n', 'hello', 'world']);
 ```php
 <?php declare(strict_types=1);
 
-use function dvikan\SimpleParts\render;
+use dvikan\SimpleParts\Template;
 
 require __DIR__ . '/vendor/autoload.php';
 
+$template = new Template();
+
 $name = $_GET['name'] ?? 'anon';
 
-print render('z.php', ['user' => $name]);
+print $template->render('welcome.php', ['name' => $name]);
 ```
 
+welcome.php:
 ```php
-<?php use function \dvikan\SimpleParts\e; ?>
+<?php namespace dvikan\SimpleParts; ?>
 
 <p>
-    Welcome <?= e($user) ?>
+    Welcome <?= e($name) ?>
 </p>
 ```

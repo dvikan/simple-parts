@@ -6,6 +6,7 @@ final class Router
 {
     private $routes;
 
+    // todo: expand with method too
     public function __construct(array $routes)
     {
         $this->routes = $routes;

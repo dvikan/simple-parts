@@ -8,8 +8,11 @@ final class Request
     private $post;
     private $server;
 
-    public function __construct(array $get = [], array $post = [], array $server = [])
-    {
+    public function __construct(
+        array $get = [],
+        array $post = [],
+        array $server = []
+    ) {
         $this->get = $get;
         $this->post = $post;
         $this->server = $server;
@@ -20,22 +23,22 @@ final class Request
         return new Request($_GET, $_POST, $_SERVER);
     }
 
-    public function get(string $key): ?string
+    public function get(string $key, string $default = null): string
     {
-        if (! isset($this->get[$key])) {
-            throw new SimpleException('Unknown key');
+        if (isset($this->get[$key])) {
+            return $this->get[$key];
         }
 
-        return $this->get[$key];
+        return $default;
     }
 
-    public function post(string $key): ?string
+    public function post(string $key, string $default = null): string
     {
-        if (! isset($this->get[$key])) {
-            throw new SimpleException('Unknown key');
+        if (isset($this->post[$key])) {
+            return $this->post[$key];
         }
 
-        return $this->post[$key];
+        return $default;
     }
 
     public function isGet(): bool

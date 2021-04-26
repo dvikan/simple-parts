@@ -6,31 +6,28 @@ use DateTime;
 use Exception;
 use SimpleXMLElement;
 
-final class Rss
+final class RssClient
 {
     const DATE_FORMAT = 'Y-m-d H:i:s';
 
     /** @var HttpClient */
     private $client;
 
-    public function __construct(HttpClient $client = null)
+    public function __construct(HttpClient $client)
     {
-        $this->client = $client ?: new CurlHttpClient([HttpClient::USERAGENT => 'Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0']);
+        $this->client = $client;
     }
 
-    /**
-     * @throws SimpleException
-     */
     public function fromUrl(string $url): array
     {
-        $response = $this->client->get($url);
+        $response = $this->client->get($this->prepareUrl($url));
 
         return $this->fromXml($response->body());
     }
 
     private function fromFile(string $fileName): array
     {
-        // todo: replace with TextFile
+        // todo: TextFile
         $xml = file_get_contents($fileName);
 
         if ($xml === false) {
@@ -75,12 +72,14 @@ final class Rss
 
         foreach ($xml->channel->item as $item) {
             $_item = [
-                'title'         => $item->title,
+                'title'         => (string) $item->title,
                 'link'          => null,
+                'guid'          => (string) $item->guid,
                 'date'          => DateTime::createFromFormat(DATE_RSS, (string) $item->pubDate)->format(self::DATE_FORMAT),
                 'description'   => (string) $item->description,
             ];
 
+            // Not all items has a link
             if (isset($item->link)) {
                 $_item['link'] = (string) $item->link;
             }
@@ -103,6 +102,7 @@ final class Rss
             $item = [
                 'title'         => (string) $entry->title,
                 'link'          => (string) $entry->link['href'],
+                'guid'          => (string) $entry->id,
                 'description'   => (string) $entry->content,
             ];
 
@@ -116,5 +116,27 @@ final class Rss
         }
 
         return $feed;
+    }
+
+
+    private function prepareUrl($url)
+    {
+        if (preg_match('#^https://www.youtube.com/channel/(\w+)$#', $url, $matches)) {
+            return 'https://www.youtube.com/feeds/videos.xml?channel_id=' . $matches[1];
+        }
+
+        if (preg_match('#^https://www.youtube.com/user/(\w+)$#', $url, $matches)) {
+            return 'https://www.youtube.com/feeds/videos.xml?user=' . $matches[1];
+        }
+
+        if (preg_match('#^https://www.reddit.com/r/(\w+)$#', $url)) {
+            return $url . '.rss';
+        }
+
+        if (preg_match('#^https://play.acast.com/s/([a-z]+)$#', $url, $matches) === 1) {
+            return 'https://rss.acast.com/' . $matches[1];
+        }
+
+        return $url;
     }
 }

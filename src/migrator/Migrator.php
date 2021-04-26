@@ -43,15 +43,16 @@ final class Migrator
             throw new SimpleException('Zero migrations found.');
         }
 
-        $cache = new FileCache(new TextFile($this->cacheFolder . '/migrations.json'));
+        $cache = new Cache(new TextFile($this->cacheFolder . '/migrations.json'));
 
         foreach ($migrations as $migration) {
             $fileName = basename($migration);
 
-            if ($cache->has($fileName)) {
+            if ($cache->get($fileName)) {
                 continue;
             }
 
+            // todo: textfile
             $sql = file_get_contents($migration);
 
             if ($this->pdo->exec($sql) === false) {
