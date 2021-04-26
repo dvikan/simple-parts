@@ -2,23 +2,41 @@
 
 namespace dvikan\SimpleParts;
 
+use Closure;
+
 final class Router
 {
     private $routes;
 
     // todo: expand with method too
-    public function __construct(array $routes)
+    public function __construct()
     {
-        $this->routes = $routes;
+        $this->routes = [];
     }
 
-    public function match(string $uri): array
+    /**
+     * @param string $regex
+     * @param string|array $handler Class name and method
+     */
+    public function get(string $regex, $handler, array $middlewares = [])
     {
-        foreach ($this->routes as $regex => $handler) {
-            if (preg_match('#^'.$regex.'$#', $uri, $matches) === 1) {
+        $this->routes[] = [
+            'method'        => 'get',
+            'regex'         => $regex,
+            'handler'       => $handler,
+            'middlewares'   => $middlewares,
+        ];
+    }
+
+    public function match(Request $request): array
+    {
+        foreach ($this->routes as $route) {
+            if (preg_match('#^'. $route['regex'] . '$#', $request->uri(), $matches) === 1) {
                 array_shift($matches);
 
-                return [$handler, $matches];
+                $route['args'] = $matches;
+
+                return $route;
             }
         }
 

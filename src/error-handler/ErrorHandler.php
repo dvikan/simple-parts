@@ -149,9 +149,9 @@ final class ErrorHandler
         $stackTrace = [];
 
         foreach ($backTrace as $trace) {
-            $file = $trace['file'];
-            $line = $trace['line'];
-            $function = $trace['function'];
+            $file = $trace['file'] ?? '';
+            $line = $trace['line'] ?? '';
+            $function = $trace['function'] ?? '';
             $class = $trace['class'] ?? '';
             //$object = $trace['object'];
             $type = $trace['type'] ?? '';

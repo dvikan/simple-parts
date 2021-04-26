@@ -48,7 +48,7 @@ final class Response
         return HttpClient::STATUS_LINES[$this->code];
     }
 
-    public function isOk(): bool
+    public function ok(): bool
     {
         return $this->code === HttpClient::OK;
     }

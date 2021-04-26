@@ -121,7 +121,7 @@ final class HttpClient
 
         $response = new Response($body, $statusCode, $headers);
 
-        if ($response->isOk()) {
+        if ($response->ok()) {
             return $response;
         }
 

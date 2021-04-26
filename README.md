@@ -16,32 +16,6 @@ Simpler components for building applications.
 * `Shell`
 * `Template`
 
-TODO:
-
-* git wrapper (todo)
-* irc client (todo)
-* socket wrapper (todo)
-* web framework (todo)
-* Url,Uri, (todo)
-* Csv (todo)
-* Collection (todo)
-* ImapClient (todo)
-* DataMapper (ORM, todo)
-* Dotenv (todo)
-* EventDispatcher (todo)
-* Validator, validate values, validate array structure (todo)
-* Random (todo)
-* Guid (todo)
-* Flat file database
-* vardumper
-* throttling
-* captcha
-* i18n
-* String, truncate
-* html form, csrf
-* browser ua lib
-* ipv4 address to location lib
-
 All classes reside under the `dvikan\SimpleParts` namespace.
 
 ## Cache
@@ -374,3 +348,31 @@ welcome.php:
     Welcome <?= e($name) ?>
 </p>
 ```
+
+## TODO
+
+
+* git wrapper (todo)
+* irc client (todo)
+* socket wrapper (todo)
+* web framework (todo)
+* Url,Uri, (todo)
+* Csv (todo)
+* Collection (todo)
+* ImapClient (todo)
+* DataMapper (ORM, todo)
+* Dotenv (todo)
+* EventDispatcher (todo)
+* Validator, validate values, validate array structure (todo)
+* Random (todo)
+* Guid (todo)
+* Flat file database
+* vardumper
+* throttling
+* captcha
+* i18n
+* String, truncate
+* html form, csrf
+* browser ua lib
+* ipv4 address to location lib
+

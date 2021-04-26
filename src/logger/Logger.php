@@ -63,9 +63,9 @@ final class Logger
         // This is a user invoked log item, so tag it with debug info
         if (! isset($context['debug'])) {
             // Consider dropping this
-            $context['debug'] = [
-                'stacktrace' => debug_backtrace(), // todo: improve stacktrace
-            ];
+//            $context['debug'] = [
+//                'stacktrace' => debug_backtrace(), // todo: improve stacktrace
+//            ];
         }
 
         foreach ($this->handlers as $handler) {
