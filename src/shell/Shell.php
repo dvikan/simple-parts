@@ -19,7 +19,7 @@ final class Shell
             $command .= ' ' . escapeshellarg($argument);
         }
 
-        exec($command, $output, $status);
+        $_ = exec($command, $output, $status);
 
         if ($status === 0) {
             return implode("\n", $output);
@@ -27,9 +27,9 @@ final class Shell
 
         switch ($status) {
             case 127:
-                throw new SimpleException('Not found: ' . $command);
+                throw new SimpleException(sprintf('Not found: "%s"', $command));
             default:
-                throw new SimpleException('Unsuccessful: ' . $command);
+                throw new SimpleException(sprintf('Unsuccessful: "%s"', $command));
         }
     }
 }

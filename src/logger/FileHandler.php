@@ -14,20 +14,20 @@ final class FileHandler
     public function handle(array $record): void
     {
         try {
-            $context = Json::encode($record['context']);
+            $json = Json::encode($record['context']);
         } catch (SimpleException $e) {
-            $context = 'Unable to encode context as json';
+            $json = sprintf('Unable to json encode context: "%s"', $e->getMessage());
         }
 
-        $item = sprintf(
-            "[%s] %s.%s %s %s\n",
-            $record['datetime']->format('Y-m-d H:i:s'),
-            $record['channel'],
+        $result = sprintf(
+            "[%s] %s.%s %s %s",
+            $record['created_at']->format('Y-m-d H:i:s'),
+            $record['name'],
             $record['level_name'],
             $record['message'],
-            $context,
+            $json
         );
 
-        $this->file->append($item);
+        $this->file->append("$result\n");
     }
 }

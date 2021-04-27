@@ -2,13 +2,10 @@
 
 namespace dvikan\SimpleParts;
 
-use Closure;
-
 final class Router
 {
     private $routes;
 
-    // todo: expand with method too
     public function __construct()
     {
         $this->routes = [];
@@ -17,6 +14,7 @@ final class Router
     /**
      * @param string $regex
      * @param string|array $handler Class name and method
+     * @param array $middlewares
      */
     public function get(string $regex, $handler, array $middlewares = [])
     {

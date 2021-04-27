@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
-class SimpleException extends \Exception
+final class SimpleException extends \Exception
 {
 }

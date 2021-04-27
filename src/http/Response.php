@@ -84,7 +84,7 @@ final class Response
         return $this;
     }
 
-    public function send()
+    public function send(): void
     {
         http_response_code($this->code);
 

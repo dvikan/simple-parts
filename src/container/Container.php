@@ -17,7 +17,7 @@ final class Container implements ArrayAccess
         }
 
         if (isset($this[$offset])) {
-            throw new SimpleException(sprintf('Already has a value stored in "%s"', $offset));
+            throw new SimpleException(sprintf('Refusing to overwrote existing key: "%s"', $offset));
         }
 
         $this->container[$offset] = $fn;
@@ -26,7 +26,7 @@ final class Container implements ArrayAccess
     public function offsetGet($offset)
     {
         if (! isset($this[$offset])) {
-            throw new SimpleException(sprintf('Dependency "%s" not found', $offset));
+            throw new SimpleException(sprintf('Key does not exists: "%s"', $offset));
         }
 
         if (isset($this->resolved[$offset])) {

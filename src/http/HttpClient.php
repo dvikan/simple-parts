@@ -7,6 +7,7 @@ final class HttpClient
     public const GET    = 'GET';
     public const POST   = 'POST';
 
+    // http codes
     public const OK                     = 200;
     public const MOVED_PERMANENTLY      = 301;
     public const FOUND                  = 302;
@@ -24,6 +25,7 @@ final class HttpClient
         self::UNAUTHORIZED          => '401 Unauthorized',
         self::INTERNAL_SERVER_ERROR => '500 Internal Server Error',
     ];
+
 
     public const BODY               = 'body';
     public const USERAGENT          = 'useragent';

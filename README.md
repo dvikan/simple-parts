@@ -349,30 +349,30 @@ welcome.php:
 </p>
 ```
 
-## TODO
+## Todo
 
-
-* git wrapper (todo)
-* irc client (todo)
-* socket wrapper (todo)
-* web framework (todo)
-* Url,Uri, (todo)
-* Csv (todo)
-* Collection (todo)
-* ImapClient (todo)
-* DataMapper (ORM, todo)
-* Dotenv (todo)
-* EventDispatcher (todo)
-* Validator, validate values, validate array structure (todo)
-* Random (todo)
-* Guid (todo)
+* git wrapper
+* irc client
+* socket wrapper
+* web framework
+* Url
+* Uri
+* Csv
+* Collection
+* ImapClient
+* DataMapper
+* ORM
+* Dotenv
+* EventDispatcher
+* Validator
+* Random
+* Guid
 * Flat file database
 * vardumper
 * throttling
 * captcha
 * i18n
-* String, truncate
+* String
 * html form, csrf
 * browser ua lib
 * ipv4 address to location lib
-

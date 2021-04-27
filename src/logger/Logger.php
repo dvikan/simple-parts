@@ -2,9 +2,6 @@
 
 namespace dvikan\SimpleParts;
 
-use DateTime;
-use stdClass;
-
 final class Logger
 {
     public const INFO       = 10;
@@ -17,12 +14,12 @@ final class Logger
         self::ERROR     => 'ERROR',
     ];
 
+    private $name;
     private $handlers;
-    private $channel;
 
-    public function __construct(string $channel, array $handlers)
+    public function __construct(string $name, array $handlers)
     {
-        $this->channel = $channel;
+        $this->name = $name;
         $this->handlers = $handlers;
     }
 
@@ -43,39 +40,14 @@ final class Logger
 
     public function log(int $level, string $message, array $context = []): void
     {
-        // Special case for records that are manually tagged with an exception
-        // The ErrorHandler never does this
-        if (isset($context['e'])) {
-            /** @var \Exception $exception */
-            $exception = $context['e'];
-
-            $context['debug'] = [
-                'message'       => $exception->getMessage(),
-                'code'          => $exception->getCode(),
-                'file'          => $exception->getFile(),
-                'line'          => $exception->getLine(),
-                'stacktrace'    => $exception->getTrace(), // todo: improve stacktrace
-            ];
-
-            unset($context['e']);
-        }
-
-        // This is a user invoked log item, so tag it with debug info
-        if (! isset($context['debug'])) {
-            // Consider dropping this
-//            $context['debug'] = [
-//                'stacktrace' => debug_backtrace(), // todo: improve stacktrace
-//            ];
-        }
-
         foreach ($this->handlers as $handler) {
             $handler->handle([
-                'channel'       => $this->channel,
+                'name'          => $this->name,
+                'created_at'    => new \DateTime(),
                 'level'         => $level,
                 'level_name'    => self::LEVEL_NAMES[$level],
                 'message'       => $message,
-                'context'       => $context ?: new stdClass(),
-                'datetime'      => new DateTime(),
+                'context'       => $context,
             ]);
         }
     }

@@ -11,10 +11,10 @@ final class Template
         $this->config = $config;
     }
 
-    public function render(string $filePath, array $vars = []): string
+    public function render(string $filePath, array $context = []): string
     {
         // todo: validate filePath
-        extract($vars);
+        extract($context);
         ob_start();
         require $filePath;
         return ob_get_clean();

@@ -40,7 +40,7 @@ final class Migrator
         }
 
         if ($migrations === []) {
-            throw new SimpleException('Zero migrations found.');
+            throw new SimpleException(sprintf('Zero migrations found in "%s"', $this->migrationsFolder);
         }
 
         $cache = new Cache(new TextFile($this->cacheFolder . '/migrations.json'));
@@ -48,7 +48,7 @@ final class Migrator
         foreach ($migrations as $migration) {
             $fileName = basename($migration);
 
-            if ($cache->get($fileName)) {
+            if ($cache->get($fileName, false)) {
                 continue;
             }
 
