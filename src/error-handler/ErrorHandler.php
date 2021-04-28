@@ -67,7 +67,11 @@ final class ErrorHandler
 
         $stackTrace = [];
         foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $trace) {
-            $stackTrace[] = sprintf('%s:%s', $trace['file'], $trace['line']);
+            $stackTrace[] = sprintf(
+                '%s:%s',
+                $trace['file'] ?? '(null)',
+                $trace['line'] ?? '(null)'
+            );
         }
 
         $this->logger->log(

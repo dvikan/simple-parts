@@ -21,50 +21,41 @@ final class Cache
 
     public function set(string $key, $value = true, int $ttl = 0): void
     {
-        $this->validateKey($key);
-        $this->validateValue($value);
-
-        // todo: might be a bug here
-        if ($ttl === 0) {
-            $ttl = PHP_INT_MAX;
-        } else {
-            $ttl = (time() + $ttl);
-        }
-
         $this->data[$key] = [
-            'value' => $value,
-            'ttl' => $ttl,
+            'key'           => $key,
+            'value'         => $value,
+            'created_at'    => time(),
+            'ttl'           => $ttl,
         ];
     }
 
-    /**
-     * Throws exception if the key do not exists, unless a default value is provided.
-     */
     public function get(string $key, $default = null)
     {
-        $this->validateKey($key);
-
-        if (isset($this->data[$key])) {
-            if ($this->data[$key]['ttl'] < time()) {
-                $this->delete($key);
-            } else {
-                return $this->data[$key]['value'];
-            }
+        if ($key === '') {
+            throw new SimpleException('Cache key cannot be null');
         }
 
-        if ($default === null) {
-            throw new SimpleException(sprintf('Unknown cache key: "%s"', $key));
+        if (! isset($this->data[$key])) {
+            return $default;
         }
 
-        // Return the default value if it's non-null
-        return $default;
+        if ($this->data[$key]['ttl'] === 0) {
+            return $this->data[$key]['value'];
+        }
+
+        if ($this->data[$key]['created_at'] + $this->data[$key]['ttl'] < time()) {
+            unset($this->data[$key]);
+            return $default;
+        }
+
+        return $this->data[$key]['value'];
     }
 
     public function delete(string $key): void
     {
-        $this->validateKey($key);
-
-        unset($this->data[$key]);
+        if (! isset($this->data[$key])) {
+            throw new SimpleException(sprintf('Unknown cache key: "%s"', $key));
+        }
     }
 
     public function clear(): void
@@ -75,21 +66,5 @@ final class Cache
     public function __destruct()
     {
         $this->file->write(Json::encode($this->data));
-    }
-
-    private function validateKey(string $key)
-    {
-        // todo: relax regex
-        if (preg_match('/^[a-z]+$/i', $key) !== 1) {
-            throw new SimpleException(sprintf('Illegal cache key: "%s"', $key));
-        }
-    }
-
-    private function validateValue($value): void
-    {
-        if ($value === null) {
-            throw new SimpleException('pls no null');
-        }
-        // perhaps only allow strings making it a key-value store
     }
 }
