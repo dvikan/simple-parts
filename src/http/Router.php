@@ -4,37 +4,37 @@ namespace dvikan\SimpleParts;
 
 final class Router
 {
-    private $routes;
+    private $routes = [];
 
-    public function __construct()
+    public function get(string $pattern, $handler)
     {
-        $this->routes = [];
+        $this->addRoute('GET', $pattern, $handler);
     }
 
-    /**
-     * @param string $regex
-     * @param string|array $handler Class name and method
-     * @param array $middlewares
-     */
-    public function get(string $regex, $handler, array $middlewares = [])
+    public function post(string $pattern, $handler)
+    {
+        $this->addRoute('POST', $pattern, $handler);
+    }
+
+    public function addRoute(string $method, string $pattern, $handler)
     {
         $this->routes[] = [
-            'method'        => 'get',
-            'regex'         => $regex,
+            'method'        => $method,
+            'pattern'       => $pattern,
             'handler'       => $handler,
-            'middlewares'   => $middlewares,
         ];
     }
 
-    public function match(Request $request): array
+    public function dispatch(string $method, string $uri): array
     {
         foreach ($this->routes as $route) {
-            if (preg_match('#^'. $route['regex'] . '$#', $request->uri(), $matches) === 1) {
-                array_shift($matches);
+            if (
+                $method === $route['method']
+                && preg_match('#^' . $route['pattern'] . '$#', $uri, $vars) === 1
+            ) {
+                array_shift($vars);
 
-                $route['args'] = $matches;
-
-                return $route;
+                return [$route['handler'], $vars];
             }
         }
 

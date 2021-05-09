@@ -9,3 +9,11 @@ function e(string $s): string
 {
     return htmlspecialchars($s);
 }
+
+/**
+ * Explicitly don't escape
+ */
+function raw(string $s): string
+{
+    return $s;
+}

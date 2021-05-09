@@ -8,6 +8,7 @@
               "src",
               "src/cache",
               "src/common",
+              "src/config/",
               "src/console",
               "src/container",
               "src/error-handler",
@@ -16,16 +17,20 @@
               "src/json",
               "src/logger",
               "src/migrator",
+              "src/renderer/",
               "src/router/",
-              "src/rss",
               "src/session",
-              "src/template/",
               "src/shell"
             ]
         },
         "files": [
-            "src/template/functions.php"
+            "src/renderer/functions.php"
         ]
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "dvikan\\SimpleParts\\": "test"
+      }
     },
     "require-dev": {
     },

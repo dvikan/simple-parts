@@ -18,7 +18,6 @@ final class Migrator
         $this->pdo = $pdo;
         $this->migrationsFolder = $migrationsFolder;
         $this->cacheFolder = $cacheFolder;
-
     }
 
     public function migrate(): array
@@ -40,7 +39,7 @@ final class Migrator
         }
 
         if ($migrations === []) {
-            throw new SimpleException(sprintf('Zero migrations found in "%s"', $this->migrationsFolder);
+            throw new SimpleException(sprintf('Zero migrations found in "%s"', $this->migrationsFolder));
         }
 
         $cache = new Cache(new TextFile($this->cacheFolder . '/migrations.json'));

@@ -8,7 +8,6 @@ final class TextFile
 
     public function __construct(string $filePath)
     {
-        // todo: validate filepath
         $this->filePath = $filePath;
     }
 

@@ -23,31 +23,46 @@ final class Request
         return new Request($_GET, $_POST, $_SERVER);
     }
 
-    public function get(string $key, string $default = null): string
-    {
-        if (isset($this->get[$key])) {
-            return $this->get[$key];
-        }
-
-        return $default;
-    }
-
-    public function post(string $key, string $default = null): string
-    {
-        if (isset($this->post[$key])) {
-            return $this->post[$key];
-        }
-
-        return $default;
-    }
-
     public function isGet(): bool
     {
-        return $this->server['REQUEST_METHOD'] === 'GET';
+        return $this->method() === 'GET';
+    }
+
+    public function isPost(): bool
+    {
+        return $this->method() === 'POST';
+    }
+
+    public function method(): string
+    {
+        return $this->server['REQUEST_METHOD'];
     }
 
     public function uri(): string
     {
-        return $this->server['REQUEST_URI'];
+        $uri = $this->server['REQUEST_URI'];
+
+        if (false !== $pos = strpos($uri, '?')) {
+            $uri = substr($uri, 0, $pos);
+        }
+
+        $uri = rawurldecode($uri);
+
+        return $uri;
+    }
+
+    public function get(string $key, string $default = null): ?string
+    {
+        return $this->get[$key] ?? $default;
+    }
+
+    public function post(string $key, string $default = null): ?string
+    {
+        return $this->post[$key] ?? $default;
+    }
+
+    public function postArray(string $key, array $default = null): ?array
+    {
+        return $this->post[$key] ?? $default;
     }
 }

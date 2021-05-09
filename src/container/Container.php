@@ -17,7 +17,7 @@ final class Container implements ArrayAccess
         }
 
         if (isset($this[$offset])) {
-            throw new SimpleException(sprintf('Refusing to overwrote existing key: "%s"', $offset));
+            throw new SimpleException(sprintf('Refusing to overwrite existing key: "%s"', $offset));
         }
 
         $this->container[$offset] = $fn;
@@ -26,14 +26,14 @@ final class Container implements ArrayAccess
     public function offsetGet($offset)
     {
         if (! isset($this[$offset])) {
-            throw new SimpleException(sprintf('Key does not exists: "%s"', $offset));
+            throw new SimpleException(sprintf('Unknown container key: "%s"', $offset));
         }
 
         if (isset($this->resolved[$offset])) {
             return $this->resolved[$offset];
         }
 
-        return $this->resolved[$offset] = $this->container[$offset]($this); // Intentional assignment
+        return $this->resolved[$offset] = $this->container[$offset]($this);
     }
 
     public function offsetExists($offset): bool

@@ -87,7 +87,11 @@ final class ErrorHandler
     {
         $stackTrace[] = sprintf('%s:%s', $e->getFile(), $e->getLine());
         foreach ($e->getTrace() as $trace) {
-            $stackTrace[] = sprintf('%s:%s', $trace['file'], $trace['line']);
+            $stackTrace[] = sprintf(
+                '%s:%s',
+                $trace['file'] ?? '(no file)',
+                $trace['line'] ?? '(no line)'
+            );
         }
 
         $this->logger->log(
@@ -121,8 +125,7 @@ final class ErrorHandler
                 $lastError['message'],
                 $lastError['file'] ?? '(null)',
                 $lastError['line'] ?? '(null)'
-            ),
-            []
+            )
         );
     }
 }

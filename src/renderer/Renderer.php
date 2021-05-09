@@ -2,18 +2,10 @@
 
 namespace dvikan\SimpleParts;
 
-final class Template
+final class Renderer
 {
-    private $config;
-
-    public function __construct(array $config = [])
-    {
-        $this->config = $config;
-    }
-
     public function render(string $filePath, array $context = []): string
     {
-        // todo: validate filePath
         extract($context);
         ob_start();
         require $filePath;

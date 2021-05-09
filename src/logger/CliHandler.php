@@ -12,6 +12,10 @@ final class CliHandler
             $json = sprintf('Unable to json encode context: "%s"', $e->getMessage());
         }
 
+        if (PHP_SAPI === 'cli-server') {
+            print '<pre>';
+        }
+
         $result = sprintf(
             "[%s] %s.%s %s %s",
             $record['created_at']->format('Y-m-d H:i:s'),
@@ -22,5 +26,9 @@ final class CliHandler
         );
 
         print "$result\n";
+
+        if (PHP_SAPI === 'cli-server') {
+            print '</pre>';
+        }
     }
 }

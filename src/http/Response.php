@@ -10,22 +10,12 @@ final class Response
 
     public function __construct(
         string $body = '',
-        int $code = HttpClient::OK,
+        int $code = Http::OK,
         array $headers = []
     ) {
         $this->body = $body;
         $this->code = $code;
         $this->headers = $headers;
-
-        if (! isset(HttpClient::STATUS_LINES[$code])) {
-            // Consider dropping this
-            throw new SimpleException(sprintf('Invalid status code "%s"', $code));
-        }
-    }
-
-    public function body(): string
-    {
-        return $this->body;
     }
 
     public function code(): int
@@ -33,9 +23,51 @@ final class Response
         return $this->code;
     }
 
+    public function withCode(int $code): self
+    {
+        $response = clone $this;
+
+        $response->code = $code;
+
+        return $response;
+    }
+
+    public function statusLine(): string
+    {
+        return Http::STATUS_LINES[$this->code] ?? 'unknown status line: ' . $this->code;
+    }
+
+    public function body(): string
+    {
+        return $this->body;
+    }
+
+    public function withBody(string $body): self
+    {
+        $response = clone $this;
+
+        $response->body = $body;
+
+        return $response;
+    }
+
+    public function header(string $key, string $default = null): ?string
+    {
+        return $this->headers[$key] ?? $default;
+    }
+
     public function headers(): array
     {
         return $this->headers;
+    }
+
+    public function withHeader(string $key, string $value): self
+    {
+        $response = clone $this;
+
+        $response->headers[$key] = $value;
+
+        return $response;
     }
 
     public function json(): array
@@ -43,53 +75,44 @@ final class Response
         return Json::decode($this->body);
     }
 
-    public function statusLine(): string
+    public function withJson(array $data): self
     {
-        return HttpClient::STATUS_LINES[$this->code];
+        $response = clone $this;
+
+        return $response
+            ->withHeader(Http::CONTENT_TYPE, 'application/json')
+            ->withBody(Json::encode($data));
     }
 
     public function ok(): bool
     {
-        return $this->code === HttpClient::OK;
+        return $this->code === Http::OK;
     }
 
-    public function isRedirect()
+    public function redirect(): bool
     {
         return in_array($this->code, [
-            HttpClient::MOVED_PERMANENTLY,
-            HttpClient::FOUND,
-            HttpClient::SEE_OTHER,
+            Http::MOVED_PERMANENTLY,
+            Http::FOUND,
+            Http::SEE_OTHER,
         ]);
     }
 
-    // consider cloning self in with* methods
-    public function withCode(int $code): self
+    public function withRedirect(string $location): self
     {
-        $this->code = $code;
-        return $this;
-    }
+        $response = clone $this;
 
-    public function withJson(array $data): self
-    {
-        $this->body = Json::encode($data);
-        $this->headers['content-type'] = 'application/json';
-        return $this;
-    }
-
-    public function withRedirect(string $url): self
-    {
-        // todo: perhaps validate url
-        $this->code = HttpClient::FOUND;
-        $this->headers['location'] = $url;
-        return $this;
+        return $response
+            ->withCode(Http::FOUND)
+            ->withHeader(Http::LOCATION, $location);
     }
 
     public function send(): void
     {
         http_response_code($this->code);
 
-        foreach ($this->headers as $name => $value) {
-            header("$name: $value");
+        foreach ($this->headers as $key => $value) {
+            header("$key: $value");
         }
 
         print $this->body;

@@ -4,12 +4,13 @@ namespace dvikan\SimpleParts;
 
 final class Session
 {
-    public function __construct(array $config = [])
+    public function __construct()
     {
-        if (PHP_SAPI === 'cli') {
-            throw new SimpleException('Sessions do not work in cli');
-        }
+        $this->start();
+    }
 
+    private function start(): void
+    {
         if (session_status() === PHP_SESSION_DISABLED) {
             throw new SimpleException('Sessions are disabled');
         }
@@ -19,7 +20,8 @@ final class Session
         }
 
         if (session_status() === PHP_SESSION_NONE) {
-            $result = session_start($config);
+            $options = [];
+            $result = session_start($options);
 
             if ($result === false) {
                 throw new SimpleException('Failed to start session');
@@ -34,11 +36,12 @@ final class Session
 
     public function get(string $key, $default = null)
     {
-        if (isset($_SESSION[$key])) {
-            return $_SESSION[$key];
-        }
+        return $_SESSION[$key] ?? $default;
+    }
 
-        return $default;
+    public function delete(string $key): void
+    {
+        unset($_SESSION[$key]);
     }
 
     public function destroy()
@@ -47,9 +50,7 @@ final class Session
             throw new SimpleException('Tried to destroy non-active session');
         }
 
-        $result = session_destroy();
-
-        if ($result === false) {
+        if (session_destroy() === false) {
             throw new SimpleException('session_destroy() failed');
         }
     }

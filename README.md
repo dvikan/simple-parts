@@ -1,44 +1,47 @@
 # Simple Parts
 
-Simpler components for building applications.
+Simple components for building web applications.
+
+These components are intentionally simple with minimal configurability.
+
+There are no interfaces here.
+
+The name is inspired by Crockford's book javascript the good parts.
 
 * `Cache`
+* `Config`
 * `Console`
 * `Container`
 * `ErrorHandler`
 * `TextFile`
-* `HttpClient`, `Request`, `Response`, `Router`
+* `HttpClient`,`Request`,`Response`,`Router`
 * `Json`
-* `Logger`, `CliHandler`, `FileHandler`
+* `Logger`,`CliHandler`,`FileHandler`
 * `Migrator`
-* `RssClient`
+* `Renderer`
 * `Session`
 * `Shell`
-* `Template`
-
-All classes reside under the `dvikan\SimpleParts` namespace.
 
 ## Cache
 
 ```php
-<?php declare(strict_types=1);
+<?php
 
-use dvikan\SimpleParts\Cache;
-use dvikan\SimpleParts\TextFile;
+$cache = new Cache('./cache.json');
 
-require __DIR__ . '/vendor/autoload.php';
-
-$cache = new Cache(new TextFile('./cache.json'));
-
-print $cache->get('foo', 'default') . "\n";
-
+$cache->set('foo');
 $cache->set('foo', 'bar');
+$cache->set('foo', 'bar', 60);
 
-print $cache->get('foo') . "\n";
+$cache->get('foo');
+$cache->get('foo', 'default');
 
 $cache->delete('foo');
+
 $cache->clear();
 ```
+
+## Config
 
 ## Console
 
@@ -149,9 +152,7 @@ use dvikan\SimpleParts\Response;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$response = new Response();
-
-$response = new Response("Hello\nworld", 200, ['Content-Type' => 'text/plain']);
+$response = new Response('Hello world', 200, ['Content-Type' => 'text/plain']);
 
 $response->send();
 ```
@@ -181,37 +182,29 @@ use dvikan\SimpleParts\Router;
 
 require __DIR__ . '/vendor/autoload.php';
 
-class Controller
-{
-    public function profile(array $vars)
-    {
-        $id = $vars[0];
-        return "The user id is {$id}";
-    }
+$router = new Router();
+
+$router->get('/', function() {
+    return 'index';
+});
+
+$router->get('/profile/([0-9]+)', function(array $args) {
+    return 'profile: ' . $args[0];
+});
+
+$method = $_SERVER['REQUEST_METHOD'];
+$uri = $_SERVER['REQUEST_URI'];
+
+if (false !== $pos = strpos($uri, '?')) {
+    $uri = substr($uri, 0, $pos);
 }
 
-$routes = [
-    '/profile/([0-9]+)' => [Controller::class, 'profile'],
-];
-
-$router = new Router($routes);
-
-$route = $router->match('/profile/3');
-
-if ($route === []) {
-    exit("404");
-}
+$route = $router->dispatch($method, $uri);
 
 $handler = $route[0];
-$args = $route[1];
+$vars = $route[1];
 
-$handlerClass = $handler[0];
-$handlerMethod = $handler[1];
-$handlerObject = new $handlerClass();
-
-$result = $handlerObject->{$handlerMethod}($args);
-
-print $result;
+print $handler($vars);
 ```
 
 ## Json
@@ -220,10 +213,15 @@ print $result;
 <?php declare(strict_types=1);
 
 use dvikan\SimpleParts\Json;
+use dvikan\SimpleParts\SimpleException;
 
 require __DIR__ . '/vendor/autoload.php';
 
-print Json::encode(['message' => 'hello']);
+try {
+    print Json::encode(['message' => 'hello']);
+} catch (SimpleException $e) {
+    print $e->getMessage();
+}
 ```
 
 ## Logger
@@ -257,7 +255,7 @@ use dvikan\SimpleParts\Migrator;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$pdo = new PDO('sqlite:' . __DIR__ . '/application.db');
+$pdo = new PDO('sqlite:application.db');
 
 $migrator = new Migrator($pdo);
 
@@ -270,28 +268,29 @@ if ($result === []) {
 print implode("\n", $result) . "\n";
 ```
 
-## Rss
+## Renderer
 
 ```php
 <?php declare(strict_types=1);
 
-use dvikan\SimpleParts\RssClient;
-use dvikan\SimpleParts\HttpClient;
+use dvikan\SimpleParts\Renderer;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$rssClient = new RssClient(new HttpClient());
+$renderer = new Renderer();
 
-$feed = $rssClient->fromUrl('https://github.com/sebastianbergmann/phpunit/releases.atom');
+$name = $_GET['name'] ?? 'anon';
 
-foreach ($feed['items'] as $item) {
-    printf(
-        "%s %s %s\n",
-        $item['date'],
-        $item['title'],
-        $item['link'] ?? '(no link)'
-    );
-}
+print $renderer->render('welcome.php', ['name' => $name]);
+```
+
+welcome.php:
+```php
+<?php namespace dvikan\SimpleParts; ?>
+
+<p>
+    Welcome <?= e($name) ?>
+</p>
 ```
 
 ## Session
@@ -322,31 +321,6 @@ require __DIR__ . '/vendor/autoload.php';
 $shell = new Shell();
 
 print $shell->execute('echo', ['-n', 'hello', 'world']);
-```
-
-## Template engine
-
-```php
-<?php declare(strict_types=1);
-
-use dvikan\SimpleParts\Template;
-
-require __DIR__ . '/vendor/autoload.php';
-
-$template = new Template();
-
-$name = $_GET['name'] ?? 'anon';
-
-print $template->render('welcome.php', ['name' => $name]);
-```
-
-welcome.php:
-```php
-<?php namespace dvikan\SimpleParts; ?>
-
-<p>
-    Welcome <?= e($name) ?>
-</p>
 ```
 
 ## Todo

@@ -2,6 +2,8 @@
 
 namespace dvikan\SimpleParts;
 
+use DateTime;
+
 final class Logger
 {
     public const INFO       = 10;
@@ -43,7 +45,7 @@ final class Logger
         foreach ($this->handlers as $handler) {
             $handler->handle([
                 'name'          => $this->name,
-                'created_at'    => new \DateTime(),
+                'created_at'    => new DateTime(),
                 'level'         => $level,
                 'level_name'    => self::LEVEL_NAMES[$level],
                 'message'       => $message,
