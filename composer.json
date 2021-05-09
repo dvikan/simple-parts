@@ -7,8 +7,9 @@
             "dvikan\\SimpleParts\\": [
               "src",
               "src/cache",
+              "src/clock",
               "src/common",
-              "src/config/",
+              "src/config",
               "src/console",
               "src/container",
               "src/error-handler",
@@ -17,10 +18,11 @@
               "src/json",
               "src/logger",
               "src/migrator",
-              "src/renderer/",
-              "src/router/",
+              "src/renderer",
+              "src/router",
               "src/session",
-              "src/shell"
+              "src/shell",
+              "src/test"
             ]
         },
         "files": [
@@ -35,8 +37,10 @@
     "require-dev": {
     },
     "scripts": {
-        "test": "phpunit"
     },
+    "bin": [
+      "bin/test.php"
+    ],
     "require": {
         "ext-json": "*",
         "ext-curl": "*",

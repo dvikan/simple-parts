@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-final class TextFile
+final class TextFile implements File
 {
     private $filePath;
 

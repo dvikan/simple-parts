@@ -8,12 +8,15 @@ There are no interfaces here.
 
 The name is inspired by Crockford's book javascript the good parts.
 
+Run tests: `composer run test`
+
 * `Cache`
+* `Clock`,`SystemClock`  
 * `Config`
 * `Console`
 * `Container`
 * `ErrorHandler`
-* `TextFile`
+* `File`,`TextFile`,`MemoryFile`
 * `HttpClient`,`Request`,`Response`,`Router`
 * `Json`
 * `Logger`,`CliHandler`,`FileHandler`
@@ -21,6 +24,7 @@ The name is inspired by Crockford's book javascript the good parts.
 * `Renderer`
 * `Session`
 * `Shell`
+* `Test`
 
 ## Cache
 
@@ -40,6 +44,8 @@ $cache->delete('foo');
 
 $cache->clear();
 ```
+
+## Clock
 
 ## Config
 
@@ -173,40 +179,6 @@ $response = $client->get('https://example.com');
 print $response->body();
 ```
 
-## Router
-
-```php
-<?php declare(strict_types=1);
-
-use dvikan\SimpleParts\Router;
-
-require __DIR__ . '/vendor/autoload.php';
-
-$router = new Router();
-
-$router->get('/', function() {
-    return 'index';
-});
-
-$router->get('/profile/([0-9]+)', function(array $args) {
-    return 'profile: ' . $args[0];
-});
-
-$method = $_SERVER['REQUEST_METHOD'];
-$uri = $_SERVER['REQUEST_URI'];
-
-if (false !== $pos = strpos($uri, '?')) {
-    $uri = substr($uri, 0, $pos);
-}
-
-$route = $router->dispatch($method, $uri);
-
-$handler = $route[0];
-$vars = $route[1];
-
-print $handler($vars);
-```
-
 ## Json
 
 ```php
@@ -293,6 +265,47 @@ welcome.php:
 </p>
 ```
 
+## Router
+
+```php
+<?php declare(strict_types=1);
+
+use dvikan\SimpleParts\Router;
+
+require 'vendor/autoload.php';
+
+$router = new Router();
+
+$router->get('/', function() { return 'index'; });
+
+$router->post('/delete', function() { return 'delete'; });
+
+$router->map(['GET', 'POST'], '/update', function() { return 'update'; });
+
+$router->post('/delete/(\d+)', function(array $vars) {
+    $id = (int) $vars[0];
+    return 'id: ' . $id;
+});
+
+$method = 'GET';
+$uri = '/update';
+
+$route = $router->dispatch($method, $uri);
+
+if ($route[0] === Router::NOT_FOUND) {
+    exit('404');
+}
+
+if ($route[0] === Router::METHOD_NOT_ALLOWED) {
+    exit('Method not allowed');
+}
+
+$handler = $route[1];
+$args = $route[2];
+
+print $handler($args);
+```
+
 ## Session
 
 ```php
@@ -323,6 +336,8 @@ $shell = new Shell();
 print $shell->execute('echo', ['-n', 'hello', 'world']);
 ```
 
+## Test
+
 ## Todo
 
 * git wrapper
@@ -350,3 +365,4 @@ print $shell->execute('echo', ['-n', 'hello', 'world']);
 * html form, csrf
 * browser ua lib
 * ipv4 address to location lib
+* autoloader
