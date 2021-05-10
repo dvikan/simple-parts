@@ -30,6 +30,7 @@ final class Config
 
     public function get(string $key)
     {
+        // Consider implementing \ArrayAccess
         if (! isset($this->config[$key])) {
             throw new SimpleException(sprintf('Unknown config key: "%s"', $key));
         }

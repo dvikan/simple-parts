@@ -6,7 +6,7 @@ final class FileHandler implements Handler
 {
     private $file;
 
-    public function __construct(TextFile $file)
+    public function __construct(File $file)
     {
         $this->file = $file;
     }
