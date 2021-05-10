@@ -8,11 +8,8 @@ final class Request
     private $post;
     private $server;
 
-    public function __construct(
-        array $get = [],
-        array $post = [],
-        array $server = []
-    ) {
+    public function __construct(array $get = [], array $post = [], array $server = [])
+    {
         $this->get = $get;
         $this->post = $post;
         $this->server = $server;
@@ -20,6 +17,9 @@ final class Request
 
     public static function fromGlobals(): Request
     {
+        if (in_array(PHP_SAPI, ['cli'])) {
+            throw new SimpleException('Unable to create request from globals in cli context');
+        }
         return new Request($_GET, $_POST, $_SERVER);
     }
 

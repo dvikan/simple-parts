@@ -44,7 +44,7 @@ final class HttpClient
         return $this->request('POST', $url, $config);
     }
 
-    private function request(string $method, string $url, array $config)
+    public function request(string $method, string $url, array $config)
     {
         $config = array_merge($this->config, $config);
 

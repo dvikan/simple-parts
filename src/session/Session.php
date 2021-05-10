@@ -6,11 +6,6 @@ final class Session
 {
     public function __construct()
     {
-        $this->start();
-    }
-
-    private function start(): void
-    {
         if (session_status() === PHP_SESSION_DISABLED) {
             throw new SimpleException('Sessions are disabled');
         }

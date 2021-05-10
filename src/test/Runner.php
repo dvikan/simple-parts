@@ -7,59 +7,62 @@ use ReflectionMethod;
 
 final class Runner
 {
-    public function run()
+    public function __construct()
     {
-        $folder = './test';
+        $_ = ErrorHandler::create(new Logger('test', [new CliHandler()]));
+    }
 
-        foreach (glob($folder . '/*.php') as $filePath) {
+    public function run(string $testFolder = './test')
+    {
+        foreach (glob($testFolder . '/*.php') as $filePath) {
             $this->runTest($filePath);
         }
     }
 
-    private function runTest($filePath): void
+    private function runTest(string $filePath): void
     {
-        $pathInfo = pathinfo($filePath);
+        // Extract namespace
+        $code = file_get_contents(realpath($filePath));
+        preg_match('/^namespace ([a-zA-Z\\\]+);$/m', $code, $matches);
+        $namespace = $matches[1] ?? '';
 
-        $dirName = $pathInfo['dirname'];
-        $baseName = $pathInfo['basename'];
-        $className = $pathInfo['filename'];
+        $fullyQualifiedClassName = $namespace . '\\' . pathinfo($filePath, PATHINFO_FILENAME);
 
-        $namespace = $this->extractNamespace($dirName . '/' . $baseName);
-
-        $fullyQualifiedClassName = $namespace . '\\' . $className;
-
+        if (!class_exists($fullyQualifiedClassName)) {
+            // These classes are not autoloaded
+            require $filePath;
+        }
         $reflection = new ReflectionClass($fullyQualifiedClassName);
 
         $testMethods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
 
         foreach ($testMethods as $testMethod) {
-            $name = $testMethod->getName();
+            $methodName = $testMethod->getName();
 
             if (
-                strpos($name, '__') === 0
-                || $name === 'setUp'
-                || $name === 'tearDown'
+                strpos($methodName, '__') === 0
+                || $methodName === 'setUp'
+                || $methodName === 'tearDown'
             ) {
                 continue;
             }
 
-            try {
-                $testClass = new $fullyQualifiedClassName;
-                $testClass->setUp();
-                $testClass->{$name}();
-            } catch(\Throwable $e) {
-                throw $e;
-            } finally {
-                $testClass->tearDown();
-            }
+            $this->runTestMethod($fullyQualifiedClassName, $methodName);
         }
     }
 
-    private function extractNamespace(string $filePath)
+    private function runTestMethod(string $fullyQualifiedClassName, string $methodName): void
     {
-        $data = file_get_contents($filePath);
-        if (preg_match('/^namespace ([a-zA-Z\\\]+);$/m', $data, $matches) === 1) {
-            return $matches[1];
+        /** @var TestCase $testClass */
+        $testClass = new $fullyQualifiedClassName;
+
+        $testClass->setUp();
+
+        try {
+            $testClass->{$methodName}();
+            return;
+        } finally {
+            $testClass->tearDown();
         }
     }
 }

@@ -19,12 +19,15 @@ final class Logger
     private $name;
     private $handlers;
 
+    /**
+     * @param Handler[] $handlers
+     */
     public function __construct(string $name, array $handlers)
     {
         $this->name = $name;
 
         if ($handlers === []) {
-            throw new SimpleException('Please provide at least one logger handler');
+            throw new SimpleException('Please provide at least one log handler');
         }
 
         $this->handlers = $handlers;

@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-interface Clock
+interface Handler
 {
-    public function now(): \DateTimeImmutable;
+    public function handle(array $record): void;
 }

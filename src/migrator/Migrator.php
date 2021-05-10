@@ -39,7 +39,7 @@ final class Migrator
         }
 
         if ($migrations === []) {
-            throw new SimpleException(sprintf('Zero migrations found in "%s"', $this->migrationsFolder));
+            throw new SimpleException(sprintf('The migrations folder is empty: "%s"', $this->migrationsFolder));
         }
 
         $cache = new Cache(new TextFile($this->cacheFolder . '/migrations.json'));

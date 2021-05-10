@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-final class CliHandler
+final class CliHandler implements Handler
 {
     public function handle(array $record): void
     {

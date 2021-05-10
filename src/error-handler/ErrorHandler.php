@@ -105,6 +105,8 @@ final class ErrorHandler
             ),
             ['stacktrace' => array_reverse($stackTrace)]
         );
+
+        exit(1);
     }
 
     public function handleShutdown()

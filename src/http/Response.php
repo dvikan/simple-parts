@@ -8,13 +8,10 @@ final class Response
     private $code;
     private $headers;
 
-    public function __construct(
-        string $body = '',
-        int $code = Http::OK,
-        array $headers = []
-    ) {
+    public function __construct(string $body = '', int $code = null, array $headers = [])
+    {
         $this->body = $body;
-        $this->code = $code;
+        $this->code = $code ?? Http::OK;
         $this->headers = $headers;
     }
 
@@ -26,9 +23,7 @@ final class Response
     public function withCode(int $code): self
     {
         $response = clone $this;
-
         $response->code = $code;
-
         return $response;
     }
 
@@ -45,9 +40,7 @@ final class Response
     public function withBody(string $body): self
     {
         $response = clone $this;
-
         $response->body = $body;
-
         return $response;
     }
 
@@ -64,9 +57,7 @@ final class Response
     public function withHeader(string $key, string $value): self
     {
         $response = clone $this;
-
         $response->headers[$key] = $value;
-
         return $response;
     }
 
@@ -78,7 +69,6 @@ final class Response
     public function withJson(array $data): self
     {
         $response = clone $this;
-
         return $response
             ->withHeader(Http::CONTENT_TYPE, 'application/json')
             ->withBody(Json::encode($data));
@@ -86,22 +76,17 @@ final class Response
 
     public function ok(): bool
     {
-        return $this->code === Http::OK;
+        return in_array($this->code, [Http::OK, Http::CREATED]);
     }
 
     public function redirect(): bool
     {
-        return in_array($this->code, [
-            Http::MOVED_PERMANENTLY,
-            Http::FOUND,
-            Http::SEE_OTHER,
-        ]);
+        return in_array($this->code, [Http::MOVED_PERMANENTLY, Http::FOUND, Http::SEE_OTHER]);
     }
 
     public function withRedirect(string $location): self
     {
         $response = clone $this;
-
         return $response
             ->withCode(Http::FOUND)
             ->withHeader(Http::LOCATION, $location);
@@ -110,11 +95,9 @@ final class Response
     public function send(): void
     {
         http_response_code($this->code);
-
         foreach ($this->headers as $key => $value) {
-            header("$key: $value");
+            header(sprintf('%s: %s', $key, $value));
         }
-
         print $this->body;
     }
 }

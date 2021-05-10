@@ -9,49 +9,52 @@ final class Console
     private const YELLOW = "\033[1;33m";
     private const RED = "\033[0;31m";
 
-    public function write(string $line, ...$args)
+    public function println(string $s = '', ...$args)
     {
-        printf($line, ...$args);
+        $this->print($s . "\n", ...$args);
     }
 
-    public function writeln(string $line = '', ...$args)
+    public function print(string $s, ...$args)
     {
-        printf($line . "\n", ...$args);
+        printf($s, ...$args);
     }
 
     public function exit(int $status = 0)
     {
+        if ($status < 0 || $status > 254) {
+            throw new SimpleException();
+        }
         exit($status);
     }
 
-    public function green(string $line, ...$args)
+    public function greenln(string $s, ...$args)
     {
-        printf(self::GREEN . $line . self::NC, ...$args);
+        $this->green($s . "\n", ...$args);
     }
 
-    public function greenln(string $line, ...$args)
+    public function green(string $s, ...$args)
     {
-        $this->green($line . "\n", ...$args);
+        $this->print(self::GREEN . $s . self::NC, ...$args);
     }
 
-    public function yellow(string $line, ...$args)
+    public function yellow(string $s, ...$args)
     {
-        printf(self::YELLOW . $line . self::NC, ...$args);
+        $this->print(self::YELLOW . $s . self::NC, ...$args);
     }
 
-    public function yellowln(string $line, ...$args)
+    public function yellowln(string $s, ...$args)
     {
-        $this->yellow($line . "\n", ...$args);
+        $this->yellow($s . "\n", ...$args);
     }
 
-    public function red(string $line, ...$args)
+    public function red(string $s, ...$args)
     {
-        printf(self::RED . $line . self::NC, ...$args);
+        $this->print(self::RED . $s . self::NC, ...$args);
     }
 
-    public function redln(string $line, ...$args)
+    public function redln(string $s, ...$args)
     {
-        $this->red($line . "\n", ...$args);
+        $this->red($s . "\n", ...$args);
     }
 
     public function table(array $headers, array $rows)
@@ -90,15 +93,15 @@ final class Console
         $format .= '|';
 
         // Render the table
-        $this->writeln($bar);
-        $this->writeln($format, ...$headers);
-        $this->writeln($bar);
+        $this->println($bar);
+        $this->println($format, ...$headers);
+        $this->println($bar);
 
         foreach ($rows as $row) {
-            $this->writeln($format, ...$row);
+            $this->println($format, ...$row);
         }
 
-        $this->writeln($bar);
+        $this->println($bar);
     }
 
     private function truncate(string $str, int $length, $placeholder = '..'): string

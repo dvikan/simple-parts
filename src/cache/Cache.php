@@ -6,7 +6,7 @@ final class Cache
 {
     private $file;
     /**
-     * @var Clock|SystemClock
+     * @var Clock
      */
     private $clock;
     private $cache;
@@ -74,7 +74,7 @@ final class Cache
 
     private function validate(string $key, $value = true, int $ttl = 0): void
     {
-        if (preg_match('#^[\w:/?=.-]{1,}$#', $key) !== 1) {
+        if (preg_match('#^[\w:/?=.,+-]{1,}$#', $key) !== 1) {
             throw new SimpleException(sprintf('Illegal cache key: "%s"', $key));
         }
 

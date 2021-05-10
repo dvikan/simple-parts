@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-final class FileHandler
+final class FileHandler implements Handler
 {
     private $file;
 

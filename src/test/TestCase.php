@@ -4,14 +4,19 @@ namespace dvikan\SimpleParts;
 
 class TestCase
 {
-    public function setUp(){}
-    public function tearDown(){}
+    public function setUp()
+    {
+        // noop
+    }
+
+    public function tearDown()
+    {
+        // noop
+    }
 
     protected function assert($expected, $actual)
     {
-        $result = $expected === $actual;
-
-        if (!$result) {
+        if ($expected !== $actual) {
             $this->fail($expected, $actual);
         }
     }
@@ -21,11 +26,17 @@ class TestCase
         $stackTrace = debug_backtrace();
         $stackFrame = $stackTrace[1];
 
-        printf("Fail at %s line %s\n\n", $stackFrame['file'], $stackFrame['line']);
+        $console = new Console();
 
-        printf("Expected:\n%s\n\n", $this->asString($expected));
+        $console->redln(
+            "Fail at %s line %s",
+            $stackFrame['file'],
+            $stackFrame['line']
+        );
 
-        printf("Actual:\n%s\n", $this->asString($actual));
+        $console->println('Expected: %s', $this->asString($expected));
+
+        $console->println("Actual: %s", $this->asString($actual));
     }
 
     private function asString($value): string
@@ -39,7 +50,7 @@ class TestCase
     private function getDelimiter($value): string
     {
         if (gettype($value) === 'string') {
-            return '"';
+            return "'";
         }
         return '';
     }
