@@ -74,6 +74,7 @@ final class Cache
 
     private function validate(string $key, $value = true, int $ttl = 0): void
     {
+        // todo: perhaps improve this regex
         if (preg_match('#^[\w:/?=.,+-]{1,}$#', $key) !== 1) {
             throw new SimpleException(sprintf('Illegal cache key: "%s"', $key));
         }
@@ -89,6 +90,7 @@ final class Cache
 
     public function __destruct()
     {
+        // todo: perhaps write to fs earlier
         $this->file->write(Json::encode($this->cache));
     }
 }

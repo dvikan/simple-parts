@@ -6,6 +6,8 @@ final class Session
 {
     public function __construct()
     {
+        // todo: config
+
         if (session_status() === PHP_SESSION_DISABLED) {
             throw new SimpleException('Sessions are disabled');
         }

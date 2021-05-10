@@ -4,28 +4,29 @@ namespace dvikan\SimpleParts;
 
 final class HttpClient
 {
-    // config
-    public const BODY               = 'body';
-    public const CONNECT_TIMEOUT    = 'connect_timeout';
-    public const TIMEOUT            = 'timeout';
-    public const CLIENT_ID          = 'client_id';
-    public const AUTH_BEARER        = 'auth_bearer';
-    public const HEADERS            = 'headers';
-    public const USERAGENT          = 'useragent';
+    /**
+     * @var Config
+     */
+    private $config;
 
-    private const DEFAULT_CONFIG = [
-        self::USERAGENT         => 'HttpClient',
-        self::CONNECT_TIMEOUT   => 10,
-        self::TIMEOUT           => 10,
-        self::HEADERS => []
+    private const CONFIG = [
+        //'exceptions' => true,
+        'useragent'         => 'HttpClient',
+        'connect_timeout'   => 10,
+        'timeout'           => 10,
+        'follow_location'   => false,
+        'max_redirs'        => 5,
+        'auth_bearer'       => null,
+        'client_id'         => null,
+        'headers' => [],
+        'body' => null,
     ];
 
     private $ch;
-    private $config;
 
     public function __construct(array $config = [])
     {
-        $this->config = array_merge(self::DEFAULT_CONFIG, $config);
+        $this->config = Config::fromArray(self::CONFIG, $config);
 
         $this->ch = curl_init();
 
@@ -44,34 +45,36 @@ final class HttpClient
         return $this->request('POST', $url, $config);
     }
 
-    public function request(string $method, string $url, array $config)
+    public function request(string $method, string $url, array $requestConfig)
     {
-        $config = array_merge($this->config, $config);
+        $config = $this->config->merge($requestConfig);
+
+        curl_reset($this->ch);
 
         curl_setopt($this->ch, CURLOPT_URL, $url);
-        curl_setopt($this->ch, CURLOPT_USERAGENT, $config[self::USERAGENT]);
-        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, $config[self::CONNECT_TIMEOUT]);
-        curl_setopt($this->ch, CURLOPT_TIMEOUT, $config[self::TIMEOUT]);
         curl_setopt($this->ch, CURLOPT_HEADER, false);
+        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->ch, CURLOPT_USERAGENT, $config['useragent']);
+        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, $config['connect_timeout']);
+        curl_setopt($this->ch, CURLOPT_TIMEOUT, $config['timeout']);
+        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, $config['follow_location']);
+        curl_setopt($this->ch, CURLOPT_MAXREDIRS, $config['max_redirs']);
 
         if ($method === 'POST') {
-            curl_setopt($this->ch, CURLOPT_POSTFIELDS, $config[self::BODY]);
+            curl_setopt($this->ch, CURLOPT_POSTFIELDS, $config['body']);
         }
 
-        $requestHeaders = $config[self::HEADERS];
+        $headers = [];
 
-        // handle special case headers that need tweaking
-
-        if (isset($config[self::AUTH_BEARER])) {
-            $requestHeaders[] = sprintf('Authorization: Bearer %s', $config[self::AUTH_BEARER]);
+        if (isset($config['auth_bearer'])) {
+            $headers[] = sprintf('Authorization: Bearer %s', $config['auth_bearer']);
         }
 
-        if (isset($config[self::CLIENT_ID])) {
-            $requestHeaders[] = sprintf('client-id: %s', $config[self::CLIENT_ID]);
+        if (isset($config['client_id'])) {
+            $headers[] = sprintf('client-id: %s', $config['client_id']);
         }
 
-        curl_setopt($this->ch, CURLOPT_HTTPHEADER, $requestHeaders);
+        curl_setopt($this->ch, CURLOPT_HTTPHEADER, array_merge($config['headers'], $headers));
 
         $responseHeaders = [];
 
@@ -95,7 +98,14 @@ final class HttpClient
         $body = curl_exec($this->ch);
 
         if ($body === false) {
-            throw new SimpleException(curl_error($this->ch));
+            switch (curl_errno($this->ch)) {
+                case CURLE_OPERATION_TIMEOUTED:
+                    throw new SimpleException('Timeout');
+                case CURLE_TOO_MANY_REDIRECTS:
+                    throw new SimpleException('Too many redirects');
+                default:
+                    throw new SimpleException(sprintf('"%s" (%s)', curl_error($this->ch), curl_errno($this->ch)));
+            }
         }
 
         $statusCode = curl_getinfo($this->ch, CURLINFO_RESPONSE_CODE);
@@ -107,9 +117,7 @@ final class HttpClient
         }
 
         if ($response->redirect()) {
-            $location = $response->header(Http::LOCATION);
-
-            return $this->request($method, $location, $config); // todo: prevent infinite loop
+        //    return $response;
         }
 
         throw new SimpleException($response->statusLine(), $response->code());

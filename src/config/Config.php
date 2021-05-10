@@ -2,7 +2,7 @@
 
 namespace dvikan\SimpleParts;
 
-final class Config
+final class Config implements \ArrayAccess
 {
     private $config;
 
@@ -28,13 +28,32 @@ final class Config
         return $config;
     }
 
-    public function get(string $key)
+    public function merge(array $config): self
     {
-        // Consider implementing \ArrayAccess
-        if (! isset($this->config[$key])) {
-            throw new SimpleException(sprintf('Unknown config key: "%s"', $key));
+        return self::fromArray($this->config, $config);
+    }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->config[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        if (isset($this->config[$offset])) {
+            return $this->config[$offset];
         }
 
-        return $this->config[$key];
+        throw new SimpleException(sprintf('Unknown config key: "%s"', $offset));
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        throw new SimpleException('Not implemented');
+    }
+
+    public function offsetUnset($offset)
+    {
+        throw new SimpleException('Not implemented');
     }
 }

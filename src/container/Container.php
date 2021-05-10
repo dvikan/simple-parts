@@ -13,11 +13,11 @@ final class Container implements ArrayAccess
     public function offsetSet($offset, $fn)
     {
         if (! $fn instanceof Closure) {
-            throw new SimpleException('Container value must be a closure');
+            throw new SimpleException(sprintf('Container value must be a closure: "%s"', $offset));
         }
 
         if (isset($this[$offset])) {
-            throw new SimpleException(sprintf('Refusing to overwrite existing key: "%s"', $offset));
+            throw new SimpleException(sprintf('Refusing to overwrite existing container key: "%s"', $offset));
         }
 
         $this->container[$offset] = $fn;
@@ -33,7 +33,13 @@ final class Container implements ArrayAccess
             return $this->resolved[$offset];
         }
 
-        return $this->resolved[$offset] = $this->container[$offset]($this);
+        $resolved = $this->container[$offset]($this);
+
+        if (empty($resolved)) {
+            throw new SimpleException(sprintf('Resolved container value was empty: "%s"', $offset));
+        }
+
+        return $this->resolved[$offset] = $resolved;
     }
 
     public function offsetExists($offset): bool
@@ -43,7 +49,6 @@ final class Container implements ArrayAccess
 
     public function offsetUnset($offset)
     {
-        unset($this->container[$offset]);
-        unset($this->resolved[$offset]);
+        throw new SimpleException('Not implemented');
     }
 }

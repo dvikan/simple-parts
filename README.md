@@ -110,11 +110,14 @@ print $clock->now()->format('Y-m-d H:i:s'); // 1981-12-24 00:00:00
 ```
 
 ## Config
-Config is a small layer around a php array with key-value pairs.
+
+Config is an immutable wrapper around an array.
 
 Keys in the custom config MUST have default values in the default config.
 
 Trying to grab a non-existing key results in an exception.
+
+The config values can be accessed with array syntax.
 
 ```php
 <?php
@@ -129,8 +132,9 @@ $customConfig = [
 
 $config = Config::fromArray($defaultConfig, $customConfig);
 
-$env = $config->get('env'); // prod
+print $config['env']; // prod
 ```
+
 ## Console
 
 The console allows for some convenient printing of text, newlines and tables.
@@ -447,6 +451,16 @@ welcome.php:
 <?php namespace dvikan\SimpleParts; ?>
 
 Hello <?= e($user) ?>
+```
+
+Configuration:
+```php
+<?php
+
+$renderer = new Renderer([
+    'templates' => './templates', // Templates folder
+    'extension' => 'tpl', // Default template file extension
+]);
 ```
 
 ## Router
