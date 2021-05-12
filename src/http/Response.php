@@ -88,16 +88,19 @@ final class Response
     {
         $response = clone $this;
         return $response
-            ->withCode(Http::FOUND)
+            ->withCode(Http::SEE_OTHER)
             ->withHeader(Http::LOCATION, $location);
     }
 
     public function send(): void
     {
-        http_response_code($this->code);
-        foreach ($this->headers as $key => $value) {
+        $response = $this->withHeader('content-length', (string) \strlen($this->body));
+
+        http_response_code($response->code());
+
+        foreach ($response->headers() as $key => $value) {
             header(sprintf('%s: %s', $key, $value));
         }
-        print $this->body;
+        print $response->body();
     }
 }

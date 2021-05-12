@@ -8,7 +8,7 @@ final class Router
     public const METHOD_NOT_ALLOWED = 'METHOD_NOT_ALLOWED';
     public const NOT_FOUND          = 'NOT_FOUND';
 
-    private const METHODS = ['GET', 'POST', 'DELETE'];
+    private const METHODS = ['HEAD', 'GET', 'POST', 'DELETE'];
 
     private $routes = [];
 
@@ -29,6 +29,10 @@ final class Router
 
     private function addRoute(array $methods, string $pattern, $handler): void
     {
+        if ($methods === []) {
+            throw new SimpleException(sprintf('The route must have at least one method: "%s"', $pattern));
+        }
+
         foreach ($methods as $method) {
             if (! in_array($method, self::METHODS)) {
                 throw new SimpleException(sprintf('Illegal route method: "%s"', $method));

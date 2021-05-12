@@ -5,13 +5,13 @@ namespace dvikan\SimpleParts;
 final class CacheTest extends TestCase
 {
     /**
-     * @var Cache
+     * @var FileCache
      */
     private $sut;
 
     public function setUp()
     {
-        $this->sut = new Cache(new MemoryFile());
+        $this->sut = new FileCache(new MemoryFile());
     }
 
     public function test_set_and_get()
@@ -53,7 +53,7 @@ final class CacheTest extends TestCase
     public function test_expire()
     {
         $clock = new FrozenClock(new \DateTimeImmutable());
-        $sut = new Cache(new MemoryFile(), $clock);
+        $sut = new FileCache(new MemoryFile(), $clock);
         $sut->set('foo', 'bar', 10);
 
         $clock->advance(new \DateInterval('PT11S'));

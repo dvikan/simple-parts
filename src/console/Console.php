@@ -57,7 +57,7 @@ final class Console
         $this->red($s . "\n", ...$args);
     }
 
-    public function table(array $headers, array $rows)
+    public function table(array $headers, array $rows, int $maxWidth = 50)
     {
         // Find the longest column value
         $columnWidth = 3;
@@ -67,40 +67,51 @@ final class Console
             }
         }
         // Enforce a maximum of 30
-        $columnWidth = min($columnWidth, 30);
+        $columnWidth = min($columnWidth, $maxWidth);
 
         // Truncate header values
         foreach ($headers as $i => $header) {
-            $headers[$i] = $this->truncate($header, $columnWidth);
+            $headers[$i] = $this->truncate((string) $header, $columnWidth);
         }
 
         // Truncate row values
         foreach ($rows as $i => $row) {
             foreach ($row as $j => $value) {
-                $value = (string) $value;
-                $rows[$i][$j] = $this->truncate($value, $columnWidth);
+                $rows[$i][$j] = $this->truncate((string) ($value ?? 'NULL'), $columnWidth);
             }
         }
 
         // Create bar and row formatter
         $bar = '';
         $format = '';
-        foreach (range(1, count($headers)) as $_) {
+        foreach ($headers as $value) {
             $bar .= '+' . str_repeat('-', $columnWidth +2);
-            $format .= '| %-' . ($columnWidth +1) . 's';
+            $format .= '| %-' . ($columnWidth +1 + strlen($value) - mb_strlen($value)) . 's';
         }
         $bar .= '+';
         $format .= '|';
 
-        // Render the table
-        $this->println($bar);
-        $this->println($format, ...$headers);
+
+        // Render bar
         $this->println($bar);
 
+        // Render header
+        $this->println($format, ...$headers);
+
+        // Render bar
+        $this->println($bar);
+
+        // Render rows
         foreach ($rows as $row) {
+            $format = '';
+            foreach ($row as $value) {
+                $format .= '| %-' . ($columnWidth +1 + strlen($value) - mb_strlen($value)) . 's';
+            }
+            $format .= '|';
             $this->println($format, ...$row);
         }
 
+        // Render bar
         $this->println($bar);
     }
 

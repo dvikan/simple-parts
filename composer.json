@@ -42,12 +42,6 @@
       "bin/test.php"
     ],
     "require": {
-        "ext-json": "*",
-        "ext-curl": "*",
-        "ext-simplexml": "*",
-        "ext-imap": "*",
-        "ext-pdo": "*",
-        "ext-libxml": "*",
-        "ext-mbstring": "*"
+
     }
 }

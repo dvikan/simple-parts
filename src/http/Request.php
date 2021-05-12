@@ -53,6 +53,8 @@ final class Request
 
     public function get(string $key, string $default = null): ?string
     {
+        // todo: consider adding paramater for array value
+        // todo: consider trimming here
         return $this->get[$key] ?? $default;
     }
 

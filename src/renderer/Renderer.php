@@ -7,6 +7,11 @@ final class Renderer
     private const CONFIG = [
         'templates' => '.',
         'extension' => 'php',
+
+        /**
+         * Default context
+         */
+        'context' => [],
     ];
 
     /**
@@ -19,11 +24,23 @@ final class Renderer
         $this->config = Config::fromArray(self::CONFIG, $config);
     }
 
-    public function render(string $template, array $context = []): string
+    public function render(string $_template, array $_context = []): string
     {
-        extract($context);
+        if (isset($_context['_template'])) {
+            throw new SimpleException('Illegal context key: "_template"');
+        }
+
+        if (isset($_context['_context'])) {
+            throw new SimpleException('Illegal context key: "_context"');
+        }
+
+        $_context = array_merge($this->config['context'], $_context);
+
+        extract($_context, EXTR_SKIP); // Don't overwrite. This is the default.
+        unset($_context); // Remove from scope
+
         ob_start();
-        require $this->resolveTemplate($template);
+        require $this->resolveTemplate($_template);
         return ob_get_clean();
     }
 
@@ -31,7 +48,7 @@ final class Renderer
     {
         // These names typically collide with an unrelated index.php in cwd
         if ($template === 'index' || $template === 'index.php') {
-            throw new SimpleException('bad idea');
+            throw new SimpleException('Illegal template names "index" or "index.php"');
         }
 
         // Absolute or relative as is

@@ -12,8 +12,14 @@ final class CliHandler implements Handler
             $json = sprintf('Unable to json encode context: "%s"', $e->getMessage());
         }
 
+
+
         if (PHP_SAPI === 'cli-server') {
-            print '<pre>';
+            // todo: see how monolog does this
+            if (ob_get_length() > 0) {
+                ob_end_clean();
+            }
+            print '<pre style="font-size: 16px">';
         }
 
         $result = sprintf(
@@ -25,7 +31,8 @@ final class CliHandler implements Handler
             $json
         );
 
-        print "$result\n";
+        // todo: escape for browser and/or escape for cli
+        print ("$result\n");
 
         if (PHP_SAPI === 'cli-server') {
             print '</pre>';

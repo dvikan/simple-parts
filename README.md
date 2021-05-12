@@ -27,7 +27,7 @@ Other reasons:
 
 Overview:
 
-* `Cache`
+* `Cache`,`FileCache`,`MemoryCache`,`NullCache`
 * `Clock`,`SystemClock`,`FrozenClock`
 * `Config`
 * `Console`
@@ -46,18 +46,18 @@ Overview:
 
 ## Cache
 
-The cache is a persistent key-value store.
+The `FileCache` is a persistent key-value store.
 
-Cached items have ttls (time-to-live) specified in seconds from now. By default they never expire.
+Cached items have a ttl (time-to-live) specified in seconds from now. By default they never expire.
 
-The underlying storage is a file. The cached data is serialized as json.
+The underlying storage is a file. The cache is serialized as json.
 
-The cache is written to file when it is garbage-collected.
+The cache is written to file when it is garbage-collected by php.
 
 ```php
 <?php
 
-$cache = new Cache(new TextFile('./cache.json'));
+$cache = new FileCache(new TextFile('./cache.json'));
 
 $cache->set('foo'); // boolean true
 $cache->set('foo', 'bar');
@@ -69,6 +69,22 @@ $cache->get('non_existing_key', 'default'); // 'default'
 
 $cache->delete('foo');
 $cache->clear();
+```
+
+The `Cache` interface:
+```php
+<?php
+
+interface Cache
+{
+    public function set(string $key, $value = true, int $ttl = 0): void;
+
+    public function get(string $key, $default = null);
+
+    public function delete(string $key): void;
+
+    public function clear(): void;
+}
 ```
 
 ## Clock

@@ -42,7 +42,7 @@ final class Migrator
             throw new SimpleException(sprintf('The migrations folder is empty: "%s"', $this->migrationsFolder));
         }
 
-        $cache = new Cache(new TextFile($this->cacheFolder . '/migrations.json'));
+        $cache = new FileCache(new TextFile($this->cacheFolder . '/migrations.json'));
 
         foreach ($migrations as $migration) {
             $fileName = basename($migration);

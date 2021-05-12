@@ -18,7 +18,7 @@ final class Config implements \ArrayAccess
         }
 
         foreach (array_keys($customConfig) as $key) {
-            if (! isset($defaultConfig[$key])) {
+            if (! array_key_exists($key, $defaultConfig)) {
                 throw new SimpleException(sprintf('Illegal config key: "%s"', $key));
             }
         }
