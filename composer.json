@@ -19,10 +19,11 @@
               "src/logger",
               "src/migrator",
               "src/renderer",
+              "src/resolver",
               "src/router",
               "src/session",
               "src/shell",
-              "src/test"
+              "src/test-runner"
             ]
         },
         "files": [
@@ -39,9 +40,9 @@
     "scripts": {
     },
     "bin": [
-      "bin/test.php"
+      "bin/test"
     ],
     "require": {
-
+      "ext-json": "*"
     }
 }

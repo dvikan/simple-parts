@@ -4,29 +4,26 @@ namespace dvikan\SimpleParts;
 
 final class CacheTest extends TestCase
 {
-    /**
-     * @var FileCache
-     */
     private $sut;
 
-    public function setUp()
+    public function __construct()
     {
         $this->sut = new FileCache(new MemoryFile());
     }
 
-    public function test_set_and_get()
+    public function test()
     {
         $this->sut->set('foo1');
         $this->sut->set('foo2', 'bar');
         $this->sut->set('foo3', [1, 2]);
 
-        $this->assert(null, $this->sut->get('non'));
-        $this->assert('def', $this->sut->get('non', 'def'));
-        $this->assert(['def'], $this->sut->get('non', ['def']));
-        $this->assert(true, $this->sut->get('foo1'));
-        $this->assert('bar', $this->sut->get('foo2'));
-        $this->assert('bar', $this->sut->get('foo2', 'def'));
-        $this->assert([1, 2], $this->sut->get('foo3'));
+        $this->assertSame(null, $this->sut->get('non'));
+        $this->assertSame('def', $this->sut->get('non', 'def'));
+        $this->assertSame(['def'], $this->sut->get('non', ['def']));
+        $this->assertSame(true, $this->sut->get('foo1'));
+        $this->assertSame('bar', $this->sut->get('foo2'));
+        $this->assertSame('bar', $this->sut->get('foo2', 'def'));
+        $this->assertSame([1, 2], $this->sut->get('foo3'));
     }
 
     public function test_delete()
@@ -35,8 +32,8 @@ final class CacheTest extends TestCase
 
         $this->sut->delete('foo');
 
-        $this->assert(null, $this->sut->get('foo'));
-        $this->assert(1, $this->sut->get('foo', 1));
+        $this->assertSame(null, $this->sut->get('foo'));
+        $this->assertSame(1, $this->sut->get('foo', 1));
     }
 
     public function test_clear()
@@ -46,8 +43,8 @@ final class CacheTest extends TestCase
 
         $this->sut->clear();
 
-        $this->assert(null, $this->sut->get('foo1'));
-        $this->assert(null, $this->sut->get('foo2'));
+        $this->assertSame(null, $this->sut->get('foo1'));
+        $this->assertSame(null, $this->sut->get('foo2'));
     }
 
     public function test_expire()
@@ -58,6 +55,6 @@ final class CacheTest extends TestCase
 
         $clock->advance(new \DateInterval('PT11S'));
 
-        $this->assert(null, $sut->get('foo'));
+        $this->assertSame(null, $sut->get('foo'));
     }
 }

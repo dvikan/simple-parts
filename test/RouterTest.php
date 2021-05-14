@@ -4,7 +4,7 @@ namespace dvikan\SimpleParts;
 
 final class RouterTest extends TestCase
 {
-    public function test_basic_usage()
+    public function test()
     {
         $sut = new Router();
 
@@ -28,7 +28,7 @@ final class RouterTest extends TestCase
         ];
 
         foreach ($cases as $case) {
-            $this->assert($case[1], $sut->dispatch(...$case[0]));
+            $this->assertSame($case[1], $sut->dispatch(...$case[0]));
         }
     }
 }

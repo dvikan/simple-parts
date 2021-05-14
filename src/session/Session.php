@@ -6,24 +6,7 @@ final class Session
 {
     public function __construct()
     {
-        // todo: config
-
-        if (session_status() === PHP_SESSION_DISABLED) {
-            throw new SimpleException('Sessions are disabled');
-        }
-
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            throw new SimpleException('A session already exists');
-        }
-
-        if (session_status() === PHP_SESSION_NONE) {
-            $options = [];
-            $result = session_start($options);
-
-            if ($result === false) {
-                throw new SimpleException('Failed to start session');
-            }
-        }
+        session_start();
     }
 
     public function set(string $key, $value = true): void
@@ -43,12 +26,6 @@ final class Session
 
     public function destroy()
     {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            throw new SimpleException('Tried to destroy non-active session');
-        }
-
-        if (session_destroy() === false) {
-            throw new SimpleException('session_destroy() failed');
-        }
+        session_destroy();
     }
 }

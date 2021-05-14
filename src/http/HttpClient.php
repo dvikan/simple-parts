@@ -4,13 +4,9 @@ namespace dvikan\SimpleParts;
 
 final class HttpClient
 {
-    /**
-     * @var Config
-     */
     private $config;
 
     private const CONFIG = [
-        //'exceptions' => true,
         'useragent'         => 'HttpClient',
         'connect_timeout'   => 10,
         'timeout'           => 10,
@@ -29,10 +25,6 @@ final class HttpClient
         $this->config = Config::fromArray(self::CONFIG, $config);
 
         $this->ch = curl_init();
-
-        if ($this->ch === false) {
-            throw new SimpleException();
-        }
     }
 
     public function get(string $url, array $config = []): Response
@@ -98,14 +90,7 @@ final class HttpClient
         $body = curl_exec($this->ch);
 
         if ($body === false) {
-            switch (curl_errno($this->ch)) {
-                case CURLE_OPERATION_TIMEOUTED:
-                    throw new SimpleException('Timeout');
-                case CURLE_TOO_MANY_REDIRECTS:
-                    throw new SimpleException('Too many redirects');
-                default:
-                    throw new SimpleException(sprintf('"%s" (%s)', curl_error($this->ch), curl_errno($this->ch)));
-            }
+            throw new SimpleException(sprintf('"%s" (%s)', curl_error($this->ch), curl_errno($this->ch)));
         }
 
         $statusCode = curl_getinfo($this->ch, CURLINFO_RESPONSE_CODE);
@@ -114,10 +99,6 @@ final class HttpClient
 
         if ($response->ok()) {
             return $response;
-        }
-
-        if ($response->redirect()) {
-        //    return $response;
         }
 
         throw new SimpleException($response->statusLine(), $response->code());

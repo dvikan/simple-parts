@@ -40,10 +40,13 @@ Overview:
 * `Logger`,`Handler`,`CliHandler`,`FileHandler`
 * `Migrator`
 * `Renderer`
+* `Resolver`  
 * `Router`  
 * `Session`
 * `Shell`
-* `Test`
+* `TestRunner`
+
+All code resides under the namespace `dvikan\SimpleParts`.
 
 ## Cache
 
@@ -311,27 +314,16 @@ $response->send();
 
 ## HttpClient
 
-This is a large undertaking.
+The http client can be configured at construction and when doing requests.
 
-Basic usage:
-```php
-<?php
-
-$client = new HttpClient();
-
-$response = $client->get('https://example.com');
-
-print $response->body();
-```
-
-Responses that are not ok will throw exception:
+Get request:
 ```php
 $client = new HttpClient();
 
 try {
     $response = $client->get('https://example.com/non-existing');
 } catch (SimpleException $e) {
-    print "Not found\n";
+    print "Not 2xx\n";
 }
 ```
 
@@ -341,16 +333,10 @@ Post request:
 
 $client = new HttpClient();
 
-$response = $client->post('https://example.com/', [
-    'body' => [
-        'foo' => 'bar'
-    ]
-]);
-
-print $response->body();
+$response = $client->post('https://example.com/', ['body' => ['foo' => 'bar']]);
 ```
 
-Generic usage:
+Request:
 ```php
 <?php
 
@@ -361,9 +347,23 @@ $response = $client->request('GET', 'https://example.com/', [
     'connect_timeout'   => 3,
     'timeout'           => 3,
 ]);
-
-print $response->body();
 ```
+
+Config:
+```json
+[
+    'useragent'         => 'HttpClient',
+    'connect_timeout'   => 10,
+    'timeout'           => 10,
+    'follow_location'   => false,
+    'max_redirs'        => 5,
+    'auth_bearer'       => null,
+    'client_id'         => null,
+    'headers' => [],
+    'body' => null
+]
+```
+
 ## Json
 
 Json is mostly a wrapper that throws exception if the data fails to encode/decode as json.
@@ -398,10 +398,10 @@ Array
 The logger is heavily inspired by
 [Monolog](https://github.com/Seldaek/monolog).
 
-It accepts an array of handlers. It has three log levels: `INFO`, `WARNING` and `ERROR`.
+It accepts an array of handlers. It has three log levels: `INFO`,`WARNING` and `ERROR`.
 
 All handlers will receive a log item of the form:
-```
+```php
 [
     'name'          => $this->name,
     'created_at'    => new DateTime(),
@@ -524,7 +524,7 @@ print $handler($args);
 
 ## Session
 
-Session is an abstraction over php's `$_SESSION`.
+Session is a abstraction over `$_SESSION`.
 ```php
 <?php
 
@@ -537,7 +537,8 @@ print 'Hello, ' . $session->get('user', 'anon');
 
 ## Shell
 
-Shell is an abstraction for running os commands.
+Shell is an abstraction over `exec()`.
+
 ```php
 <?php
 
@@ -548,47 +549,46 @@ print $shell->execute('echo', ['hello', 'world']);
 
 The arguments are escaped but you still need to make sure they are not parsed as command options.
 
-You can sometimes use `--` otherwise validate the arguments manually.
+You can sometimes use `--`, otherwise validate the arguments manually.
 ```php
 <?php
 
 $shell = new Shell();
 
-$userInput = 'https://github.com/Seldaek/monolog.git';
-
 print $shell->execute('git clone --', [$userInput]);
 ```
-## Test
+## TestRunner
 
-Test is a tool for creating unit tests. Tests must inherit from `TestCase`.
+The test runner is a tool for creating unit tests. Tests must inherit from `TestCase`.
 
 Tests are assumed to be located in `./test`.
 
 Example:
+
 ```php
 <?php
 
 use dvikan\SimpleParts\TestCase;
 
-final class test extends TestCase
+class FooTest extends TestCase
 {
-    function test_1()
+    function test()
     {
-        $this->assert(1, 1);
-        $this->assert(1, 2);
+        $this->assert(1 === 1);
+        $this->assertSame(1, 2);
     }
 }
 ```
 
-Run tests:
-```
-$ php vendor/bin/test.php
-Fail at /home/u/simple-parts/test.php line 10
-Expected: 1
-Actual: 2
-```
+## Development
+
+Install `composer create-project dvikan/simple-parts`
+
+Run tests: `./bin/test`
 
 ## Todo
+
+Some more ideas.
 
 * git wrapper
 * irc client

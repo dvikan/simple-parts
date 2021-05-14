@@ -1,7 +1,7 @@
+#!/usr/bin/env php
 <?php declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
-
 $projectAutoLoader = __DIR__ . '/../vendor/autoload.php';
 
 if (file_exists($projectAutoLoader)) {
@@ -9,6 +9,8 @@ if (file_exists($projectAutoLoader)) {
     require $projectAutoLoader;
 }
 
-$runner = new Runner();
+$_ = ErrorHandler::create(new Logger('test', [new CliHandler()]));
+
+$runner = new TestRunner();
 
 $runner->run();

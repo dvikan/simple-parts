@@ -48,4 +48,9 @@ final class TextFile implements File
             throw new SimpleException(sprintf('Unable to append to "%s"', $this->filePath));
         }
     }
+
+    public function name(): string
+    {
+        return $this->filePath;
+    }
 }

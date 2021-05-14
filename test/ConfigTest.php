@@ -8,13 +8,13 @@ final class ConfigTest extends TestCase
     {
         $sut = Config::fromArray(['env' => 'dev']);
 
-        $this->assert('dev', $sut['env']);
+        $this->assertSame('dev', $sut['env']);
     }
 
     public function test_custom_config()
     {
         $sut = Config::fromArray(['env' => 'dev'], ['env' => 'prod']);
 
-        $this->assert('prod', $sut['env']);
+        $this->assertSame('prod', $sut['env']);
     }
 }

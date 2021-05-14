@@ -9,6 +9,11 @@ final class Console
     private const YELLOW = "\033[1;33m";
     private const RED = "\033[0;31m";
 
+    public function __construct()
+    {
+        // todo: add option for escaping ansi codes
+    }
+
     public function println(string $s = '', ...$args)
     {
         $this->print($s . "\n", ...$args);

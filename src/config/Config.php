@@ -13,10 +13,6 @@ final class Config implements \ArrayAccess
 
     public static function fromArray(array $defaultConfig, array $customConfig = []): self
     {
-        if ($defaultConfig === []) {
-            throw new SimpleException('Config array is empty');
-        }
-
         foreach (array_keys($customConfig) as $key) {
             if (! array_key_exists($key, $defaultConfig)) {
                 throw new SimpleException(sprintf('Illegal config key: "%s"', $key));
@@ -35,12 +31,12 @@ final class Config implements \ArrayAccess
 
     public function offsetExists($offset)
     {
-        return isset($this->config[$offset]);
+        return array_key_exists($offset, $this->config);
     }
 
     public function offsetGet($offset)
     {
-        if (isset($this->config[$offset])) {
+        if (array_key_exists($offset, $this->config)) {
             return $this->config[$offset];
         }
 
@@ -49,6 +45,7 @@ final class Config implements \ArrayAccess
 
     public function offsetSet($offset, $value)
     {
+        // possibly return a modified clone
         throw new SimpleException('Not implemented');
     }
 

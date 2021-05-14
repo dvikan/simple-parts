@@ -4,9 +4,6 @@ namespace dvikan\SimpleParts;
 
 final class MemoryFile implements File
 {
-    /**
-     * @var array
-     */
     private $data;
 
     public function __construct()
@@ -32,5 +29,10 @@ final class MemoryFile implements File
     public function append(string $data): void
     {
         $this->data .= $data;
+    }
+
+    public function name(): string
+    {
+        return ':memory:';
     }
 }

@@ -11,4 +11,6 @@ interface File
     public function write(string $data): void;
 
     public function append(string $data): void;
+
+    public function name(): string;
 }

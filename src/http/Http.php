@@ -30,10 +30,6 @@ interface Http
         self::INTERNAL_SERVER_ERROR => '500 Internal Server Error',
     ];
 
-    // request headers
-    // noop
-
-    // response headers
     public const CONTENT_TYPE       = 'content-type';
     public const LOCATION           = 'location';
 }

@@ -7,12 +7,10 @@ final class CliHandler implements Handler
     public function handle(array $record): void
     {
         try {
-            $json = Json::encode($record['context']);
+            $json = Json::encode($record['context'], JSON_PRETTY_PRINT);
         } catch (SimpleException $e) {
             $json = sprintf('Unable to json encode context: "%s"', $e->getMessage());
         }
-
-
 
         if (PHP_SAPI === 'cli-server') {
             // todo: see how monolog does this
@@ -23,8 +21,7 @@ final class CliHandler implements Handler
         }
 
         $result = sprintf(
-            "[%s] %s.%s %s %s",
-            $record['created_at']->format('Y-m-d H:i:s'),
+            "%s.%s %s %s",
             $record['name'],
             $record['level_name'],
             $record['message'],

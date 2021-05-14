@@ -17,9 +17,6 @@ final class Request
 
     public static function fromGlobals(): Request
     {
-        if (in_array(PHP_SAPI, ['cli'])) {
-            throw new SimpleException('Unable to create request from globals in cli context');
-        }
         return new Request($_GET, $_POST, $_SERVER);
     }
 

@@ -25,11 +25,6 @@ final class Logger
     public function __construct(string $name, array $handlers)
     {
         $this->name = $name;
-
-        if ($handlers === []) {
-            throw new SimpleException('Please provide at least one log handler');
-        }
-
         $this->handlers = $handlers;
     }
 
