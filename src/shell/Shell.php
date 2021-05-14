@@ -1,12 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
 final class Shell
 {
-    /**
-     * @param string[] $arguments
-     */
     public function execute(string $command, array $arguments = []): string
     {
         foreach ($arguments as $argument) {

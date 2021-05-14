@@ -14,6 +14,7 @@
               "src/container",
               "src/error-handler",
               "src/file",
+              "src/framework",
               "src/http",
               "src/json",
               "src/logger",
@@ -27,7 +28,7 @@
             ]
         },
         "files": [
-            "src/renderer/functions.php"
+            "src/common/common.php"
         ]
     },
     "autoload-dev": {
@@ -43,6 +44,9 @@
       "bin/test"
     ],
     "require": {
-      "ext-json": "*"
+      "ext-json": "*",
+      "ext-mbstring": "*",
+      "ext-curl": "*",
+      "ext-pdo": "*"
     }
 }

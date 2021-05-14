@@ -1,8 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
-
-use Throwable;
 
 abstract class TestCase
 {
@@ -29,7 +28,7 @@ abstract class TestCase
         }
     }
 
-    protected function expectException(string $class = Throwable::class)
+    protected function expectException(string $class = \Throwable::class)
     {
         $this->expectException = $class;
     }

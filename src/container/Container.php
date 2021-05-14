@@ -1,36 +1,35 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
-use ArrayAccess;
-
-final class Container implements ArrayAccess
+final class Container implements \ArrayAccess
 {
-    private $container = [];
+    private $values = [];
     private $resolved = [];
 
-    public function offsetSet($offset, $fn)
+    public function offsetSet($key, $value)
     {
-        $this->container[$offset] = $fn;
+        $this->values[$key] = $value;
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($key)
     {
-        if (isset($this->resolved[$offset])) {
-            return $this->resolved[$offset];
+        if (isset($this->resolved[$key])) {
+            return $this->resolved[$key];
         }
 
-        $resolved = $this->container[$offset]($this);
+        $this->resolved[$key] = $this->values[$key]($this);
 
-        return $this->resolved[$offset] = $resolved;
+        return $this->resolved[$key];
     }
 
-    public function offsetExists($offset): bool
+    public function offsetExists($key): bool
     {
-        return isset($this->container[$offset]);
+        throw new SimpleException('Not implemented');
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($key)
     {
         throw new SimpleException('Not implemented');
     }

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
@@ -8,14 +9,12 @@ use Throwable;
 
 final class TestRunner
 {
-    private $tests;
-    private $assertions;
+    private $tests = 0;
+    private $assertions = 0;
     private $console;
 
     public function __construct()
     {
-        $this->tests = 0;
-        $this->assertions = 0;
         $this->console = new Console();
     }
 

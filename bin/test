@@ -1,15 +1,17 @@
 #!/usr/bin/env php
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
-$projectAutoLoader = __DIR__ . '/../vendor/autoload.php';
 
-if (file_exists($projectAutoLoader)) {
+$autoload = __DIR__ . '/../vendor/autoload.php';
+
+if (file_exists($autoload)) {
     // Installed as project
-    require $projectAutoLoader;
+    require $autoload;
 }
 
-$_ = ErrorHandler::create(new Logger('test', [new CliHandler()]));
+ErrorHandler::create(new Logger('test', [new CliHandler()]));
 
 $runner = new TestRunner();
 

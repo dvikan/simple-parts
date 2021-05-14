@@ -1,8 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
-
-use DateTime;
 
 final class Logger
 {
@@ -18,14 +17,16 @@ final class Logger
 
     private $name;
     private $handlers;
+    private $clock;
 
     /**
      * @param Handler[] $handlers
      */
-    public function __construct(string $name, array $handlers)
+    public function __construct(string $name, array $handlers, Clock $clock = null)
     {
         $this->name = $name;
         $this->handlers = $handlers;
+        $this->clock = $clock ?? new SystemClock();
     }
 
     public function info(string $message, array $context = []): void
@@ -48,7 +49,7 @@ final class Logger
         foreach ($this->handlers as $handler) {
             $handler->handle([
                 'name'          => $this->name,
-                'created_at'    => new DateTime(),
+                'created_at'    => $this->clock->now(),
                 'level'         => $level,
                 'level_name'    => self::LEVEL_NAMES[$level],
                 'message'       => $message,

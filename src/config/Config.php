@@ -34,16 +34,16 @@ final class Config implements \ArrayAccess
         return array_key_exists($offset, $this->config);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($key)
     {
-        if (array_key_exists($offset, $this->config)) {
-            return $this->config[$offset];
+        if (array_key_exists($key, $this->config)) {
+            return $this->config[$key];
         }
 
-        throw new SimpleException(sprintf('Unknown config key: "%s"', $offset));
+        throw new SimpleException(sprintf('Unknown config key: "%s"', $key));
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($key, $value)
     {
         // possibly return a modified clone
         throw new SimpleException('Not implemented');

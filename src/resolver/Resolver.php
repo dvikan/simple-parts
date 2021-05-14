@@ -1,8 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
-
-use Closure;
 
 final class Resolver
 {
@@ -28,7 +27,7 @@ final class Resolver
             }
         }
 
-        if ($handler instanceof Closure || is_callable($handler)) {
+        if ($handler instanceof \Closure || is_callable($handler)) {
             return [$handler, '__invoke'];
         }
 

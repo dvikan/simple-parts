@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
@@ -16,6 +17,9 @@ final class Renderer
 
     private const CONFIG = [
         'templates' => null,
+        /**
+         * perhaps remove this config
+         */
         'extension' => 'php',
 
         /**
@@ -24,11 +28,6 @@ final class Renderer
         'context' => [],
     ];
 
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(array $config = [])
     {
         $this->config = Config::fromArray(self::CONFIG, $config);
@@ -36,6 +35,7 @@ final class Renderer
 
     public function render(string $_filePath, array $_context = []): string
     {
+        // todo: perhaps prevent collision with local vars
         extract(array_merge($this->config['context'], $_context));
         ob_start();
         require $this->resolve($_filePath);

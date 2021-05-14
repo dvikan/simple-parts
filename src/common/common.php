@@ -1,6 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
+
+final class SimpleException extends \Exception
+{
+}
 
 /**
  * Escape for html context

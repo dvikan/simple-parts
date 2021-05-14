@@ -1,15 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
 final class MemoryFile implements File
 {
-    private $data;
-
-    public function __construct()
-    {
-        $this->data = '';
-    }
+    private $data = '';
 
     public function exists(): bool
     {

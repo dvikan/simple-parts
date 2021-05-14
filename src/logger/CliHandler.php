@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
+// rename to stream handler?
 final class CliHandler implements Handler
 {
     public function handle(array $record): void
@@ -20,13 +22,7 @@ final class CliHandler implements Handler
             print '<pre style="font-size: 16px">';
         }
 
-        $result = sprintf(
-            "%s.%s %s %s",
-            $record['name'],
-            $record['level_name'],
-            $record['message'],
-            $json
-        );
+        $result = sprintf('%s.%s %s %s', $record['name'], $record['level_name'], $record['message'], $json);
 
         // todo: escape for browser and/or escape for cli
         print ("$result\n");

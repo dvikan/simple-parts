@@ -1,8 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
-
-use PDO;
 
 final class Migrator
 {
@@ -11,7 +10,7 @@ final class Migrator
     private $cacheFolder;
 
     public function __construct(
-        PDO $pdo,
+        \PDO $pdo,
         string $migrationsFolder = './',
         string $cacheFolder = './'
     ) {

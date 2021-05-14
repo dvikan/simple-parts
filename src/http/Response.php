@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
@@ -12,7 +13,7 @@ final class Response
     {
         $this->body = $body;
         $this->code = $code ?? Http::OK;
-        $this->headers = $headers;
+        $this->headers = $headers; // todo: canonicalize
     }
 
     public function code(): int
