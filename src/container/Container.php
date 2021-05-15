@@ -10,17 +10,21 @@ final class Container implements \ArrayAccess
 
     public function offsetSet($key, $value)
     {
+        if (! $value instanceof \Closure) {
+            $this->resolved[$key] = $value;
+        }
+
         $this->values[$key] = $value;
     }
 
     public function offsetGet($key)
     {
-        if (isset($this->resolved[$key])) {
-            return $this->resolved[$key];
+        if (!isset($this->values[$key])) {
+            throw new SimpleException(sprintf('Unknown container key: "%s"', $key));
         }
 
-        if (!isset($this[$key])) {
-            throw new SimpleException(sprintf('Unknown container key: "%s"', $key));
+        if (isset($this->resolved[$key])) {
+            return $this->resolved[$key];
         }
 
         $this->resolved[$key] = $this->values[$key]($this);
