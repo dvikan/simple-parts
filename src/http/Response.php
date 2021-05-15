@@ -95,7 +95,9 @@ final class Response
 
     public function send(): void
     {
-        $response = $this->withHeader('content-length', (string) \strlen($this->body));
+        $response = $this;
+
+        $response = $response->withHeader('content-length', (string) \strlen($this->body));
 
         http_response_code($response->code());
 

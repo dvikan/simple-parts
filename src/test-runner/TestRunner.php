@@ -89,18 +89,21 @@ final class TestRunner
         $testFile = $stackFrame[0]['file'];
         $testLine = $stackFrame[0]['line'];
 
-        $this->console->println(sprintf("AssertionFailure %s::%s() at %s line %s", $testClass, $testMethod, $testFile, $testLine));
+        $this->console->println(sprintf('%s::%s() at %s line %s', $testClass, $testMethod, $testFile, $testLine));
         $this->console->println('Expected: %s', $this->getValueAsString($expected));
         $this->console->println("Actual: %s", $this->getValueAsString($actual));
+        $this->console->exit(1);
     }
 
     private function failException(string $class, string $method, string $expected = null)
     {
-        $this->console->println('ExceptionFailure %s::%s()', $class, $method);
+        $this->console->println('%s::%s()', $class, $method);
 
         if ($expected) {
             $this->console->println('Expected: %s', $this->getValueAsString($expected));
         }
+
+        $this->console->exit(1);
     }
 
     private function getValueAsString($value): string

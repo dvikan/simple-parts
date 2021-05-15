@@ -22,7 +22,7 @@ final class Logger
     /**
      * @param Handler[] $handlers
      */
-    public function __construct(string $name, array $handlers, Clock $clock = null)
+    public function __construct(string $name = 'default', array $handlers = [], Clock $clock = null)
     {
         $this->name = $name;
         $this->handlers = $handlers;

@@ -19,6 +19,10 @@ final class Container implements \ArrayAccess
             return $this->resolved[$key];
         }
 
+        if (!isset($this[$key])) {
+            throw new SimpleException(sprintf('Unknown container key: "%s"', $key));
+        }
+
         $this->resolved[$key] = $this->values[$key]($this);
 
         return $this->resolved[$key];
@@ -26,7 +30,7 @@ final class Container implements \ArrayAccess
 
     public function offsetExists($key): bool
     {
-        throw new SimpleException('Not implemented');
+        return isset($this->values[$key]);
     }
 
     public function offsetUnset($key)

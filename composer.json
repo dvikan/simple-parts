@@ -20,7 +20,6 @@
               "src/logger",
               "src/migrator",
               "src/renderer",
-              "src/resolver",
               "src/router",
               "src/session",
               "src/shell",

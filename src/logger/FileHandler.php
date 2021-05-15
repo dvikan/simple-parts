@@ -15,7 +15,7 @@ final class FileHandler implements Handler
     public function handle(array $record): void
     {
         try {
-            $json = Json::encode($record['context']);
+            $json = Json::encode($record['context'], JSON_PRETTY_PRINT);
         } catch (SimpleException $e) {
             $json = sprintf('Unable to json encode context: "%s"', $e->getMessage());
         }

@@ -9,23 +9,23 @@ final class RouterTest extends TestCase
     {
         $sut = new Router();
 
-        $sut->get('/', 'index');
-        $sut->get('/about', 'about');
-        $sut->get('/user/(\d+)', 'user');
-        $sut->get('/user/(\d+)/(\d+)', 'user');
-        $sut->post('/delete', 'delete');
-        $sut->map(['GET', 'POST'], '/login', 'login');
+        $sut->addRoute('GET', '/', 'index');
+        $sut->addRoute('GET', '/about', 'about');
+        $sut->addRoute('GET', '/user/(\d+)', 'user');
+        $sut->addRoute('GET', '/user/(\d+)/(\d+)', 'user');
+        $sut->addRoute('POST', '/delete', 'delete');
+        $sut->addRoute(['GET', 'POST'], '/login', 'login');
 
         $cases = [
-            [['GET', '/about'], [Router::FOUND, 'about', []]],
             [['GET', '/'], [Router::FOUND, 'index', []]],
+            [['GET', '/about'], [Router::FOUND, 'about', []]],
             [['GET', '/user/1'], [Router::FOUND, 'user', ['1']]],
             [['GET', '/user/2/3'], [Router::FOUND, 'user', ['2', '3']]],
             [['POST', '/delete'], [Router::FOUND, 'delete', []]],
             [['GET', '/login'], [Router::FOUND, 'login', []]],
             [['POST', '/login'], [Router::FOUND, 'login', []]],
-            [['GET', '/foo'], [Router::NOT_FOUND]],
-            [['DELETE', '/'], [Router::METHOD_NOT_ALLOWED]],
+            [['GET', '/foo'], [Router::NOT_FOUND, null, []]],
+            [['DELETE', '/'], [Router::METHOD_NOT_ALLOWED, null, []]],
         ];
 
         foreach ($cases as $case) {

@@ -6,111 +6,112 @@ namespace dvikan\SimpleParts;
 final class Application
 {
     private $container;
+    private $router;
     private $routes = [];
-    private $middleware = [];
-    private $controllerMiddleware = [];
+    private $notFoundHandler = null;
 
-    public function __construct(Container $container)
+    public function __construct(Container $container = null)
     {
-        $this->container = $container;
+        $this->container = $container ?? new Container();
+        $this->router = new Router();
     }
 
-    public function get(string $pattern, $handler, $middleware = [])
+    public function get(string $pattern, array $handler, $middlewares = []): void
     {
-        $this->addRoute('GET', $pattern, $handler, $middleware);
+        $this->addRoute('GET', $pattern, $handler, $middlewares);
     }
 
-    public function post(string $pattern, $handler, $middleware = [])
+    public function post(string $pattern, array $handler, $middlewares = []): void
     {
-        $this->addRoute('POST', $pattern, $handler, $middleware);
+        $this->addRoute('POST', $pattern, $handler, $middlewares);
     }
 
-    public function map(array $methods, string $pattern, $handler, $middleware = [])
+    public function map(array $methods, string $pattern, array $handler, $middlewares = []): void
     {
-        $this->addRoute($methods, $pattern, $handler, $middleware);
+        $this->addRoute($methods, $pattern, $handler, $middlewares);
     }
 
-    protected function addRoute($methods, string $pattern, $handler, $middleware = []): void
+    public function addRoute($methods, string $pattern, array $handler, $middlewares = []): void
     {
-        $this->routes[$pattern] = [
+        $handler[] =  is_array($middlewares) ? $middlewares : [$middlewares];
+
+        $this->routes[] = [
             'methods' => (array) $methods,
             'pattern' => $pattern,
             'handler' => $handler,
-            'middleware' => is_array($middleware) ? $middleware : [$middleware],
         ];
     }
 
-    public function addMiddleware(callable $middleware)
+    public function setNotFoundHandler(array $handler): void
     {
-        $this->middleware[] = $middleware;
+        $handler[] = [];
+        $this->notFoundHandler = $handler;
     }
 
-    public function addControllerMiddleware(string $controller, callable $middleware)
+    public function setMethodNotAllowedHandler(array $handler): void
     {
-        $this->controllerMiddleware[$controller][] = $middleware;
+        $handler[] = [];
+        $this->methodNotAllowedHandler = $handler;
     }
 
     public function run(): void
     {
-        $response = $this->_run();
+        $this->container[NotFound::class] = function () {
+            return new NotFound;
+        };
 
-        if (!$response instanceof Response) {
-            $response = new Response($response);
-        }
-
-        $response->send();
-    }
-
-    public function _run()
-    {
-        $router = new Router();
-        $request = Request::fromGlobals();
+        $this->container[MethodNotAllowed::class] = function () {
+            return new MethodNotAllowed;
+        };
 
         foreach ($this->routes as $route) {
-            $router->addRoute($route['methods'], $route['pattern'], $route['handler']);
+            $this->router->addRoute(
+                $route['methods'],
+                $route['pattern'],
+                $route['handler']
+            );
         }
 
-        $route = $router->dispatch($request->method(), $request->uri());
+        $request = Request::fromGlobals();
 
-        foreach ($this->middleware as $mw) {
-            $mw($request);
+        [$result, $handler, $args] = $this->router->dispatch($request->method(), $request->uri());
+
+        if ($result === Router::NOT_FOUND) {
+            $handler = $this->notFoundHandler ?? [NotFound::class, '__invoke', []];
         }
 
-        if ($route[0] === Router::NOT_FOUND) {
-            return new Response('Page not found', Http::NOT_FOUND);
+        if ($result === Router::METHOD_NOT_ALLOWED) {
+            $handler = $this->methodNotAllowedHandler ?? [MethodNotAllowed::class, '__invoke', []];
         }
 
-        if ($route[0] === Router::METHOD_NOT_ALLOWED) {
-            return new Response('Method not allowed', Http::METHOD_NOT_ALLOWED);
+        $handler[0] = $this->container[$handler[0]];
+
+        foreach (array_pop($handler) as $middleware) {
+            $middleware($request);
         }
 
-        foreach ($this->routes as $_route) {
-            if (preg_match('#' . $_route['pattern'] . '#', $request->uri())) {
-                foreach ($_route['middleware'] as $mw) {
-                    $mw($request);
-                }
-            }
+        $response = $handler($request, $args);
+
+        if ($response instanceof Response) {
+            $response->send();
+        } else {
+            print $response;
         }
+    }
+}
 
-        $handler    = $route[1];
-        $args       = $route[2];
+final class NotFound
+{
+    public function __invoke($request, $args)
+    {
+        return new Response('Page not found', Http::NOT_FOUND);
+    }
+}
 
-        if ($handler instanceof \Closure) {
-            return $handler($request, $args);
-        }
-
-        $controllerClass = $handler[0];
-        $controllerMethod = $handler[1];
-        $controller = $this->container[$controllerClass];
-
-        foreach ($this->controllerMiddleware as $c => $mw) {
-            if ($controllerClass === $c) {
-                foreach ($mw as $m) {
-                    $m($request);
-                }
-            }
-        }
-
-        return $controller->$controllerMethod($request, $args);
+final class MethodNotAllowed
+{
+    public function __invoke($request, $args)
+    {
+        return new Response('Method not allowed bro', Http::METHOD_NOT_ALLOWED);
     }
 }

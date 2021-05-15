@@ -5,26 +5,11 @@ namespace dvikan\SimpleParts;
 
 final class Router
 {
-    public const FOUND              = 10;
-    public const METHOD_NOT_ALLOWED = 20;
-    public const NOT_FOUND          = 30;
+    public const FOUND              = 'FOUND';
+    public const METHOD_NOT_ALLOWED = 'METHOD_NOT_ALLOWED';
+    public const NOT_FOUND          = 'NOT_FOUND';
 
     private $routes = [];
-
-    public function get(string $pattern, $handler)
-    {
-        $this->addRoute('GET', $pattern, $handler);
-    }
-
-    public function post(string $pattern, $handler)
-    {
-        $this->addRoute('POST', $pattern, $handler);
-    }
-
-    public function map(array $methods, string $pattern, $handler)
-    {
-        $this->addRoute($methods, $pattern, $handler);
-    }
 
     /**
      * @param string|array $methods
@@ -46,7 +31,7 @@ final class Router
             }
 
             if (! in_array($method, $route['methods'])) {
-                return [self::METHOD_NOT_ALLOWED];
+                return [self::METHOD_NOT_ALLOWED, null, []];
             }
 
             array_shift($matches);
@@ -54,6 +39,6 @@ final class Router
             return [self::FOUND, $route['handler'], $matches];
         }
 
-        return [self::NOT_FOUND];
+        return [self::NOT_FOUND, null, []];
     }
 }
