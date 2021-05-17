@@ -27,9 +27,6 @@ final class Console
 
     public function exit(int $status = 0)
     {
-        if ($status < 0 || $status > 254) {
-            throw new SimpleException();
-        }
         exit($status);
     }
 
@@ -72,7 +69,7 @@ final class Console
                 $columnWidth = max($columnWidth, mb_strlen((string) $value));
             }
         }
-        // Enforce a maximum of 30
+
         $columnWidth = min($columnWidth, $maxWidth);
 
         // Truncate header values
@@ -96,7 +93,6 @@ final class Console
         }
         $bar .= '+';
         $format .= '|';
-
 
         // Render bar
         $this->println($bar);

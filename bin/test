@@ -11,8 +11,11 @@ if (file_exists($autoload)) {
     require $autoload;
 }
 
-ErrorHandler::create(new Logger('test', [new CliHandler()]));
+ErrorHandler::create(new SimpleLogger('test', [
+    new CliHandler(),
+    //new FileHandler(new TextFile('./log')),
+]));
 
 $runner = new TestRunner();
 
-$runner->run();
+$runner->run($argc, $argv);

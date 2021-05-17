@@ -38,7 +38,7 @@ final class HttpClient
         return $this->request('POST', $url, $config);
     }
 
-    public function request(string $method, string $url, array $requestConfig)
+    public function request(string $method, string $url, array $requestConfig): Response
     {
         $config = $this->config->merge($requestConfig);
 
@@ -58,7 +58,6 @@ final class HttpClient
         }
 
         $headers = [];
-
         if (isset($config['auth_bearer'])) {
             $headers[] = sprintf('Authorization: Bearer %s', $config['auth_bearer']);
         }
@@ -67,7 +66,8 @@ final class HttpClient
             $headers[] = sprintf('client-id: %s', $config['client_id']);
         }
 
-        curl_setopt($this->ch, CURLOPT_HTTPHEADER, array_merge($config['headers'], $headers));
+        $value = array_merge($config['headers'], $headers);
+        curl_setopt($this->ch, CURLOPT_HTTPHEADER, $value);
 
         $responseHeaders = [];
 

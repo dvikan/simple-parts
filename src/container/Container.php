@@ -34,7 +34,7 @@ final class Container implements \ArrayAccess
 
     public function offsetExists($key): bool
     {
-        return isset($this->values[$key]);
+        throw new SimpleException('Not implemented');
     }
 
     public function offsetUnset($key)

@@ -5,7 +5,7 @@ namespace dvikan\SimpleParts;
 
 abstract class TestCase
 {
-    public $expectException = null;
+    public $expectException = '';
 
     protected function assert(bool $condition)
     {

@@ -41,7 +41,7 @@ final class ErrorHandler
         E_USER_DEPRECATED   => 'E_USER_DEPRECATED',
     ];
 
-    /** @var Logger */
+    /** @var SimpleLogger */
     private $logger;
 
     private function __construct()
@@ -49,42 +49,25 @@ final class ErrorHandler
         // noop
     }
 
-    public static function create(Logger $logger): self
+    public static function create(SimpleLogger $logger): self
     {
-        $errorHandler = new self();
+        $handler = new self();
 
-        $errorHandler->logger = $logger;
+        $handler->logger = $logger;
 
-        set_error_handler(          [$errorHandler, 'handleError']);
-        set_exception_handler(      [$errorHandler, 'handleException']);
-        register_shutdown_function( [$errorHandler, 'handleShutdown']);
+        set_error_handler(          [$handler, 'handleError']);
+        set_exception_handler(      [$handler, 'handleException']);
+        register_shutdown_function( [$handler, 'handleShutdown']);
 
-        return $errorHandler;
+        return $handler;
     }
 
     public function handleError($code, $message, $file, $line)
     {
-        $codeString = self::ERROR_MAP[$code] ?? 'Unknown PHP error';
-
-        $stackTrace = [];
-        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $trace) {
-            $stackTrace[] = sprintf(
-                '%s:%s',
-                $trace['file'] ?? '(null)',
-                $trace['line'] ?? '(null)'
-            );
-        }
-
-        $this->logger->log(
-            self::LEVEL_MAP[$code] ?? Logger::ERROR,
-            sprintf('%s: %s at %s line %s', $codeString, $message, $file, $line),
-            ['stacktrace' => array_reverse($stackTrace)]
-        );
-
-        exit(1);
+        throw new \ErrorException($message, 0, $code, $file, $line);
     }
 
-    public function handleException($e)
+    public function handleException(\Throwable $e)
     {
         $stackTrace[] = sprintf('%s:%s', $e->getFile(), $e->getLine());
         foreach ($e->getTrace() as $trace) {
@@ -96,7 +79,7 @@ final class ErrorHandler
         }
 
         $this->logger->log(
-            Logger::ERROR,
+            SimpleLogger::ERROR,
             sprintf(
                 'Uncaught Exception %s: %s at %s line %s',
                 get_class($e), // Could possibly generate a new error
@@ -104,10 +87,10 @@ final class ErrorHandler
                 $e->getFile(),
                 $e->getLine()
             ),
-            ['stacktrace' => array_reverse($stackTrace)]
+            [
+                'stacktrace' => array_reverse($stackTrace),
+            ]
         );
-
-        exit(1);
     }
 
     public function handleShutdown()
@@ -121,7 +104,7 @@ final class ErrorHandler
         $codeString = self::ERROR_MAP[$lastError['type']] ?? 'Unknown PHP error';
 
         $this->logger->log(
-            self::LEVEL_MAP[$lastError['type']] ?? Logger::ERROR,
+            self::LEVEL_MAP[$lastError['type']] ?? SimpleLogger::ERROR,
             sprintf(
                 'Fatal Error %s: %s in %s line %s',
                 $codeString,

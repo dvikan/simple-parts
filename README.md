@@ -36,10 +36,9 @@ Overview:
 * `File`,`TextFile`,`MemoryFile`
 * `HttpClient`,`Request`,`Response`
 * `Json`
-* `Logger`,`Handler`,`CliHandler`,`FileHandler`
+* `Logger`,`SimpleLogger`,`Handler`,`CliHandler`,`FileHandler`
 * `Migrator`
 * `Renderer`
-* `Resolver`  
 * `Router`  
 * `Session`
 * `Shell`
@@ -399,6 +398,23 @@ The logger is heavily inspired by
 
 It accepts an array of handlers. It has three log levels: `INFO`,`WARNING` and `ERROR`.
 
+
+
+Usage:
+```php
+$logger = new SimpleLoggerLogger('default', [new CliHandler()]);
+
+$logger->info('hello');
+$logger->warning('hello');
+$logger->error('hello');
+```
+```
+[2021-05-10 03:23:53] default.INFO hello []
+[2021-05-10 03:23:53] default.WARNING hello []
+[2021-05-10 03:23:53] default.ERROR hello []
+```
+
+
 All handlers will receive a log item of the form:
 ```php
 [
@@ -409,24 +425,6 @@ All handlers will receive a log item of the form:
     'message'       => $message,
     'context'       => $context,
 ]
-```
-
-Usage:
-```php
-<?php
-
-$logger = new Logger('default', [new CliHandler()]);
-
-$logger->info('hello', ['foo' => 'bar']);
-$logger->warning('hello');
-$logger->error('hello');
-```
-```
-[2021-05-10 03:23:53] default.INFO hello {
-    "foo": "bar"
-}
-[2021-05-10 03:23:53] default.WARNING hello []
-[2021-05-10 03:23:53] default.ERROR hello []
 ```
 
 ## Migrator

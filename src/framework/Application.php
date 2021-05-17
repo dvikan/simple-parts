@@ -7,14 +7,16 @@ final class Application
 {
     private $container;
     private $router;
+    private $logger;
 
-    public function __construct(Container $container)
+    public function __construct(Container $container, Logger $logger = null)
     {
         $this->container = $container;
+        $this->logger = $logger ?? new SimpleLogger('simple-parts', [new CliHandler]);
         $this->router = new Router();
 
-        $this->addRoute(['GET'], '/404', [NotFound::class, '__invoke']);
-        $this->addRoute(['GET'], '/405', [MethodNotAllowed::class, '__invoke']);
+        $this->addRoute('GET', '/404', [NotFound::class, '__invoke']);
+        $this->addRoute('GET', '/405', [MethodNotAllowed::class, '__invoke']);
     }
 
     public function addRoute($methods, string $pattern, $handler, $middleware = []): void
@@ -30,8 +32,10 @@ final class Application
 
     public function run(): void
     {
+        $_ = ErrorHandler::create($this->logger);
+
         $this->container[NotFound::class] = new NotFound();
-        $this->container[MethodNotAllowed::class] = MethodNotAllowed::class;
+        $this->container[MethodNotAllowed::class] = new MethodNotAllowed;
 
         $request = Request::fromGlobals();
 
@@ -48,10 +52,10 @@ final class Application
         $handler[0] = $this->container[$handler[0]];
 
         foreach (array_pop($handler) as $middleware) {
-            $request = $middleware($request);
+            $middleware($request);
         }
 
-        $response = $handler($request, $args);
+        $response = $handler($request, /* ... */ $args);
 
         if ($response instanceof Response) {
             $response->send();
@@ -65,7 +69,7 @@ final class NotFound
 {
     public function __invoke($request, $args)
     {
-        return new Response('Page not found', Http::NOT_FOUND);
+        return new Response("Page not found\n", Http::NOT_FOUND);
     }
 }
 
@@ -73,6 +77,6 @@ final class MethodNotAllowed
 {
     public function __invoke($request, $args)
     {
-        return new Response('Method not allowed', Http::METHOD_NOT_ALLOWED);
+        return new Response("Method not allowed\n", Http::METHOD_NOT_ALLOWED);
     }
 }

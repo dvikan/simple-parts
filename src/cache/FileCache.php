@@ -6,25 +6,28 @@ namespace dvikan\SimpleParts;
 final class FileCache implements Cache
 {
     private $file;
-    /**
-     * @var Clock
-     */
     private $clock;
+    private $isDirty = false;
     private $cache;
 
     public function __construct(File $file, Clock $clock = null)
     {
         $this->file = $file;
         $this->clock = $clock ?? new SystemClock();
-        $this->cache = [];
 
         if ($file->exists()) {
             $this->cache = Json::decode($file->read() ?: '[]');
+        } else {
+            $this->cache = [];
+            $this->write();
         }
     }
 
     public function set(string $key, $value = true, int $ttl = 0): void
     {
+        $this->isDirty = true;
+
+        //  can possibly test if value can be json encoded
         $this->cache[$key] = [
             'value'             => $value,
             'ttl'               => $ttl,
@@ -52,17 +55,25 @@ final class FileCache implements Cache
 
     public function delete(string $key): void
     {
+        $this->isDirty = true;
         unset($this->cache[$key]);
     }
 
     public function clear(): void
     {
+        $this->isDirty = true;
         $this->cache = [];
     }
 
     public function __destruct()
     {
-        // perhaps write to fs more frequently
+        if ($this->isDirty) {
+            $this->write();
+        }
+    }
+
+    private function write(): void
+    {
         $this->file->write(Json::encode($this->cache, JSON_PRETTY_PRINT));
     }
 }

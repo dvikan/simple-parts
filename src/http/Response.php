@@ -101,8 +101,10 @@ final class Response
 
         http_response_code($response->code());
 
-        foreach ($response->headers() as $key => $value) {
-            header(sprintf('%s: %s', $key, $value));
+        if (!headers_sent()) {
+            foreach ($response->headers() as $key => $value) {
+                header(sprintf('%s: %s', $key, $value));
+            }
         }
         print $response->body();
     }

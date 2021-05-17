@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
@@ -17,7 +18,7 @@ final class Request
 
     public static function fromGlobals(): Request
     {
-        return new Request($_GET, $_POST, $_SERVER);
+        return new self($_GET, $_POST, $_SERVER);
     }
 
     public function isGet(): bool
@@ -39,19 +40,15 @@ final class Request
     {
         $uri = $this->server['REQUEST_URI'];
 
-        if (false !== $pos = strpos($uri, '?')) {
+        if (($pos = strpos($uri, '?')) !== false) {
             $uri = substr($uri, 0, $pos);
         }
 
-        $uri = rawurldecode($uri);
-
-        return $uri;
+        return rawurldecode($uri);
     }
 
     public function get(string $key, string $default = null): ?string
     {
-        // todo: consider adding paramater for array value
-        // todo: consider trimming here
         return $this->get[$key] ?? $default;
     }
 

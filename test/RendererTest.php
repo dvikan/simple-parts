@@ -22,26 +22,9 @@ final class RendererTest extends TestCase
 
     function test()
     {
-        $this->file->write('hello <?= $user ?>');
+        $this->file->write('foo <?= $bar ?>');
 
-        $this->assertSame('hello root', $this->sut->render($this->file->name(), ['user' => 'root']));
-    }
-
-    function test_escape_html()
-    {
-        $this->file->write(<<<'TEMPLATE'
-<?php namespace dvikan\SimpleParts; ?>
-hello <?= e($user) ?>
-TEMPLATE
-);
-
-        $this->assertSame('hello &lt;', $this->sut->render($this->file->name(), ['user' => '<']));
-    }
-
-    function test_illegal_file_path_1()
-    {
-        $this->expectException(SimpleException::class);
-        $this->sut->render('/');
+        $this->assertSame('foo bar', $this->sut->render($this->file->name(), ['bar' => 'bar']));
     }
 
     public function __destruct()

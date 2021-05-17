@@ -18,13 +18,16 @@ final class TestRunner
         $this->console = new Console();
     }
 
-    public function run(string $testFolder = './test')
+    public function run(int $argc, array $argv)
     {
-        foreach (glob($testFolder . '/*.php') as $filePath) {
+        $testFolder = $argv[1] ?? './test/';
+
+        foreach (glob($testFolder . '*.php') as $filePath) {
+            $this->console->println($filePath);
             $this->test($filePath);
         }
 
-        $this->console->greenln('%s tests and %s assertions', $this->tests, $this->assertions);
+        $this->console->greenln('%s test classes and %s test methods', $this->tests, $this->assertions);
     }
 
     private function test(string $filePath): void
@@ -66,12 +69,16 @@ final class TestRunner
             $test->$method();
 
             if ($test->expectException) {
-                $this->failException(get_class($test), $method, $test->expectException);
+                $this->failException(get_class($test), $method, $test->expectException, null);
+                $this->console->exit(1);
             }
-        } catch (AssertionFailure $e) {
+        }
+        catch (AssertionFailure $e) {
             $this->failAssertion($e);
-        } catch (Throwable $e) {
-            if (get_class($e) !== $test->expectException) {
+        }
+        catch (Throwable $e) {
+            if (! ($e instanceof $test->expectException)) {
+                $this->failException(get_class($test), $method, $test->expectException, get_class($e));
                 throw $e;
             }
         }
@@ -95,7 +102,7 @@ final class TestRunner
         $this->console->exit(1);
     }
 
-    private function failException(string $class, string $method, string $expected = null)
+    private function failException(string $class, string $method, string $expected = null, string $actual = null)
     {
         $this->console->println('%s::%s()', $class, $method);
 
@@ -103,7 +110,9 @@ final class TestRunner
             $this->console->println('Expected: %s', $this->getValueAsString($expected));
         }
 
-        $this->console->exit(1);
+        if ($actual) {
+            $this->console->println('Actual: %s', $this->getValueAsString($actual));
+        }
     }
 
     private function getValueAsString($value): string

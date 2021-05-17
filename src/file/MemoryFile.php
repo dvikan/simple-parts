@@ -5,7 +5,13 @@ namespace dvikan\SimpleParts;
 
 final class MemoryFile implements File
 {
+    private $filePath;
     private $data = '';
+
+    public function __construct(string $filePath)
+    {
+        $this->filePath = $filePath;
+    }
 
     public function exists(): bool
     {
@@ -29,6 +35,11 @@ final class MemoryFile implements File
 
     public function name(): string
     {
-        return ':memory:';
+        return $this->filePath;
+    }
+
+    public function delete(): void
+    {
+        $this->data = '';
     }
 }

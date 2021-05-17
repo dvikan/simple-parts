@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
@@ -14,7 +15,7 @@ final class Config implements \ArrayAccess
     public static function fromArray(array $defaultConfig, array $customConfig = []): self
     {
         foreach (array_keys($customConfig) as $key) {
-            if (! array_key_exists($key, $defaultConfig)) {
+            if (! isset($defaultConfig[$key])) {
                 throw new SimpleException(sprintf('Illegal config key: "%s"', $key));
             }
         }
@@ -29,14 +30,14 @@ final class Config implements \ArrayAccess
         return self::fromArray($this->config, $config);
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($key)
     {
-        return array_key_exists($offset, $this->config);
+        return isset($this->config[$key]);
     }
 
     public function offsetGet($key)
     {
-        if (array_key_exists($key, $this->config)) {
+        if (isset($this->config[$key])) {
             return $this->config[$key];
         }
 
@@ -45,7 +46,6 @@ final class Config implements \ArrayAccess
 
     public function offsetSet($key, $value)
     {
-        // possibly return a modified clone
         throw new SimpleException('Not implemented');
     }
 

@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
-final class CacheTest extends TestCase
+final class FileCacheTest extends TestCase
 {
     private $sut;
 
     public function __construct()
     {
-        $this->sut = new FileCache(new MemoryFile());
+        $this->sut = new FileCache(new MemoryFile('./foo'));
     }
 
     public function test()
@@ -48,10 +48,16 @@ final class CacheTest extends TestCase
         $this->assertSame(null, $this->sut->get('foo2'));
     }
 
+    public function test_null()
+    {
+        $this->sut->set('foo', null);
+        $this->assertSame(null, $this->sut->get('foo'));
+    }
+
     public function test_expire()
     {
         $clock = new FrozenClock(new \DateTimeImmutable());
-        $sut = new FileCache(new MemoryFile(), $clock);
+        $sut = new FileCache(new MemoryFile('./foo'), $clock);
         $sut->set('foo', 'bar', 10);
 
         $clock->advance(new \DateInterval('PT11S'));

@@ -5,11 +5,13 @@ namespace dvikan\SimpleParts;
 
 final class MemoryCache implements Cache
 {
-    private $cache;
+    private $cache = [];
+    private $clock;
 
-    public function __construct()
+    public function __construct(Clock $clock = null)
     {
         $this->cache = [];
+        $this->clock = $clock ?? new SystemClock();
     }
 
     public function set(string $key, $value = true, int $ttl = 0): void
@@ -17,7 +19,7 @@ final class MemoryCache implements Cache
         $this->cache[$key] = [
             'value'             => $value,
             'ttl'               => $ttl,
-            'created_at'        => (new \DateTimeImmutable())->getTimestamp(),
+            'created_at'        => $this->clock->now()->getTimestamp(),
         ];
     }
 
@@ -31,7 +33,7 @@ final class MemoryCache implements Cache
             return $this->cache[$key]['value'];
         }
 
-        if ($this->cache[$key]['created_at'] + $this->cache[$key]['ttl'] < (new \DateTimeImmutable())->getTimestamp()) {
+        if ($this->cache[$key]['created_at'] + $this->cache[$key]['ttl'] < $this->clock->now()->getTimestamp()) {
             unset($this->cache[$key]);
             return $default;
         }

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
+use SebastianBergmann\CodeCoverage\Report\Text;
+
 final class Migrator
 {
     private $pdo;
@@ -44,14 +46,15 @@ final class Migrator
         $cache = new FileCache(new TextFile($this->cacheFolder . '/migrations.json'));
 
         foreach ($migrations as $migration) {
+            $file = new TextFile($migration);
+
             $fileName = basename($migration);
 
             if ($cache->get($fileName, false)) {
                 continue;
             }
 
-            // todo: textfile
-            $sql = file_get_contents($migration);
+            $sql = $file->read();
 
             if ($this->pdo->exec($sql) === false) {
                 throw new SimpleException(sprintf('%s: %s', $fileName, $this->pdo->errorInfo()[2]));
