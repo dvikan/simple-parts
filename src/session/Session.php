@@ -7,6 +7,10 @@ final class Session
 {
     public function __construct()
     {
+        if (headers_sent()) {
+            throw new SimpleException('Headers are already sent');
+        }
+        
         session_start();
     }
 

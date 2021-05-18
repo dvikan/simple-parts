@@ -44,9 +44,14 @@ final class Request
             $uri = substr($uri, 0, $pos);
         }
 
-        return rawurldecode($uri);
+        return ($uri);
     }
 
+    public function ip(): string
+    {
+        return $this->server['REMOTE_ADDR'];
+    }
+    
     public function get(string $key, string $default = null): ?string
     {
         return $this->get[$key] ?? $default;

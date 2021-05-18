@@ -20,12 +20,14 @@ final class FileHandler implements Handler
             $json = sprintf('Unable to json encode context: "%s"', $e->getMessage());
         }
 
+        $cleanMessage = str_replace(["\n", "\r"], "\\n", $record['message']);
+        
         $result = sprintf(
             "[%s] %s.%s %s %s",
             $record['created_at']->format('Y-m-d H:i:s'),
             $record['name'],
             $record['level_name'],
-            $record['message'],
+            $cleanMessage,
             $json
         );
 

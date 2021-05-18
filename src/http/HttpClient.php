@@ -102,7 +102,7 @@ final class HttpClient
             return $response;
         }
 
-        throw new SimpleException($response->statusLine(), $response->code());
+        throw new SimpleException($url . ' ' . $response->statusLine(), $response->code());
     }
 
     public function __destruct()

@@ -6,14 +6,16 @@ namespace dvikan\SimpleParts;
 final class Application
 {
     private $container;
-    private $router;
     private $logger;
+    private $router;
+    private $middlewares;
 
     public function __construct(Container $container, Logger $logger = null)
     {
         $this->container = $container;
         $this->logger = $logger ?? new SimpleLogger('simple-parts', [new CliHandler]);
         $this->router = new Router();
+        $this->middlewares = [];
 
         $this->addRoute('GET', '/404', [NotFound::class, '__invoke']);
         $this->addRoute('GET', '/405', [MethodNotAllowed::class, '__invoke']);
@@ -30,6 +32,11 @@ final class Application
         $this->router->addRoute((array) $methods, $pattern, $handler);
     }
 
+    public function add($middleware): void
+    {
+        $this->middlewares[] = $middleware;
+    }
+
     public function run(): void
     {
         $_ = ErrorHandler::create($this->logger);
@@ -39,7 +46,7 @@ final class Application
 
         $request = Request::fromGlobals();
 
-        [$result, $handler, $args] = $this->router->dispatch($request->method(), $request->uri());
+        [$result, $handler, $args] = $this->router->dispatch($request->method(), rawurldecode($request->uri()));
 
         if ($result === Router::NOT_FOUND) {
             [$_, $handler, $_] = $this->router->dispatch('GET', '/404');
@@ -51,6 +58,12 @@ final class Application
 
         $handler[0] = $this->container[$handler[0]];
 
+        // Application middlewares
+        foreach ($this->middlewares as $middleware) {
+            $middleware($request);
+        }
+        
+        // Route middlewares
         foreach (array_pop($handler) as $middleware) {
             $middleware($request);
         }

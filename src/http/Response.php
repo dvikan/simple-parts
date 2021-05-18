@@ -72,7 +72,7 @@ final class Response
         $response = clone $this;
         return $response
             ->withHeader(Http::CONTENT_TYPE, 'application/json')
-            ->withBody(Json::encode($data));
+            ->withBody(Json::encode($data, JSON_PRETTY_PRINT));
     }
 
     public function ok(): bool
@@ -95,17 +95,20 @@ final class Response
 
     public function send(): void
     {
-        $response = $this;
+        $response = clone $this;
 
         $response = $response->withHeader('content-length', (string) \strlen($this->body));
+        
+        if (headers_sent()) {
+            throw new SimpleException('Headers already sent');
+        }
 
         http_response_code($response->code());
-
-        if (!headers_sent()) {
-            foreach ($response->headers() as $key => $value) {
-                header(sprintf('%s: %s', $key, $value));
-            }
+        
+        foreach ($response->headers() as $key => $value) {
+            header(sprintf('%s: %s', $key, $value));
         }
+        
         print $response->body();
     }
 }

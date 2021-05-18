@@ -12,10 +12,9 @@ final class TextFile implements File
     {
         $this->filePath = $filePath;
 
-        try {
-            clearstatcache();
+        if (file_exists($filePath)) {
             $this->stat = stat($filePath);
-        } catch (\ErrorException $e) {
+        } else {
             $this->stat = [];
         }
     }
@@ -27,6 +26,8 @@ final class TextFile implements File
 
     public function exists(): bool
     {
+        clearstatcache();
+
         return file_exists($this->filePath);
     }
 
@@ -51,26 +52,18 @@ final class TextFile implements File
 
     protected function _write(string $data, int $flags): void
     {
-        try {
-            clearstatcache();
-            $stat = stat($this->filePath);
-        } catch (\ErrorException $e) {
-            $stat = [];
-        }
-
         if ($this->exists()) {
+            $stat = stat($this->filePath);
+
             if ($this->stat['mtime'] !== $stat['mtime']) {
                 throw new SimpleException(sprintf('The file was modified during runtime: "%s"', $this->filePath));
             }
         }
-
-        try {
-            $a = file_put_contents($this->filePath, $data, $flags);
-        } catch(\ErrorException $e) {
-            throw new SimpleException($e->getMessage());
-        }
+        
+        file_put_contents($this->filePath, $data, $flags);
 
         clearstatcache();
+
         $this->stat = stat($this->filePath);
     }
 
