@@ -18,10 +18,17 @@ final class Renderer
 
     public function render(string $_filePath, array $_context = []): string
     {
-        extract(array_merge($this->config['context'], $_context));
-        ob_start();
-        require $this->resolve($_filePath);
-        return ob_get_clean();
+        try {
+            extract(array_merge($this->config['context'], $_context));
+            ob_start();
+            require $this->resolve($_filePath);
+            return ob_get_clean();
+        } catch(\Throwable $t) {
+            if (ob_get_length() > 0) {
+                ob_end_clean();
+            }
+            throw $t;
+        }
     }
 
     private function resolve(string $filePath): string
