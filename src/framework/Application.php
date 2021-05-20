@@ -6,23 +6,31 @@ namespace dvikan\SimpleParts;
 final class Application
 {
     private $container;
-    private $logger;
     private $router;
     private $middlewares;
 
     public function __construct(Container $container, Logger $logger = null)
     {
         $this->container = $container;
-        $this->logger = $logger ?? new SimpleLogger('simple-parts', [new CliHandler]);
         $this->router = new Router();
         $this->middlewares = [];
 
         $this->addRoute('GET', '/404', [NotFound::class, '__invoke']);
         $this->addRoute('GET', '/405', [MethodNotAllowed::class, '__invoke']);
+
+        $this->container[NotFound::class] = new NotFound;
+        $this->container[MethodNotAllowed::class] = new MethodNotAllowed;
+
+        $logger = $logger ?? new SimpleLogger('simple-parts', [new CliHandler]);
+        ErrorHandler::create($logger);
     }
 
     public function addRoute($methods, string $pattern, $handler, $middleware = []): void
     {
+        if ($handler instanceof \Closure) {
+            $handler = [$handler, '__invoke'];
+        }
+
         if (! is_array($middleware)) {
             $middleware = [$middleware];
         }
@@ -39,11 +47,6 @@ final class Application
 
     public function run(): void
     {
-        $_ = ErrorHandler::create($this->logger);
-
-        $this->container[NotFound::class] = new NotFound();
-        $this->container[MethodNotAllowed::class] = new MethodNotAllowed;
-
         $request = Request::fromGlobals();
 
         [$result, $handler, $args] = $this->router->dispatch($request->method(), rawurldecode($request->uri()));
@@ -56,8 +59,6 @@ final class Application
             [$_, $handler, $_] = $this->router->dispatch('GET', '/405');
         }
 
-        $handler[0] = $this->container[$handler[0]];
-
         // Application middlewares
         foreach ($this->middlewares as $middleware) {
             $middleware($request);
@@ -68,7 +69,11 @@ final class Application
             $middleware($request);
         }
 
-        $response = $handler($request, /* ... */ $args);
+        if (! $handler[0] instanceof \Closure) {
+            $handler[0] = $this->container[$handler[0]];
+        }
+
+        $response = $handler($request, $args);
 
         if ($response instanceof Response) {
             $response->send();

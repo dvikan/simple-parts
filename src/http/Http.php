@@ -15,6 +15,7 @@ interface Http
     public const UNAUTHORIZED           = 401;
     public const NOT_FOUND              = 404;
     public const METHOD_NOT_ALLOWED     = 405;
+    public const TOO_MANY_REQUESTS      = 429;
     public const INTERNAL_SERVER_ERROR  = 500;
 
     public const STATUS_LINES = [
@@ -28,6 +29,7 @@ interface Http
         self::UNAUTHORIZED          => '401 Unauthorized',
         self::NOT_FOUND             => '404 Not Found',
         self::METHOD_NOT_ALLOWED    => '405 Method Not Allowed',
+        self::TOO_MANY_REQUESTS     => '429 Too Many Requests',
         self::INTERNAL_SERVER_ERROR => '500 Internal Server Error',
     ];
 

@@ -14,7 +14,7 @@ final class CliHandler implements Handler
             $json = sprintf('Unable to json encode context: "%s"', $e->getMessage());
         }
 
-        if (PHP_SAPI === 'cli-server') {
+        if (PHP_SAPI === 'cli-server' || PHP_SAPI === 'fpm-fcgi') {
             // todo: see how monolog does this
             if (ob_get_length() > 0) {
                 ob_end_clean();
@@ -27,7 +27,7 @@ final class CliHandler implements Handler
         // todo: escape for browser and/or escape for cli
         print ("$result\n");
 
-        if (PHP_SAPI === 'cli-server') {
+        if (PHP_SAPI === 'cli-server' || PHP_SAPI === 'fpm-fcgi') {
             print '</pre>';
         }
     }

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
-final class Config implements \ArrayAccess
+final class Config implements \ArrayAccess, \JsonSerializable
 {
     private $config;
 
@@ -15,7 +15,7 @@ final class Config implements \ArrayAccess
     public static function fromArray(array $defaultConfig, array $customConfig = []): self
     {
         foreach (array_keys($customConfig) as $key) {
-            if (! isset($defaultConfig[$key])) {
+            if (! array_key_exists($key, $defaultConfig)) {
                 throw new SimpleException(sprintf('Illegal config key: "%s"', $key));
             }
         }
@@ -32,25 +32,34 @@ final class Config implements \ArrayAccess
 
     public function offsetExists($key)
     {
-        return isset($this->config[$key]);
+        return array_key_exists($key, $this->config);
     }
 
     public function offsetGet($key)
     {
-        if (isset($this->config[$key])) {
+        if (array_key_exists($key, $this->config)) {
             return $this->config[$key];
         }
 
-        throw new SimpleException(sprintf('Unknown config key: "%s"', $key));
+        throw new SimpleException(sprintf('Illegal config key: "%s"', $key));
     }
 
     public function offsetSet($key, $value)
     {
-        throw new SimpleException('Not implemented');
+        if (!array_key_exists($key, $this->config)) {
+            throw new SimpleException(sprintf('Illegal config key: "%s"', $key));
+        }
+        $this->config[$key] = $value;
     }
 
     public function offsetUnset($offset)
     {
         throw new SimpleException('Not implemented');
     }
+
+    public function jsonSerialize()
+    {
+        return $this->config;
+    }
+
 }

@@ -14,6 +14,7 @@ final class Request
         $this->get = $get;
         $this->post = $post;
         $this->server = $server;
+        $this->attributes = [];
     }
 
     public static function fromGlobals(): Request
@@ -44,12 +45,26 @@ final class Request
             $uri = substr($uri, 0, $pos);
         }
 
-        return ($uri);
+        return $uri;
     }
 
     public function ip(): string
     {
         return $this->server['REMOTE_ADDR'];
+    }
+    
+    public function setAttribute(string $key, $value): void
+    {
+        $this->attributes[$key] = $value;
+    }
+    
+    public function getAttribute(string $key)
+    {
+        if (! isset($this->attributes[$key])) {
+            throw new \Exception(sprintf('Unknown request attribute: "%s"', $key));
+        }
+
+        return $this->attributes[$key];
     }
     
     public function get(string $key, string $default = null): ?string
