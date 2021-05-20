@@ -19,21 +19,21 @@ final class Renderer
     public function render(string $_filePath, array $_context = []): string
     {
         try {
-            extract(array_merge($this->config['context'], $_context));
             ob_start();
+            extract(array_merge($this->config['context'], $_context));
             require $this->resolve($_filePath);
-            return ob_get_clean();
+            $output = ob_get_clean();
         } catch(\Throwable $t) {
-            if (ob_get_length() > 0) {
-                ob_end_clean();
-            }
+            ob_end_clean();
             throw $t;
         }
+
+        return $output;
     }
 
     private function resolve(string $filePath): string
     {
-        static $badPaths = [
+        static $badFilePaths = [
             '',
             '.',
             './',
@@ -43,7 +43,7 @@ final class Renderer
             '/'
         ];
 
-        if (in_array($filePath, $badPaths)) {
+        if (in_array($filePath, $badFilePaths)) {
             throw new SimpleException(sprintf('Illegal template filepath: "%s"', $filePath));
         }
 

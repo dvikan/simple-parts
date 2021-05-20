@@ -16,16 +16,17 @@ final class CliHandler implements Handler
 
         if (PHP_SAPI === 'cli-server' || PHP_SAPI === 'fpm-fcgi') {
             // todo: see how monolog does this
+            http_response_code(500);
             if (ob_get_length() > 0) {
                 ob_end_clean();
             }
-            print '<pre style="font-size: 16px">';
+            print '!<pre>';
         }
 
         $result = sprintf('%s.%s %s %s', $record['name'], $record['level_name'], $record['message'], $json);
 
         // todo: escape for browser and/or escape for cli
-        print ("$result\n");
+        print "$result\n";
 
         if (PHP_SAPI === 'cli-server' || PHP_SAPI === 'fpm-fcgi') {
             print '</pre>';
