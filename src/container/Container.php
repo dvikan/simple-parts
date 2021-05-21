@@ -32,7 +32,7 @@ final class Container implements \ArrayAccess
         return $this->resolved[$key];
     }
 
-    public function offsetExists($key): bool
+    public function offsetExists($key)
     {
         throw new SimpleException('Not implemented');
     }

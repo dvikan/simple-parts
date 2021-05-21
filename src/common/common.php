@@ -31,6 +31,9 @@ function sanitize(string $s): string
     return filter_var($s, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
 }
 
+/**
+ * Truncate string
+ */
 function truncate(string $s, int $length = 400, $marker = '...'): string
 {
     $s = trim($s);

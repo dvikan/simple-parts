@@ -5,15 +5,6 @@ namespace dvikan\SimpleParts;
 
 final class Session
 {
-    public function __construct()
-    {
-        if (headers_sent()) {
-            throw new SimpleException('Headers are already sent');
-        }
-        
-        session_start();
-    }
-
     public function set(string $key, $value = true): void
     {
         $_SESSION[$key] = $value;
@@ -27,6 +18,11 @@ final class Session
     public function delete(string $key): void
     {
         unset($_SESSION[$key]);
+    }
+
+    public function start(): void
+    {
+        session_start();
     }
 
     public function destroy()

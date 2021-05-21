@@ -5,7 +5,7 @@ namespace dvikan\SimpleParts;
 
 abstract class TestCase
 {
-    public $expectException = '';
+    public $expectedException = '';
 
     protected function assert(bool $condition)
     {
@@ -30,6 +30,6 @@ abstract class TestCase
 
     protected function expectException(string $class = \Throwable::class)
     {
-        $this->expectException = $class;
+        $this->expectedException = $class;
     }
 }

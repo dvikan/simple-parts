@@ -1,12 +1,12 @@
 <?php
-declare(strict_types=1,ticks=1);
+declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
 final class TextFileTest extends TestCase
 {
-    private $sut;
     private $filePath;
+    private $sut;
 
     public function __construct()
     {
@@ -78,14 +78,7 @@ final class TextFileTest extends TestCase
 
         $file1->write('');
     }
-
-    function test_foo()
-    {
-        $file = new TextFile('/tmp/keka');
-
-        //$file->write('a');
-    }
-
+    
     public function __destruct()
     {
         unlink($this->filePath);

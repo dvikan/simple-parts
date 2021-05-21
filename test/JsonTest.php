@@ -7,20 +7,6 @@ final class JsonTest extends TestCase
 {
     public function test()
     {
-        $this->assertSame(
-            '{"f":"b"}',
-            Json::encode(['f' => 'b'])
-        );
-
-        $json = <<<JSON
-{
-    "f": "b"
-}
-JSON;
-
-        $this->assertSame(
-            $json,
-            Json::encode(['f' => 'b'], JSON_PRETTY_PRINT)
-        );
+        $this->assertSame('{"foo":"bar"}', Json::encode(['foo' => 'bar']));
     }
 }

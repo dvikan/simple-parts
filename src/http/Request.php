@@ -8,16 +8,20 @@ final class Request
     private $get;
     private $post;
     private $server;
+    private $attributes;
 
-    public function __construct(array $get = [], array $post = [], array $server = [])
-    {
+    public function __construct(
+        array $get = [],
+        array $post = [],
+        array $server = []
+    ) {
         $this->get = $get;
         $this->post = $post;
         $this->server = $server;
         $this->attributes = [];
     }
 
-    public static function fromGlobals(): Request
+    public static function fromGlobals(): self
     {
         return new self($_GET, $_POST, $_SERVER);
     }
@@ -34,12 +38,12 @@ final class Request
 
     public function method(): string
     {
-        return $this->server['REQUEST_METHOD'];
+        return $this->server('REQUEST_METHOD');
     }
 
     public function uri(): string
     {
-        $uri = $this->server['REQUEST_URI'];
+        $uri = $this->server('REQUEST_URI');
 
         if (($pos = strpos($uri, '?')) !== false) {
             $uri = substr($uri, 0, $pos);
@@ -50,7 +54,7 @@ final class Request
 
     public function ip(): string
     {
-        return $this->server['REMOTE_ADDR'];
+        return $this->server('REMOTE_ADDR');
     }
     
     public function setAttribute(string $key, $value): void
@@ -71,6 +75,11 @@ final class Request
     public function post(string $key, string $default = null): ?string
     {
         return $this->post[$key] ?? $default;
+    }
+
+    public function server(string $key, string $default = null): ?string
+    {
+        return $this->server[$key] ?? $default;
     }
 
     public function postArray(string $key, array $default = null): ?array

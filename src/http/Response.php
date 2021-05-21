@@ -9,10 +9,10 @@ final class Response
     private $code;
     private $headers;
 
-    public function __construct(string $body = '', int $code = null, array $headers = [])
+    public function __construct(string $body = '', int $code = Http::OK, array $headers = [])
     {
         $this->body = $body;
-        $this->code = $code ?? Http::OK;
+        $this->code = $code;
         $this->headers = $headers; // todo: canonicalize
     }
 
@@ -71,7 +71,7 @@ final class Response
     {
         $response = clone $this;
         return $response
-            ->withHeader(Http::CONTENT_TYPE, 'application/json')
+            ->withHeader(Http::CONTENT_TYPE, Http::APPLICATION_JSON)
             ->withBody(Json::encode($data, JSON_PRETTY_PRINT));
     }
 
@@ -97,7 +97,7 @@ final class Response
     {
         $response = clone $this;
 
-        $response = $response->withHeader('content-length', (string) \strlen($this->body));
+        $response = $response->withHeader(Http::CONTENT_LENGTH, (string) \strlen($this->body));
         
         if (headers_sent()) {
             throw new SimpleException('Headers already sent');

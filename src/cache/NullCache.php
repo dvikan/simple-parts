@@ -10,7 +10,7 @@ final class NullCache implements Cache
         // noop
     }
 
-    public function get(string $key, $default = null)
+    public function get(string $_, $default = null)
     {
         return $default;
     }

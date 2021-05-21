@@ -21,7 +21,7 @@ final class Renderer
         try {
             ob_start();
             extract(array_merge($this->config['context'], $_context));
-            require $this->resolve($_filePath);
+            require $this->resolveFilePath($_filePath);
             $output = ob_get_clean();
         } catch(\Throwable $t) {
             ob_end_clean();
@@ -31,7 +31,7 @@ final class Renderer
         return $output;
     }
 
-    private function resolve(string $filePath): string
+    private function resolveFilePath(string $filePath): string
     {
         static $badFilePaths = [
             '',

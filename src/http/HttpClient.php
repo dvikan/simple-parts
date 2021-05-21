@@ -5,8 +5,6 @@ namespace dvikan\SimpleParts;
 
 final class HttpClient
 {
-    private $config;
-
     private const CONFIG = [
         'useragent'         => 'HttpClient',
         'connect_timeout'   => 10,
@@ -15,16 +13,16 @@ final class HttpClient
         'max_redirs'        => 5,
         'auth_bearer'       => null,
         'client_id'         => null,
-        'headers' => [],
-        'body' => null,
+        'headers'           => [],
+        'body'              => null,
     ];
 
+    private $config;
     private $ch;
 
     public function __construct(array $config = [])
     {
         $this->config = Config::fromArray(self::CONFIG, $config);
-
         $this->ch = curl_init();
     }
 
@@ -38,36 +36,37 @@ final class HttpClient
         return $this->request('POST', $url, $config);
     }
 
-    public function request(string $method, string $url, array $requestConfig): Response
+    public function request(string $method, string $url, array $config): Response
     {
-        $config = $this->config->merge($requestConfig);
+        $config = $this->config->merge($config);
 
         curl_reset($this->ch);
+
         curl_setopt($this->ch, CURLOPT_URL, $url);
         curl_setopt($this->ch, CURLOPT_HEADER, false);
         curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->ch, CURLOPT_USERAGENT, $config['useragent']);
-        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, $config['connect_timeout']);
-        curl_setopt($this->ch, CURLOPT_TIMEOUT, $config['timeout']);
-        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, $config['follow_location']);
-        curl_setopt($this->ch, CURLOPT_MAXREDIRS, $config['max_redirs']);
+        curl_setopt($this->ch, CURLOPT_USERAGENT,               $config['useragent']);
+        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT,          $config['connect_timeout']);
+        curl_setopt($this->ch, CURLOPT_TIMEOUT,                 $config['timeout']);
+        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION,          $config['follow_location']);
+        curl_setopt($this->ch, CURLOPT_MAXREDIRS,               $config['max_redirs']);
 
         if ($method === 'POST') {
             curl_setopt($this->ch, CURLOPT_POSTFIELDS, $config['body']);
         }
 
         $headers = [];
-        if (($config['auth_bearer'])) {
-            $headers[] = sprintf('Authorization: Bearer %s', $config['auth_bearer']);
+        if ($config['auth_bearer']) {
+            $headers[] = ['Authorization' => sprintf('Bearer %s', $config['auth_bearer'])];
         }
 
-        if (($config['client_id'])) {
-            $headers[] = sprintf('client-id: %s', $config['client_id']);
+        if ($config['client_id']) {
+            $headers[] = ['client-id' => $config['client_id']];
         }
 
         $requestHeaders = [];
-        foreach (array_merge($config['headers'], $headers) as $key => $val) {
-            $requestHeaders[] = "$key: $val";
+        foreach (array_merge($config['headers'], $headers) as $key => $value) {
+            $requestHeaders[] = "$key: $value";
         }
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $requestHeaders);
 
@@ -104,7 +103,7 @@ final class HttpClient
             return $response;
         }
 
-        throw new SimpleException($url . ' ' . $response->statusLine(), $response->code());
+        throw new SimpleException(sprintf("%s %s", $response->statusLine(), $url), $response->code());
     }
 
     public function __destruct()

@@ -18,4 +18,11 @@ final class ConfigTest extends TestCase
 
         $this->assertSame('prod', $sut['env']);
     }
+
+    public function test_cexception()
+    {
+        $this->expectException();
+
+        Config::fromArray([], ['env' => 'prod']);
+    }
 }

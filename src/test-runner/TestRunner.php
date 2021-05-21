@@ -9,8 +9,8 @@ use Throwable;
 
 final class TestRunner
 {
+    private $classes = 0;
     private $tests = 0;
-    private $assertions = 0;
     private $console;
 
     public function __construct()
@@ -27,12 +27,12 @@ final class TestRunner
             $this->test($filePath);
         }
 
-        $this->console->greenln('%s test classes and %s test methods', $this->tests, $this->assertions);
+        $this->console->greenln('%s classes and %s tests', $this->classes, $this->tests);
     }
 
     private function test(string $filePath): void
     {
-        $this->tests++;
+        $this->classes++;
 
         $code = file_get_contents(realpath($filePath));
         preg_match('/^namespace ([a-zA-Z\\\]+);$/m', $code, $matches);
@@ -55,7 +55,7 @@ final class TestRunner
                 continue;
             }
 
-            $this->assertions++;
+            $this->tests++;
 
             $test = new $fullyQualifiedClassName;
 
@@ -68,8 +68,8 @@ final class TestRunner
         try {
             $test->$method();
 
-            if ($test->expectException) {
-                $this->failException(get_class($test), $method, $test->expectException, null);
+            if ($test->expectedException) {
+                $this->failException(get_class($test), $method, $test->expectedException, null);
                 $this->console->exit(1);
             }
         }
@@ -77,8 +77,8 @@ final class TestRunner
             $this->failAssertion($e);
         }
         catch (Throwable $e) {
-            if (! ($e instanceof $test->expectException)) {
-                $this->failException(get_class($test), $method, $test->expectException, get_class($e));
+            if (! ($e instanceof $test->expectedException)) {
+                $this->failException(get_class($test), $method, $test->expectedException, get_class($e));
                 throw $e;
             }
         }

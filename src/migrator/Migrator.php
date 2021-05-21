@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
-use SebastianBergmann\CodeCoverage\Report\Text;
-
 final class Migrator
 {
     private $pdo;

@@ -14,7 +14,7 @@ final class FrozenClock implements Clock
 
     public function now(): \DateTimeImmutable
     {
-        return clone $this->now;
+        return $this->now;
     }
 
     public function advance(\DateInterval $interval): void

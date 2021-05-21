@@ -37,11 +37,11 @@ final class Config implements \ArrayAccess, \JsonSerializable
 
     public function offsetGet($key)
     {
-        if (array_key_exists($key, $this->config)) {
-            return $this->config[$key];
+        if (!array_key_exists($key, $this->config)) {
+            throw new SimpleException(sprintf('Illegal config key: "%s"', $key));
         }
 
-        throw new SimpleException(sprintf('Illegal config key: "%s"', $key));
+        return $this->config[$key];
     }
 
     public function offsetSet($key, $value)
@@ -49,6 +49,7 @@ final class Config implements \ArrayAccess, \JsonSerializable
         if (!array_key_exists($key, $this->config)) {
             throw new SimpleException(sprintf('Illegal config key: "%s"', $key));
         }
+
         $this->config[$key] = $value;
     }
 

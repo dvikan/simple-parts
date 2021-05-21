@@ -5,13 +5,7 @@ namespace dvikan\SimpleParts;
 
 final class RendererTest extends TestCase
 {
-    /**
-     * @var TextFile
-     */
     private $file;
-    /**
-     * @var Renderer
-     */
     private $sut;
 
     public function __construct()

@@ -5,13 +5,13 @@ namespace dvikan\SimpleParts;
 
 final class MemoryCache implements Cache
 {
-    private $cache = [];
     private $clock;
+    private $cache;
 
     public function __construct(Clock $clock = null)
     {
-        $this->cache = [];
         $this->clock = $clock ?? new SystemClock();
+        $this->cache = [];
     }
 
     public function set(string $key, $value = true, int $ttl = 0): void

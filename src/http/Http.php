@@ -39,4 +39,10 @@ interface Http
 
     public const CONTENT_TYPE       = 'content-type';
     public const LOCATION           = 'location';
+
+    // content types
+    public const APPLICATION_JSON = 'application/json';
+
+    // response headers
+    public const CONTENT_LENGTH = 'content-length';
 }

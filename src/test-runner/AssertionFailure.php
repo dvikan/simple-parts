@@ -13,8 +13,8 @@ final class AssertionFailure extends \Exception
     {
         parent::__construct();
 
-        $this->stackFrame = $stackFrame;
         $this->expected = $expected;
         $this->actual = $actual;
+        $this->stackFrame = $stackFrame;
     }
 }

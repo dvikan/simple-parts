@@ -6,11 +6,12 @@ namespace dvikan\SimpleParts;
 final class MemoryFile implements File
 {
     private $filePath;
-    private $data = '';
+    private $data;
 
     public function __construct(string $filePath)
     {
         $this->filePath = $filePath;
+        $this->data = '';
     }
 
     public function exists(): bool

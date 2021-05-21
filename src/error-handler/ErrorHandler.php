@@ -79,7 +79,7 @@ final class ErrorHandler
         }
 
         $this->logger->log(
-            SimpleLogger::ERROR,
+            Logger::ERROR,
             sprintf(
                 'Uncaught Exception %s: %s at %s line %s',
                 get_class($e), // Could possibly generate a new error
@@ -104,7 +104,7 @@ final class ErrorHandler
         $codeString = self::ERROR_MAP[$lastError['type']] ?? 'Unknown PHP error';
 
         $this->logger->log(
-            self::LEVEL_MAP[$lastError['type']] ?? SimpleLogger::ERROR,
+            self::LEVEL_MAP[$lastError['type']] ?? Logger::ERROR,
             sprintf(
                 'Fatal Error %s: %s in %s line %s',
                 $codeString,

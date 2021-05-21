@@ -7,13 +7,14 @@ final class FileCache implements Cache
 {
     private $file;
     private $clock;
-    private $isDirty = false;
+    private $isDirty;
     private $cache;
 
     public function __construct(File $file, Clock $clock = null)
     {
         $this->file = $file;
         $this->clock = $clock ?? new SystemClock();
+        $this->isDirty = false;
 
         if ($file->exists()) {
             $this->cache = Json::decode($file->read() ?: '[]');
@@ -25,14 +26,13 @@ final class FileCache implements Cache
 
     public function set(string $key, $value = true, int $ttl = 0): void
     {
-        $this->isDirty = true;
-
-        //  can possibly test if value can be json encoded
         $this->cache[$key] = [
             'value'             => $value,
             'ttl'               => $ttl,
             'created_at'        => $this->clock->now()->getTimestamp(),
         ];
+
+        $this->isDirty = true;
     }
 
     public function get(string $key, $default = null)
@@ -55,14 +55,14 @@ final class FileCache implements Cache
 
     public function delete(string $key): void
     {
-        $this->isDirty = true;
         unset($this->cache[$key]);
+        $this->isDirty = true;
     }
 
     public function clear(): void
     {
-        $this->isDirty = true;
         $this->cache = [];
+        $this->isDirty = true;
     }
 
     public function __destruct()
