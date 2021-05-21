@@ -31,6 +31,13 @@ final class TextFile implements File
         return file_exists($this->filePath);
     }
 
+    public function modificationTime(): int
+    {
+        clearstatcache();
+        $stat = stat($this->filePath);
+        return $stat['mtime'];
+    }
+
     public function read(): string
     {
         if (! $this->exists()) {

@@ -9,6 +9,8 @@ interface File
 
     public function exists(): bool;
 
+    public function modificationTime(): int;
+
     public function read(): string;
 
     public function write(string $data): void;

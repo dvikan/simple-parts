@@ -14,7 +14,7 @@ final class CliHandler implements Handler
         }
 
         if (PHP_SAPI === 'cli-server' || PHP_SAPI === 'fpm-fcgi') {
-            http_response_code(500);
+            //http_response_code(500);
             if (ob_get_length() > 0) {
                 ob_end_clean();
             }

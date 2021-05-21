@@ -100,15 +100,15 @@ final class Response
         $response = $response->withHeader(Http::CONTENT_LENGTH, (string) \strlen($this->body));
         
         if (headers_sent()) {
-            throw new SimpleException('Headers already sent');
+            print 'Headers already sent';
+        } else {
+            http_response_code($response->code());
+
+            foreach ($response->headers() as $key => $value) {
+                header(sprintf('%s: %s', $key, $value));
+            }
         }
 
-        http_response_code($response->code());
-        
-        foreach ($response->headers() as $key => $value) {
-            header(sprintf('%s: %s', $key, $value));
-        }
-        
         print $response->body();
     }
 }

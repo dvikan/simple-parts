@@ -7,11 +7,13 @@ final class MemoryFile implements File
 {
     private $filePath;
     private $data;
+    private $modificationTime;
 
     public function __construct(string $filePath)
     {
         $this->filePath = $filePath;
         $this->data = '';
+        $this->modificationTime = time();
     }
 
     public function exists(): bool
@@ -27,11 +29,13 @@ final class MemoryFile implements File
     public function write(string $data): void
     {
         $this->data = $data;
+        $this->modificationTime = time();
     }
 
     public function append(string $data): void
     {
         $this->data .= $data;
+        $this->modificationTime = time();
     }
 
     public function name(): string
@@ -42,5 +46,11 @@ final class MemoryFile implements File
     public function delete(): void
     {
         $this->data = '';
+        $this->modificationTime = time();
+    }
+
+    public function modificationTime(): int
+    {
+        return $this->modificationTime;
     }
 }

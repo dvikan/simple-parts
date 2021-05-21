@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
+use PDO;
+
 final class FileCacheTest extends TestCase
 {
     private $sut;
@@ -37,7 +39,7 @@ final class FileCacheTest extends TestCase
         $this->assertSame(1, $this->sut->get('foo', 1));
     }
 
-    public function test_clear()
+    protected function test_clear()
     {
         $this->sut->set('foo1');
         $this->sut->set('foo2');
