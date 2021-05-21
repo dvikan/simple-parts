@@ -60,11 +60,7 @@ final class Request
     
     public function getAttribute(string $key)
     {
-        if (! isset($this->attributes[$key])) {
-            throw new \Exception(sprintf('Unknown request attribute: "%s"', $key));
-        }
-
-        return $this->attributes[$key];
+        return $this->attributes[$key] ?? null;
     }
     
     public function get(string $key, string $default = null): ?string

@@ -30,7 +30,7 @@ final class Response
 
     public function statusLine(): string
     {
-        return Http::STATUS_LINES[$this->code] ?? 'unknown status line: ' . $this->code;
+        return Http::STATUS_LINES[$this->code] ?? 'Unknown status code: ' . $this->code;
     }
 
     public function body(): string

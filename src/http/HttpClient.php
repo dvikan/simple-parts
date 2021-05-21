@@ -43,7 +43,6 @@ final class HttpClient
         $config = $this->config->merge($requestConfig);
 
         curl_reset($this->ch);
-
         curl_setopt($this->ch, CURLOPT_URL, $url);
         curl_setopt($this->ch, CURLOPT_HEADER, false);
         curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
@@ -58,16 +57,19 @@ final class HttpClient
         }
 
         $headers = [];
-        if (isset($config['auth_bearer'])) {
+        if (($config['auth_bearer'])) {
             $headers[] = sprintf('Authorization: Bearer %s', $config['auth_bearer']);
         }
 
-        if (isset($config['client_id'])) {
+        if (($config['client_id'])) {
             $headers[] = sprintf('client-id: %s', $config['client_id']);
         }
 
-        $value = array_merge($config['headers'], $headers);
-        curl_setopt($this->ch, CURLOPT_HTTPHEADER, $value);
+        $requestHeaders = [];
+        foreach (array_merge($config['headers'], $headers) as $key => $val) {
+            $requestHeaders[] = "$key: $val";
+        }
+        curl_setopt($this->ch, CURLOPT_HTTPHEADER, $requestHeaders);
 
         $responseHeaders = [];
 
