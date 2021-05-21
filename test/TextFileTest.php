@@ -78,7 +78,7 @@ final class TextFileTest extends TestCase
 
         $file1->write('');
     }
-    
+
     public function __destruct()
     {
         unlink($this->filePath);

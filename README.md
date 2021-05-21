@@ -34,17 +34,19 @@ Overview:
 * `Container`
 * `ErrorHandler`
 * `File`,`TextFile`,`MemoryFile`
+* `Application` (framework)  
 * `HttpClient`,`Request`,`Response`
 * `Json`
 * `Logger`,`SimpleLogger`,`Handler`,`CliHandler`,`FileHandler`
-* `Migrator`
-* `Renderer`
+* `Migrator` (database migrations)
+* `Renderer` (template engine)
 * `Router`  
 * `Session`
 * `Shell`
-* `TestRunner`
+* `TestRunner` (unit testing tool)
 
-All code resides under the namespace `dvikan\SimpleParts`.
+All code resides under `dvikan\SimpleParts` and throws `SimpleException`
+in case of failure.
 
 ## Cache
 
@@ -57,8 +59,6 @@ The underlying storage is a file. The cache is serialized as json.
 The cache is written to file when it is garbage-collected by php.
 
 ```php
-<?php
-
 $cache = new FileCache(new TextFile('./cache.json'));
 
 $cache->set('foo'); // boolean true
@@ -75,8 +75,6 @@ $cache->clear();
 
 The `Cache` interface:
 ```php
-<?php
-
 interface Cache
 {
     public function set(string $key, $value = true, int $ttl = 0): void;
@@ -94,9 +92,8 @@ interface Cache
 The clock component is useful in testing.
 
 Clock interface:
-```php
-<?php
 
+```php
 interface Clock
 {
     public function now(): \DateTimeImmutable;
@@ -104,9 +101,8 @@ interface Clock
 ```
 
 System clock:
-```php
-<?php
 
+```php
 $clock = new SystemClock();
 
 $now = $clock->now();
@@ -115,9 +111,8 @@ print $now->format('Y-m-d H:i:s'); // 2021-05-09 22:56:25
 ```
 
 Frozen clock:
-```php
-<?php
 
+```php
 $clock = new FrozenClock(new \DateTimeImmutable('1980-12-24'));
 
 print $clock->now()->format('Y-m-d H:i:s'); // 1980-12-24 00:00:00
@@ -138,8 +133,6 @@ Trying to grab a non-existing key results in an exception.
 The config values can be accessed with array syntax.
 
 ```php
-<?php
-
 $defaultConfig = [
     'env' => 'dev',
 ];
@@ -205,21 +198,13 @@ The resolved dependencies are cached.
 Only closures are allowed as values.
 
 ```php
-<?php
-
 $container = new Container();
 
-$container['http_client'] = function($container) {
-    return new HttpClient($container['http_client_config']);
+$container['http'] = function () {
+    return new HttpClient();
 };
 
-$container['http_client_config'] = function() {
-    return [
-        'timeout' => 5,
-    ];
-};
-
-$httpClient = $container['http_client'];
+$http = $container['http'];
 ```
 
 ## ErrorHandler
@@ -228,12 +213,7 @@ The error handler registers itself as php's error handler, exception handler and
 
 A logger MUST be provided.
 
-It is heavily inspired by
-[Monolog](https://github.com/Seldaek/monolog).
-
 ```php
-<?php
-
 $logger = new Logger('default', [new CliHandler()]);
 
 $_ = ErrorHandler::create($logger);
@@ -253,8 +233,6 @@ print $foo;
 TextFile is a standard file abstraction.
 
 ```php
-<?php
-
 $file = new TextFile('./diary.txt');
 
 $file->write('hello ');
@@ -271,15 +249,13 @@ if ($file->exists()) {
 Request is an abstraction over an http request.
 
 ```php
-<?php
-
 $request = Request::fromGlobals();
 
-print $request->method(); // request method
-print $request->uri(); // request uri
-print $request->get('non_existing'); // query param, defaults to NULL
-print $request->get('id', '42'); // query param, defaults to '42'
-print $request->post('user', 'anon'); // post param, defaults to 'anon'
+print $request->method(); // 'GET'
+print $request->uri(); // '/'
+print $request->get('foo'); // NULL
+print $request->get('id', '42'); // '42'
+print $request->post('user', 'anon'); // 'anon'
 ```
 
 ## Response
@@ -287,8 +263,6 @@ print $request->post('user', 'anon'); // post param, defaults to 'anon'
 Response is an abstraction over an http response.
 
 ```php
-<?php
-
 $response = new Response("Hello world\n", 200, ['Content-Type' => 'text/plain']);
 
 $response->send();
@@ -304,7 +278,7 @@ $response = new Response();
 $response = $response
     ->withHeader('foo', 'bar')
     ->withCode(201)
-    ->withJson(['message' => 'all is good'])
+    ->withJson(['message' => 'All is good'])
 ;
 
 $response->send();
@@ -315,29 +289,29 @@ $response->send();
 The http client can be configured at construction and when doing requests.
 
 Get request:
+
 ```php
 $client = new HttpClient();
 
 try {
-    $response = $client->get('https://example.com/non-existing');
+    $response = $client->get('https://example.com/');
 } catch (SimpleException $e) {
     print "Not 2xx\n";
 }
 ```
 
 Post request:
-```php
-<?php
 
+```php
 $client = new HttpClient();
 
-$response = $client->post('https://example.com/', ['body' => ['foo' => 'bar']]);
+$response = $client->post('https://example.com/', [
+    'body' => ['foo' => 'bar']]
+);
 ```
 
 Request:
 ```php
-<?php
-
 $client = new HttpClient();
 
 $response = $client->request('GET', 'https://example.com/', [
@@ -357,30 +331,19 @@ Config:
     'max_redirs'        => 5,
     'auth_bearer'       => null,
     'client_id'         => null,
-    'headers' => [],
-    'body' => null
+    'headers'           => [],
+    'body'              => null
 ]
 ```
 
 ## Json
 
-Json is mostly a wrapper that throws exception if the data fails to encode/decode as json.
+Json is wrapper that throws exception if the data fails to encode/decode as json.
 
 ```php
-<?php
-
-try {
-    $json = Json::encode(['message' => 'hello']);
-
-    print $json . "\n";
-
-    $array = Json::decode($json);
-
-    print_r($array);
-} catch (SimpleException $e) {
-    print $e->getMessage();
-}
+print Json::encode(['message' => 'hello']);
 ```
+
 ```
 $ php test.php
 {
@@ -393,16 +356,11 @@ Array
 ```
 ## Logger
 
-The logger is heavily inspired by
-[Monolog](https://github.com/Seldaek/monolog).
+The logger requires a name and an array of handlers.
+It has three log levels: `INFO`, `WARNING` and `ERROR`.
 
-It accepts an array of handlers. It has three log levels: `INFO`,`WARNING` and `ERROR`.
-
-
-
-Usage:
 ```php
-$logger = new SimpleLoggerLogger('default', [new CliHandler()]);
+$logger = new SimpleLogger('default', [new CliHandler()]);
 
 $logger->info('hello');
 $logger->warning('hello');
@@ -432,9 +390,8 @@ All handlers will receive a log item of the form:
 The migrator is for database migrations.
 
 Migrate migrations in `./migrations`:
-```php
-<?php
 
+```php
 $pdo = new \PDO('sqlite:application.db');
 
 $migrator = new Migrator($pdo, './migrations');
@@ -453,8 +410,6 @@ print implode("\n", $result) . "\n";
 Renderer is a template engine. `e` is a function that escapes for html context.
 
 ```php
-<?php 
-
 $renderer = new Renderer();
 
 print $renderer->render('./welcome.php', ['user' => 'bob']);
@@ -469,11 +424,8 @@ Hello <?= e($user) ?>
 
 Configuration:
 ```php
-<?php
-
 $renderer = new Renderer([
-    'templates' => './templates', // Templates folder
-    'extension' => 'tpl', // Default template file extension
+    'context' => [], // Default context
 ]);
 ```
 
@@ -482,25 +434,10 @@ $renderer = new Renderer([
 The router maps http requests to handlers.
 
 ```php
-<?php
-
 $router = new Router();
 
-$router->get('/', function() {
+$router->addRoute('GET', '/', function() {
     return 'index';
-});
-
-$router->post('/delete', function() {
-    return 'delete';
-});
-
-$router->map(['GET', 'POST'], '/update', function() {
-    return 'update';
-});
-
-$router->post('/delete/(\d+)', function(array $vars) {
-    $id = (int) $vars[0];
-    return 'id: ' . $id;
 });
 
 $route = $router->dispatch('GET', '/');
@@ -514,22 +451,19 @@ if ($route[0] === Router::METHOD_NOT_ALLOWED) {
 }
 
 $handler = $route[1];
-$args = $route[2];
 
-print $handler($args);
+print $handler();
 ```
 
 ## Session
 
-Session is a abstraction over `$_SESSION`.
+Session is an abstraction over `$_SESSION`.
 ```php
-<?php
-
 $session = new Session();
 
 $session->set('user', 'alice');
 
-print 'Hello, ' . $session->get('user', 'anon');
+print $session->get('user');
 ```
 
 ## Shell
@@ -537,8 +471,6 @@ print 'Hello, ' . $session->get('user', 'anon');
 Shell is an abstraction over `exec()`.
 
 ```php
-<?php
-
 $shell = new Shell();
 
 print $shell->execute('echo', ['hello', 'world']);
@@ -548,8 +480,6 @@ The arguments are escaped but you still need to make sure they are not parsed as
 
 You can sometimes use `--`, otherwise validate the arguments manually.
 ```php
-<?php
-
 $shell = new Shell();
 
 print $shell->execute('git clone --', [$userInput]);
@@ -563,18 +493,17 @@ Tests are assumed to be located in `./test`.
 Example:
 
 ```php
-<?php
-
-use dvikan\SimpleParts\TestCase;
-
 class FooTest extends TestCase
 {
     function test()
     {
-        $this->assert(1 === 1);
+        $this->assert(true);
         $this->assertSame(1, 2);
     }
 }
+```
+```
+./vendor/bin/test
 ```
 
 ## Development
