@@ -43,6 +43,10 @@ interface Http
     // content types
     public const APPLICATION_JSON = 'application/json';
 
-    // response headers
-    public const CONTENT_LENGTH = 'content-length';
+    // headers
+    public const IF_MODIFIED_SINCE  = 'if-modified-since';
+    public const IF_NONE_MATCH      = 'if-none-match';
+    public const ETAG               = 'etag';
+    public const CONTENT_LENGTH     = 'content-length';
+    public const LAST_MODIFIED      = 'last-modified';
 }
