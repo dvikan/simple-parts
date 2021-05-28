@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
-$autoload = __DIR__ . '/../vendor/autoload.php';
-
-if (file_exists($autoload)) {
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     // Installed as project
-    require $autoload;
+    require __DIR__ . '/../vendor/autoload.php';
+} else {
+    // Installed as dependency
+    require __DIR__ . '/../../autoload.php';
 }
 
 ErrorHandler::create(new SimpleLogger('test', [new CliHandler()]));

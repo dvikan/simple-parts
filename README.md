@@ -28,6 +28,10 @@ Other reasons:
 
 All code resides under `dvikan\SimpleParts` and in case of failure throws `SimpleException`.
 
+## Installation
+
+`composer require dvikan/simple-parts`
+
 ## FileCache
 
 ```php
