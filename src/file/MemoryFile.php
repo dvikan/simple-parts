@@ -21,9 +21,14 @@ final class MemoryFile implements File
         return $this->filePath;
     }
 
+    public function getBaseName(): string
+    {
+        return pathinfo($this->filePath, PATHINFO_FILENAME);
+    }
+
     public function getExtension(): string
     {
-        return '';
+        return pathinfo($this->filePath, PATHINFO_EXTENSION);
     }
 
     public function getRealPath(): string

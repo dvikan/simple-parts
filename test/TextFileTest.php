@@ -19,6 +19,11 @@ final class TextFileTest extends TestCase
         $this->assert($this->sut->exists());
         $this->assertSame($this->filePath, $this->sut->getRealPath());
         $this->assertSame('', $this->sut->read());
+
+        $file = new TextFile('/tmp/test.txt');
+        $this->assertSame('test.txt', $file->getFileName());
+        $this->assertSame('test', $file->getBaseName());
+        $this->assertSame('txt', $file->getExtension());
     }
 
     function test_write()
