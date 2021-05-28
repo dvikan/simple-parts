@@ -25,6 +25,11 @@ final class TextFile implements File
         return basename($this->filePath);
     }
 
+    public function getExtension(): string
+    {
+        return pathinfo($this->filePath, PATHINFO_EXTENSION);
+    }
+
     public function getRealPath(): string
     {
         return realpath($this->filePath);

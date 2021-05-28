@@ -7,6 +7,8 @@ interface File
 {
     public function getFileName(): string;
 
+    public function getExtension(): string;
+
     public function getRealPath(): string;
 
     public function exists(): bool;
