@@ -16,6 +16,16 @@ final class MemoryFile implements File
         $this->modificationTime = time();
     }
 
+    public function getFileName(): string
+    {
+        return $this->filePath;
+    }
+
+    public function getRealPath(): string
+    {
+        return $this->filePath;
+    }
+
     public function exists(): bool
     {
         return true;
@@ -38,18 +48,13 @@ final class MemoryFile implements File
         $this->modificationTime = time();
     }
 
-    public function name(): string
-    {
-        return $this->filePath;
-    }
-
     public function delete(): void
     {
         $this->data = '';
         $this->modificationTime = time();
     }
 
-    public function modificationTime(): int
+    public function getModificationTime(): int
     {
         return $this->modificationTime;
     }

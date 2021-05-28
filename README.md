@@ -4,12 +4,9 @@
 
 Surprisingly simple components!
 
-These components are intentionally smaller and simpler than usual.
+These components are intentionally simpler than usual.
 
-We advise you to actually read the code of a component you want to use because
-they are so small and simple.
-
-There are some code samples below on basic usage. The code itself is the documentation.
+I suggest that you read each component in its entirety.
 
 The name is inspired by Crockford's book *Javascript: The Good Parts*.
 
@@ -28,69 +25,6 @@ Other reasons:
 * We are less exposed to a [supply chain attack](https://blog.sonarsource.com/php-supply-chain-attack-on-composer)  
 * Smaller and simpler components have less defects and vulnerabilities
 * We suffer from the NIH-syndrome (not-invented-here)
-
-## File tree
-
-```bash
-$ tree src
-src
-├── cache
-│   ├── Cache.php
-│   ├── FileCache.php
-│   ├── MemoryCache.php
-│   ├── NullCache.php
-│   └── SqliteCache.php
-├── clock
-│   ├── Clock.php
-│   ├── FrozenClock.php
-│   └── SystemClock.php
-├── common
-│   └── common.php
-├── config
-│   └── Config.php
-├── console
-│   └── Console.php
-├── container
-│   └── Container.php
-├── error-handler
-│   └── ErrorHandler.php
-├── file
-│   ├── File.php
-│   ├── MemoryFile.php
-│   └── TextFile.php
-├── framework
-│   └── Application.php
-├── http
-│   ├── CurlHttpClient.php
-│   ├── HttpClient.php
-│   ├── Http.php
-│   ├── Request.php
-│   └── Response.php
-├── json
-│   └── Json.php
-├── logger
-│   ├── CliHandler.php
-│   ├── FileHandler.php
-│   ├── Handler.php
-│   ├── Logger.php
-│   └── SimpleLogger.php
-├── migrator
-│   └── Migrator.php
-├── renderer
-│   └── Renderer.php
-├── router
-│   └── Router.php
-├── session
-│   └── Session.php
-├── shell
-│   └── Shell.php
-└── test-runner
-    ├── AssertionFailure.php
-    ├── TestCase.php
-    └── TestRunner.php
-
-18 directories, 36 files
-```
 
 All code resides under `dvikan\SimpleParts` and in case of failure throws `SimpleException`.
 
@@ -322,12 +256,12 @@ print $shell->execute('echo', ['hello', 'world']);
 ## TestRunner
 
 ```php
-class FooTest extends TestCase
+final class FooTest extends TestCase
 {
-    function test()
+    public function test()
     {
         $this->assert(true);
-        $this->assertSame(1, 2);
+        $this->assertSame(1, 1);
     }
 }
 ```

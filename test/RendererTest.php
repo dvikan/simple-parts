@@ -18,11 +18,11 @@ final class RendererTest extends TestCase
     {
         $this->file->write('foo <?= $bar ?>');
 
-        $this->assertSame('foo bar', $this->sut->render($this->file->name(), ['bar' => 'bar']));
+        $this->assertSame('foo bar', $this->sut->render($this->file->getRealPath(), ['bar' => 'bar']));
     }
 
     public function __destruct()
     {
-        unlink($this->file->name());
+        $this->file->delete();
     }
 }

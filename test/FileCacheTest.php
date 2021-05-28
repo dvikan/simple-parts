@@ -50,7 +50,7 @@ final class FileCacheTest extends TestCase
         $this->assertSame(null, $this->sut->get('foo2'));
     }
 
-    public function test_expire()
+    protected function test_expire()
     {
         $clock = new FrozenClock(new \DateTimeImmutable());
         $sut = new FileCache(new MemoryFile('./foo'), $clock);

@@ -3,64 +3,59 @@ declare(strict_types=1);
 
 namespace dvikan\SimpleParts;
 
+use GlobIterator;
+use PDO;
+
 final class Migrator
 {
+    private $migrations;
     private $pdo;
-    private $migrationsFolder;
-    private $cacheFolder;
+    private $cache;
 
     public function __construct(
-        \PDO $pdo,
-        string $migrationsFolder = './',
-        string $cacheFolder = './'
+        PDO $pdo,
+        string $migrations = './migrations'
     ) {
         $this->pdo = $pdo;
-        $this->migrationsFolder = $migrationsFolder;
-        $this->cacheFolder = $cacheFolder;
+        $this->migrations = $migrations;
+        $this->cache = new SqliteCache('migrations', $this->pdo);
     }
 
     public function migrate(): array
     {
-        if (! is_dir($this->migrationsFolder)) {
-            throw new SimpleException(sprintf('Not a folder: "%s"', $this->migrationsFolder));
+        if (! is_dir($this->migrations)) {
+            throw new SimpleException(sprintf('Not a folder: "%s"', $this->migrations));
         }
 
-        if (! is_dir($this->cacheFolder)) {
-            throw new SimpleException(sprintf('Not a folder: "%s"', $this->cacheFolder));
-        }
-
-        $result = [];
-
-        $migrations = glob($this->migrationsFolder . '/*.sql');
-
-        if ($migrations === false) {
-            throw new SimpleException(sprintf('Error reading migrations folder: "%s"', $this->migrationsFolder));
+        $migrations = [];
+        foreach (new GlobIterator($this->migrations . '/*.sql') as $fileInfo) {
+            $migrations[] = new TextFile($fileInfo->getPathname());
         }
 
         if ($migrations === []) {
-            throw new SimpleException(sprintf('The migrations folder is empty: "%s"', $this->migrationsFolder));
+            throw new SimpleException(sprintf('The migrations folder is empty: "%s"', $this->migrations));
         }
 
-        $cache = new FileCache(new TextFile($this->cacheFolder . '/migrations.json'));
+        usort($migrations, function (File $a, File $b) {
+            return $a->getFileName() <=> $b->getFileName();
+        });
+
+        $result = [];
 
         foreach ($migrations as $migration) {
-            $file = new TextFile($migration);
-
-            $fileName = basename($migration);
-
-            if ($cache->get($fileName, false)) {
+            if ($this->cache->get($migration->getFileName())) {
                 continue;
             }
 
-            $sql = $file->read();
-
-            if ($this->pdo->exec($sql) === false) {
-                throw new SimpleException(sprintf('%s: %s', $fileName, $this->pdo->errorInfo()[2]));
+            $this->pdo->beginTransaction();
+            if ($this->pdo->exec($migration->read()) === false) {
+                throw new SimpleException(sprintf('%s: %s', $migration->getFileName(), $this->pdo->errorInfo()[2]));
             }
+            $this->pdo->commit();
 
-            $result[] = sprintf('Migrated "%s"', $fileName);
+            $result[] = sprintf('Migrated "%s"', $migration->getFileName());
 
-            $cache->set($fileName);
+            $this->cache->set($migration->getFileName());
         }
 
         return $result;

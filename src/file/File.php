@@ -5,11 +5,13 @@ namespace dvikan\SimpleParts;
 
 interface File
 {
-    public function name(): string;
+    public function getFileName(): string;
+
+    public function getRealPath(): string;
 
     public function exists(): bool;
 
-    public function modificationTime(): int;
+    public function getModificationTime(): int;
 
     public function read(): string;
 

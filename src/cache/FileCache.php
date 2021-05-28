@@ -6,14 +6,12 @@ namespace dvikan\SimpleParts;
 final class FileCache implements Cache
 {
     private $file;
-    private $clock;
     private $isDirty;
     private $cache;
 
-    public function __construct(File $file, Clock $clock = null)
+    public function __construct(File $file)
     {
         $this->file = $file;
-        $this->clock = $clock ?? new SystemClock();
         $this->isDirty = false;
 
         if ($file->exists()) {
@@ -26,13 +24,18 @@ final class FileCache implements Cache
 
     public function set(string $key, $value = true, int $ttl = 0): void
     {
+        $this->isDirty = true;
+
+        if ($ttl === 0) {
+            $expiration = 0;
+        } else {
+            $expiration = time() + $ttl;
+        }
+
         $this->cache[$key] = [
             'value'             => $value,
-            'ttl'               => $ttl,
-            'created_at'        => $this->clock->now()->getTimestamp(),
+            'expiration'        => $expiration,
         ];
-
-        $this->isDirty = true;
     }
 
     public function get(string $key, $default = null)
@@ -41,28 +44,24 @@ final class FileCache implements Cache
             return $default;
         }
 
-        if ($this->cache[$key]['ttl'] === 0) {
+        if ($this->cache[$key]['expiration'] === 0 || $this->cache[$key]['expiration'] >= time()) {
             return $this->cache[$key]['value'];
         }
 
-        if ($this->cache[$key]['created_at'] + $this->cache[$key]['ttl'] < $this->clock->now()->getTimestamp()) {
-            unset($this->cache[$key]);
-            return $default;
-        }
-
-        return $this->cache[$key]['value'];
+        $this->delete($key);
+        return $default;
     }
 
     public function delete(string $key): void
     {
-        unset($this->cache[$key]);
         $this->isDirty = true;
+        unset($this->cache[$key]);
     }
 
     public function clear(): void
     {
-        $this->cache = [];
         $this->isDirty = true;
+        $this->cache = [];
     }
 
     public function __destruct()

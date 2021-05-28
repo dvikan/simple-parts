@@ -20,9 +20,14 @@ final class TextFile implements File
         }
     }
 
-    public function name(): string
+    public function getFileName(): string
     {
-        return $this->filePath;
+        return basename($this->filePath);
+    }
+
+    public function getRealPath(): string
+    {
+        return realpath($this->filePath);
     }
 
     public function exists(): bool
@@ -31,7 +36,7 @@ final class TextFile implements File
         return file_exists($this->filePath);
     }
 
-    public function modificationTime(): int
+    public function getModificationTime(): int
     {
         clearstatcache();
         $stat = stat($this->filePath);

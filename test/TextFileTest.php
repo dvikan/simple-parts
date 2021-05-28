@@ -17,7 +17,7 @@ final class TextFileTest extends TestCase
     function test()
     {
         $this->assert($this->sut->exists());
-        $this->assertSame($this->filePath, $this->sut->name());
+        $this->assertSame($this->filePath, $this->sut->getRealPath());
         $this->assertSame('', $this->sut->read());
     }
 
@@ -81,6 +81,6 @@ final class TextFileTest extends TestCase
 
     public function __destruct()
     {
-        unlink($this->filePath);
+        $this->sut->delete();
     }
 }
