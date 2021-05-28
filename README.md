@@ -1,34 +1,39 @@
 # Simple Parts
 
-*PHP: The Simple Parts*
-
-Surprisingly simple components!
+Simpler components for building applications
 
 These components are intentionally simpler than usual.
 
 I suggest that you read each component in its entirety.
 
-The name is inspired by Crockford's book *Javascript: The Good Parts*.
-
-## Why?
+### Why?
 
 Mostly as a personal learning exercise. The initial motivation was to create
 a framework like Slim, only slimmer.
 
 Other reasons:
 
-* We dislike depending on an endless amount of third-party packages
-* We dislike the endless amount of upgrades for third-party packages
-* We dislike monitoring third-party packages for vulnerabilities
-* We dislike learning existing frameworks
-* We dislike general-purpose frameworks
-* We are less exposed to a [supply chain attack](https://blog.sonarsource.com/php-supply-chain-attack-on-composer)  
+* I dislike depending on an endless amount of third-party packages
+* I dislike the endless amount of upgrades from third-party packages
+* I dislike monitoring third-party packages for vulnerabilities
+* I dislike learning existing frameworks
+* I dislike general-purpose frameworks
+* I am less exposed to a [supply chain attack](https://blog.sonarsource.com/php-supply-chain-attack-on-composer)  
 * Smaller and simpler components have less defects and vulnerabilities
-* We suffer from the NIH-syndrome (not-invented-here)
+* I suffer from the NIH-syndrome (not-invented-here)
 
-All code resides under `dvikan\SimpleParts` and in case of failure throws `SimpleException`.
+All code resides under the `dvikan\SimpleParts` namespace
+and in case of failure throws `SimpleException`.
 
-## Installation
+### Requirements
+
+* `php 7.3`
+* `ext-json`
+* `ext-mbstring`
+* `ext-curl`
+* `ext-pdo`
+
+### Installation
 
 `composer require dvikan/simple-parts`
 
@@ -259,6 +264,7 @@ print $shell->execute('echo', ['hello', 'world']);
 
 ## TestRunner
 
+Create `./test/FooTest.php`:
 ```php
 final class FooTest extends TestCase
 {
@@ -269,9 +275,8 @@ final class FooTest extends TestCase
     }
 }
 ```
-```
-./vendor/bin/test
-```
+
+Run tests: `./vendor/bin/test`
 
 ## Todo
 

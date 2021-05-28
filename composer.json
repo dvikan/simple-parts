@@ -1,7 +1,7 @@
 {
     "name": "dvikan/simple-parts",
-    "description": "Simple components for building applications",
-    "license": "MIT",
+    "description": "Simpler components for building applications",
+    "license": "GPL-3.0-or-later",
     "autoload": {
         "psr-4": {
             "dvikan\\SimpleParts\\": [
@@ -35,14 +35,11 @@
         "dvikan\\SimpleParts\\": "test"
       }
     },
-    "require-dev": {
-    },
-    "scripts": {
-    },
     "bin": [
       "bin/test"
     ],
     "require": {
+      "php" : ">=7.3",
       "ext-json": "*",
       "ext-mbstring": "*",
       "ext-curl": "*",
