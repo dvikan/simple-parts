@@ -12,7 +12,7 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     require __DIR__ . '/../../../autoload.php';
 }
 
-ErrorHandler::create(new SimpleLogger('test', [new CliHandler()]));
+ErrorHandler::create();
 
 $runner = new TestRunner();
 
