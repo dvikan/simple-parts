@@ -60,18 +60,19 @@ final class CurlHttpClient implements HttpClient
             curl_setopt($this->ch, CURLOPT_POSTFIELDS, $config['body']);
         }
 
-        $headers = [];
+        $headers = $config['headers'];
+
         if ($config['auth_bearer']) {
-            $headers[] = ['Authorization' => sprintf('Bearer %s', $config['auth_bearer'])];
+            $headers[HTTP::AUTHORIZATION] = sprintf('Bearer %s', $config['auth_bearer']);
         }
 
         if ($config['client_id']) {
-            $headers[] = ['client-id' => $config['client_id']];
+            $headers[HTTP::CLIENT_ID] = $config['client_id'];
         }
 
         $requestHeaders = [];
-        foreach (array_merge($config['headers'], $headers) as $key => $value) {
-            $requestHeaders[] = "$key: $value";
+        foreach ($headers as $key => $value) {
+            $requestHeaders[] = sprintf('%s: %s', $key, $value);
         }
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $requestHeaders);
 
@@ -100,15 +101,15 @@ final class CurlHttpClient implements HttpClient
             throw new SimpleException(sprintf('"%s" (%s)', curl_error($this->ch), curl_errno($this->ch)));
         }
 
-        $statusCode = curl_getinfo($this->ch, CURLINFO_RESPONSE_CODE);
+        $code = curl_getinfo($this->ch, CURLINFO_RESPONSE_CODE);
 
-        $response = new Response($body, $statusCode, $responseHeaders);
+        $response = new Response($body, $code, $responseHeaders);
 
         if ($response->ok()) {
             return $response;
         }
 
-        throw new SimpleException(sprintf("%s %s", $response->statusLine(), $url), $response->code());
+        throw new SimpleException(sprintf('%s %s', $response->getStatusLine(), $url), $response->getCode());
     }
 
     public function __destruct()

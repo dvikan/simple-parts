@@ -9,31 +9,46 @@ final class Response
     private $code;
     private $headers;
 
-    public function __construct(string $body = '', int $code = Http::OK, array $headers = [])
+    public function __construct(string $body = '', int $code = 200, array $headers = [])
     {
         $this->body = $body;
         $this->code = $code;
-        $this->headers = $headers; // todo: canonicalize
+        $this->headers = $headers;
     }
 
-    public function code(): int
+    public function getStatusLine(): string
+    {
+        return Http::STATUS_LINES[$this->code] ?? 'Unknown status code: ' . $this->code;
+    }
+
+    public function getCode(): int
     {
         return $this->code;
     }
 
     public function withCode(int $code): self
     {
-        $response = clone $this;
-        $response->code = $code;
-        return $response;
+        $this->code = $code;
+        return $this;
     }
 
-    public function statusLine(): string
+    public function getHeader(string $key, string $default = null): ?string
     {
-        return Http::STATUS_LINES[$this->code] ?? 'Unknown status code: ' . $this->code;
+        return $this->headers[$key] ?? $default;
     }
 
-    public function body(): string
+    public function getHeaders(): array
+    {
+        return $this->headers;
+    }
+
+    public function withHeader(string $key, string $value): self
+    {
+        $this->headers[$key] = $value;
+        return $this;
+    }
+
+    public function getBody(): string
     {
         return $this->body;
     }
@@ -45,26 +60,11 @@ final class Response
         return $response;
     }
 
-    public function header(string $key, string $default = null): ?string
-    {
-        return $this->headers[$key] ?? $default;
-    }
-
-    public function headers(): array
-    {
-        return $this->headers;
-    }
-
-    public function withHeader(string $key, string $value): self
+    public function withHeaders(array $headers): self
     {
         $response = clone $this;
-        $response->headers[$key] = $value;
+        $response->headers = array_merge($this->headers, $headers);
         return $response;
-    }
-
-    public function json(): array
-    {
-        return Json::decode($this->body);
     }
 
     public function withJson(array $data): self
@@ -73,6 +73,11 @@ final class Response
         return $response
             ->withHeader(Http::CONTENT_TYPE, Http::APPLICATION_JSON)
             ->withBody(Json::encode($data, JSON_PRETTY_PRINT));
+    }
+
+    public function json(): array
+    {
+        return Json::decode($this->body);
     }
 
     public function ok(): bool
@@ -102,13 +107,13 @@ final class Response
         if (headers_sent()) {
             print 'Headers already sent';
         } else {
-            http_response_code($response->code());
+            http_response_code($response->code);
 
-            foreach ($response->headers() as $key => $value) {
+            foreach ($response->headers as $key => $value) {
                 header(sprintf('%s: %s', $key, $value));
             }
         }
 
-        print $response->body();
+        print $response->body;
     }
 }

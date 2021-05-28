@@ -9,6 +9,8 @@ These components are intentionally smaller and simpler than usual.
 We advise you to actually read the code of a component you want to use because
 they are so small and simple.
 
+There are some code samples below on basic usage. The code itself is the documentation.
+
 The name is inspired by Crockford's book *Javascript: The Good Parts*.
 
 ## Why?
@@ -27,52 +29,81 @@ Other reasons:
 * Smaller and simpler components have less defects and vulnerabilities
 * We suffer from the NIH-syndrome (not-invented-here)
 
-## Overview
+## File tree
 
-* `Cache`
-* `Clock`
-* `Config`
-* `Console`
-* `Container`
-* `ErrorHandler`
-* `File`
-* `Application` (web framework)  
-* `HttpClient`
-* `Json`
-* `Logger`
-* `Migrator` (database migrations)
-* `Renderer` (template engine)
-* `Router`  
-* `Session`
-* `Shell`
-* `TestRunner` (unit testing)
+```bash
+$ tree src
+src
+├── cache
+│   ├── Cache.php
+│   ├── FileCache.php
+│   ├── MemoryCache.php
+│   ├── NullCache.php
+│   └── SqliteCache.php
+├── clock
+│   ├── Clock.php
+│   ├── FrozenClock.php
+│   └── SystemClock.php
+├── common
+│   └── common.php
+├── config
+│   └── Config.php
+├── console
+│   └── Console.php
+├── container
+│   └── Container.php
+├── error-handler
+│   └── ErrorHandler.php
+├── file
+│   ├── File.php
+│   ├── MemoryFile.php
+│   └── TextFile.php
+├── framework
+│   └── Application.php
+├── http
+│   ├── CurlHttpClient.php
+│   ├── HttpClient.php
+│   ├── Http.php
+│   ├── Request.php
+│   └── Response.php
+├── json
+│   └── Json.php
+├── logger
+│   ├── CliHandler.php
+│   ├── FileHandler.php
+│   ├── Handler.php
+│   ├── Logger.php
+│   └── SimpleLogger.php
+├── migrator
+│   └── Migrator.php
+├── renderer
+│   └── Renderer.php
+├── router
+│   └── Router.php
+├── session
+│   └── Session.php
+├── shell
+│   └── Shell.php
+└── test-runner
+    ├── AssertionFailure.php
+    ├── TestCase.php
+    └── TestRunner.php
+
+18 directories, 36 files
+```
 
 All code resides under `dvikan\SimpleParts` and in case of failure throws `SimpleException`.
 
-## Cache
+## FileCache
 
 ```php
 $cache = new FileCache(new TextFile('./cache.json'));
 
-$cache->get('foo'); // NULL
-$cache->get('foo', 'default'); // 'default'
-
-$cache->set('foo');
 $cache->set('foo', 'bar');
-$cache->set('foo', 'bar', 60);
-
+$cache->get('foo');
 $cache->delete('foo');
-
 $cache->clear();
 ```
-
-The `FileCache` is a persistent key-value store.
-
-Cache items have a ttl (time-to-live) specified in seconds from now. By default they never expire.
-
-The underlying storage is a file. The cache is serialized as json.
-
-The cache is written to file when it is garbage-collected by php.
 
 ## Clock
 
@@ -97,16 +128,8 @@ $customConfig = [
 
 $config = Config::fromArray($defaultConfig, $customConfig);
 
-print $config['env']; // prod
+print $config['env'];
 ```
-
-Config is an immutable wrapper around an array.
-
-Keys in the custom config MUST have default values in the default config.
-
-Trying to grab a non-existing key results in an exception.
-
-The config values can be accessed with array syntax.
 
 ## Console
 
@@ -134,52 +157,37 @@ $console->exit(1);
 +---------+---------+
 ```
 
-The console allows for some convenient printing of text, newlines and tables.
-
-Also useful is colored text and exit code.
-
-All methods support printf-style formatting.
-
 ## Container
 
 ```php
 $container = new Container;
 
-$container['http'] = function ($container) {
-    return new HttpClient;
+$container['foo'] = function($c) {
+    return new Foo($c['bar']);
 };
 
-$http = $container['http'];
+$container['bar'] = function() {
+    return new Bar;
+};
+
+$foo = $container['foo'];
 ```
-
-The container is a standard dependency container.
-
-Values that are not closures are stored as is.
-
-The stacktrace is passed to the logger in the context.
 
 ## ErrorHandler
 
 ```php
-$logger = new Logger('default', [new CliHandler]);
-
-ErrorHandler::create($logger);
+ErrorHandler::create();
 
 print $foo;
 ```
 ```
-[2021-05-10 02:18:56] default.INFO E_NOTICE: Undefined variable: foo at /home/u/simple-parts/test.php line 11 {
+default.ERROR Uncaught Exception ErrorException: Undefined variable: foo at /home/u/repos/simple-parts/test2.php line 13 {
     "stacktrace": [
-        "/home/u/simple-parts/test.php:11"
+        "/home/u/repos/simple-parts/test2.php:13",
+        "/home/u/repos/simple-parts/test2.php:13"
     ]
 }
 ```
-
-The error handler registers itself as php's error handler, exception handler and shutdown function.
-
-A logger MUST be provided.
-
-All php errors are converted to exceptions.
 
 ## TextFile
 
@@ -195,21 +203,16 @@ if ($file->exists()) {
 }
 ```
 
-TextFile is a standard file abstraction.
-
 ## Request
 
 ```php
 $request = Request::fromGlobals();
 
-print $request->method(); // 'GET'
-print $request->uri(); // '/'
-print $request->get('foo'); // NULL
-print $request->get('id', '42'); // '42'
-print $request->post('user', 'anon'); // 'anon'
+print $request->method();
+print $request->uri();
+print $request->get('foo');
+print $request->post('user');
 ```
-
-Request is an abstraction over an http request.
 
 ## Response
 
@@ -219,9 +222,7 @@ $response = new Response('Hello world', 200, ['Content-Type' => 'text/plain']);
 $response->send();
 ```
 
-Response is an abstraction over an http response.
-
-## HttpClient
+## CurlHttpClient
 
 ```php
 $client = new CurlHttpClient;
@@ -236,28 +237,23 @@ try {
 ## Json
 
 ```php
-print Json::encode(['message' => 'hello']);
+print Json::encode(['foo' => 'bar']);
 ```
-
-Json is wrapper that throws exception if the data fails to encode/decode as json.
 
 ## Logger
 
 ```php
 $logger = new SimpleLogger('default', [new CliHandler()]);
 
-$logger->info('hello');
-$logger->warning('hello');
-$logger->error('hello');
+$logger->info('foo');
+$logger->warning('foo');
+$logger->error('bar');
 ```
 ```
-[2021-05-10 03:23:53] default.INFO hello []
-[2021-05-10 03:23:53] default.WARNING hello []
-[2021-05-10 03:23:53] default.ERROR hello []
+default.INFO foo []
+default.WARNING foo []
+default.ERROR bar []
 ```
-
-The logger requires a name and an array of handlers.
-It has three log levels: `INFO`, `WARNING` and `ERROR`.
 
 ## Migrator
 
@@ -275,10 +271,6 @@ if ($result === []) {
 print implode("\n", $result) . "\n";
 ```
 
-The migrator is for database migrations.
-
-Migrate migrations in `./migrations`:
-
 ## Renderer
 
 ```php
@@ -288,12 +280,10 @@ print $renderer->render('./welcome.php', ['user' => 'bob']);
 ```
 
 ```php
-<?php namespace dvikan\SimpleParts; ?>
+<?php use function dvikan\SimpleParts\e; ?>
 
 Hello <?= e($user) ?>
 ```
-
-Renderer is a template engine. `e` is a function that escapes for html context.
 
 ## Router
 
@@ -311,8 +301,6 @@ $handler = $route[1];
 print $handler();
 ```
 
-The router maps http requests to handlers.
-
 ## Session
 
 ```php
@@ -323,25 +311,12 @@ $session->set('user', 'alice');
 print $session->get('user');
 ```
 
-Session is an abstraction over `$_SESSION`.
-
 ## Shell
 
 ```php
 $shell = new Shell();
 
 print $shell->execute('echo', ['hello', 'world']);
-```
-
-Shell is an abstraction over `exec()`.
-
-The arguments are escaped but you still need to make sure they are not parsed as command options.
-
-You can sometimes use `--`, otherwise validate the arguments manually.
-```php
-$shell = new Shell();
-
-print $shell->execute('git clone --', [$userInput]);
 ```
 
 ## TestRunner
@@ -359,16 +334,6 @@ class FooTest extends TestCase
 ```
 ./vendor/bin/test
 ```
-
-The test runner is a tool for creating unit tests. Tests must inherit from `TestCase`.
-
-Tests are assumed to be located in `./test`.
-
-## Development
-
-Install `composer create-project dvikan/simple-parts`
-
-Run tests: `./bin/test`
 
 ## Todo
 

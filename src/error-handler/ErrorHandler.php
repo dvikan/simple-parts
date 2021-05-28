@@ -49,11 +49,11 @@ final class ErrorHandler
         // noop
     }
 
-    public static function create(SimpleLogger $logger): self
+    public static function create(SimpleLogger $logger = null): self
     {
         $handler = new self();
 
-        $handler->logger = $logger;
+        $handler->logger = $logger ?? new SimpleLogger('default', [new CliHandler]);
 
         set_error_handler(          [$handler, 'handleError']);
         set_exception_handler(      [$handler, 'handleException']);
@@ -100,7 +100,7 @@ final class ErrorHandler
         if (! $lastError) {
             return;
         }
-
+        
         $codeString = self::ERROR_MAP[$lastError['type']] ?? 'Unknown PHP error';
 
         $this->logger->log(

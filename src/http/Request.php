@@ -74,7 +74,10 @@ final class Request
 
     public function post(string $key, string $default = null): ?string
     {
-        return $this->post[$key] ?? $default;
+        if (isset($this->post[$key]) && is_string($this->post[$key])) {
+            return $this->post[$key];
+        }
+        return $default;
     }
 
     public function server(string $key, string $default = null): ?string

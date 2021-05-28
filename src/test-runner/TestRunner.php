@@ -20,6 +20,10 @@ final class TestRunner
 
     public function run(int $argc, array $argv)
     {
+        if (file_exists('vendor/autoload.php')) {
+            require 'vendor/autoload.php';
+        }
+
         $testFolder = $argv[1] ?? './test/';
 
         foreach (glob($testFolder . '*.php') as $filePath) {

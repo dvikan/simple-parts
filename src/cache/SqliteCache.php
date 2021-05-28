@@ -15,16 +15,7 @@ final class SqliteCache implements Cache
 
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
-
-        $this->pdo->query(<<<'SQL'
-CREATE TABLE if not exists cache (
-    id integer primary key autoincrement,
-    key text,
-    value text,
-    expiration text
-)
-SQL
-);
+        $this->pdo->query('CREATE TABLE if not exists cache (id integer primary key, key text, value text, expiration text)');
     }
 
     public function set(string $key, $value = true, int $ttl = 0): void
@@ -35,17 +26,10 @@ SQL
             $expiration = time() + $ttl;
         }
 
-        $stmt = $this->pdo->prepare('select key from cache where key=?');
-        $stmt->execute([$key]);
-        $result = $stmt->fetch();
+        $this->delete($key);
 
-        if ($result) {
-            $stmt = $this->pdo->prepare('update cache set value = ?, expiration = ? where key = ?');
-            $stmt->execute([Json::encode($value), $expiration, $key]);
-        } else {
-            $stmt = $this->pdo->prepare('insert into cache (key, value, expiration) values (?, ?, ?)');
-            $stmt->execute([$key, Json::encode($value), $expiration]);
-        }
+        $stmt = $this->pdo->prepare('insert into cache (key, value, expiration) values (?, ?, ?)');
+        $stmt->execute([$key, Json::encode($value), $expiration]);
     }
 
     public function get(string $key, $default = null)

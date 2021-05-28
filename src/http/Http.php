@@ -37,16 +37,17 @@ interface Http
         self::SERVICE_UNAVAILABLE   => '503 Service Unavailable',
     ];
 
+    // headers
     public const CONTENT_TYPE       = 'content-type';
     public const LOCATION           = 'location';
-
-    // content types
-    public const APPLICATION_JSON = 'application/json';
-
-    // headers
     public const IF_MODIFIED_SINCE  = 'if-modified-since';
     public const IF_NONE_MATCH      = 'if-none-match';
     public const ETAG               = 'etag';
     public const CONTENT_LENGTH     = 'content-length';
     public const LAST_MODIFIED      = 'last-modified';
+    public const AUTHORIZATION      = 'authorization';
+    public const CLIENT_ID          = 'client-id';
+
+    // content types
+    public const APPLICATION_JSON = 'application/json';
 }
